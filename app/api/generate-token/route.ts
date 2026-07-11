@@ -145,7 +145,7 @@ export async function POST(req: Request) {
         const response = NextResponse.json(result.data);
         response.headers.set('X-Cache', result.cached ? 'HIT' : 'MISS');
         return response;
-      } catch (err) {
+      } catch (err: any) {
         console.warn('[generate-token] AI failed, using mock fallback:', err);
         return NextResponse.json(getMockToken(prompt));
       }
