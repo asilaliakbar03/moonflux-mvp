@@ -6,9 +6,9 @@ import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { clusterApiUrl } from "@solana/web3.js";
 
-// Use your Helius RPC URL from env var, fallback to public mainnet
+// Use your Helius RPC URL from env var, fallback to public devnet
 const RPC_ENDPOINT =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? clusterApiUrl("mainnet-beta");
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? clusterApiUrl("devnet");
 
 interface SolanaProviderProps {
   children: ReactNode;
