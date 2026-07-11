@@ -6,7 +6,7 @@ import idl from './idl.json';
 // ── Program constants ─────────────────────────────────────────────────────────
 // Replace this with the real deployed program ID after `anchor deploy`
 export const PROGRAM_ID = new PublicKey(
-  process.env.NEXT_PUBLIC_PROGRAM_ID ?? '8vkiPVrCriVX2YPtmEPLh37odLCdEiT49VBgyrXkqKbS'
+  process.env.NEXT_PUBLIC_PROGRAM_ID ?? 'DrVK92avUZvKHbyxd3StwX9c3zkZf5nDNoBrgU32e1NE'
 );
 
 // IMPORTANT: Replace this with your actual treasury wallet public key before mainnet
@@ -20,8 +20,8 @@ export function getMoonfluxProgram(connection: Connection, wallet: any): Program
     commitment: 'confirmed',
     preflightCommitment: 'confirmed',
   });
-  // Pass address explicitly as string — Anchor 0.30 accepts string | PublicKey as 2nd arg
-  return new Program(idl as unknown as Idl, PROGRAM_ID.toBase58(), provider);
+  // Address is read from idl.address — Anchor 0.30 only accepts (idl, provider)
+  return new Program(idl as unknown as Idl, provider);
 }
 
 // ── PDA derivations ───────────────────────────────────────────────────────────
