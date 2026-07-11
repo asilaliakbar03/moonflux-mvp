@@ -127,3 +127,46 @@ Rank tokens by fit for this user. Consider: their viewing/buying history, stated
 
   return NextResponse.json(getMockFeed(body.preferences));
 }
+
+export async function GET(req: NextRequest) {
+  if (isAIConfigured()) {
+    try {
+      const result = await aiGenerate<PersonalizedFeedResponse>({
+        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Solana traders.
+
+Respond with a JSON object containing these fields:
+- "tokens" (array of 4-6 objects): Each token object contains:
+  - "id" (string): must be one of the exact token IDs from the token universe list provided in the prompt
+  - "matchScore" (integer 0-100): personalization fit score
+  - "urgencySignal" (string): one of "Buy Window", "Watch", "Avoid", "Strong Buy" — "Buy Window" = entry opportunity open now, "Watch" = monitor but not urgent, "Avoid" = risk too high, "Strong Buy" = strong conviction
+  - "matchReasons" (array of 2-3 strings): specific reasons this token matches this user (15 words max each)
+  - "explanation" (string): 1-2 sentences in crypto-native voice explaining why this token is recommended for this specific user
+- "profileTag" (string): a creative 2-3 word label for this trader's style, e.g. "Degen Ape", "Diamond Hand Maxi", "AI-First Trader"
+- "insight" (string): 1 strategic sentence — what should this trader focus on right now based on their profile and the current market?`,
+        prompt: `User Profile:
+- Wallet: anonymous
+- Recently viewed tokens: none
+- Recently bought tokens: none
+- Stated preferences: {}
+
+Token Universe (select 4-6 tokens to recommend, use exact IDs):
+${TOKEN_UNIVERSE.map(t => `- ${t.id}: ${t.name} (${t.ticker}) — ${t.category}, ${t.change} 24h, ${t.status}, risk: ${t.risk}`).join('\n')}
+
+Rank tokens by fit for this user. Consider: their viewing/buying history, stated preferences, current narrative momentum, and risk tolerance inferred from their history. Give specific, personalized reasons — not generic ones. The urgencySignal must reflect actual current market conditions.`,
+        model: MODELS.FAST,
+        temperature: 0.3,
+        maxTokens: 400,
+        cacheTtlMs: 300000,
+      });
+
+      return NextResponse.json(result.data, {
+        headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' },
+      });
+    } catch (err) {
+      console.warn('[personalized-feed] AI failed, using mock:', err);
+      return NextResponse.json(getMockFeed({}));
+    }
+  }
+
+  return NextResponse.json(getMockFeed({}));
+}
