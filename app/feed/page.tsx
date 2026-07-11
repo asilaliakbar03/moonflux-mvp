@@ -29,7 +29,11 @@ export default function FeedPage() {
   useEffect(() => {
     async function loadFeed() {
       try {
-        const res = await fetch('/api/personalized-feed');
+        const res = await fetch('/api/personalized-feed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
         const data = await res.json();
         
         // Enhance API data with some visual mock data for the UI
