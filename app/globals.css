@@ -1,142 +1,136 @@
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+/* ══════════════════════════════════════════════════════════════
+   MoonFluxx — "Midnight Indigo" Design System
+   Tailwind CSS v4 · globals.css
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── GOOGLE FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  /* ── EXISTING MF TOKENS (preserved) ── */
-  --color-mf-bg-primary: #000000;
-  --color-mf-bg-surface: #0a0a12;
-  --color-mf-bg-elevated: #12111f;
-  --color-mf-bg-hover: #1a1830;
 
-  --color-mf-ink: #f4f2ff;
-  --color-mf-dim: #6b6987;
-  --color-mf-dimmer: #35334a;
+  /* ── SURFACES ── */
+  --color-surface-base:  #080B12;
+  --color-surface-1:     #0D1117;
+  --color-surface-2:     #161B27;
+  --color-surface-3:     #1E2433;
+  --color-surface-4:     #252D3D;
+  --color-surface-hover: #2A3347;
 
-  --color-mf-violet: #7c3aed;
-  --color-mf-hot: #a855f7;
-  --color-mf-ice: #38bdf8;
-  --color-mf-flare: #c4b5fd;
+  /* ── TEXT ── */
+  --color-text-primary:   #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted:     #475569;
+  --color-text-faint:     #334155;
 
-  /* ── OBSIDIAN & LIQUID GOLD — flagship language ── */
-  --color-mf-gold: #e8b84b;      /* primary molten gold */
-  --color-mf-gold-hi: #ffe6a3;   /* highlight / champagne sheen */
-  --color-mf-gold-deep: #a9791f; /* shadowed gold for depth */
-  --color-mf-champagne: #f5e6c8; /* warm ivory */
-  --color-mf-obsidian: #050403;  /* warm-black surface */
+  /* ── BRAND INDIGO ── */
+  --color-indigo-50:  #EEF2FF;
+  --color-indigo-100: #E0E7FF;
+  --color-indigo-200: #C7D2FE;
+  --color-indigo-300: #A5B4FC;
+  --color-indigo-400: #818CF8;
+  --color-indigo-500: #6366F1;
+  --color-indigo-600: #4F46E5;
+  --color-indigo-700: #4338CA;
+  --color-indigo-800: #3730A3;
+  --color-indigo-900: #312E81;
 
-  --color-mf-danger: #ef4444;
-  --color-mf-success: #10b981;
-  --color-mf-warning: #f59e0b;
-
-  --color-mf-line: rgba(140, 90, 255, 0.13);
-  --color-mf-line-gold: rgba(232, 184, 75, 0.18);
-  --color-mf-glass: rgba(4, 3, 10, 0.75);
-
-  /* ── EXISTING CT TOKENS (preserved) ── */
-  --color-ct-surface: #131314;
-  --color-ct-surface-dim: #131314;
-  --color-ct-surface-container-lowest: #0e0e0f;
-  --color-ct-surface-container-low: #1c1b1c;
-  --color-ct-surface-container: #201f20;
-  --color-ct-surface-container-high: #2a2a2b;
-  --color-ct-surface-container-highest: #353436;
-  --color-ct-on-surface: #e5e2e3;
-  --color-ct-on-surface-variant: #d1c5b1;
-  --color-ct-outline: #9a907d;
-  --color-ct-outline-variant: #4e4636;
-  --color-ct-primary: #fff3e1;
-  --color-ct-on-primary: #3f2e00;
-  --color-ct-primary-container: #ffd369;
-  --color-ct-on-primary-container: #775a00;
-  --color-ct-primary-fixed-dim: #ecc159;
-  --color-ct-secondary: #e6feff;
-  --color-ct-secondary-container: #00f4fe;
-  --color-ct-secondary-fixed-dim: #00dce5;
-  --color-ct-tertiary-fixed-dim: #d0bcff;
-  --color-ct-surface-glass: rgba(20, 20, 22, 0.7);
-  --color-ct-border-low: rgba(255, 255, 255, 0.08);
-
-  /* ══════════════════════════════════════════════════════════════
-     PRO MAX DESIGN SYSTEM — Fintech/Crypto Profile
-     Domain: Trading floor × Cyberpunk terminal × Liquid gold
-     ══════════════════════════════════════════════════════════════ */
-
-  /* ── FOREGROUND (Text Hierarchy) ── */
-  --color-fg-primary: #F0ECE5;        /* primary text — warm off-white */
-  --color-fg-secondary: #A8A29E;      /* secondary — stone-400 */
-  --color-fg-tertiary: #78716C;       /* tertiary — stone-500 */
-  --color-fg-muted: #44403C;          /* muted — stone-700 */
-
-  /* ── BACKGROUND (Surface Elevation Scale) ── */
-  --color-bg-base: #0C0A14;           /* deepest — near-black with blue tint */
-  --color-bg-raised: #12101E;         /* cards, panels */
-  --color-bg-overlay: #1A1730;        /* dropdowns, modals */
-  --color-bg-elevated: #221F38;       /* highest elevation */
-  --color-bg-hover: #2A2650;          /* interactive hover */
-  --color-bg-active: #332E5C;         /* active/pressed */
-
-  /* ── BORDER (Separation Scale) ── */
-  --color-border-default: rgba(248, 211, 103, 0.08);   /* barely visible */
-  --color-border-subtle: rgba(248, 211, 103, 0.14);    /* card edges */
-  --color-border-strong: rgba(248, 211, 103, 0.25);    /* focus proximity */
-  --color-border-strongest: rgba(248, 211, 103, 0.45); /* focus rings */
-
-  /* ── BRAND (Liquid Gold) ── */
-  --color-brand-50: #FFFBEB;
-  --color-brand-100: #FEF3C7;
-  --color-brand-200: #FDE68A;
-  --color-brand-300: #FCD34D;
-  --color-brand-400: #FBBF24;
-  --color-brand-500: #F59E0B;         /* PRIMARY BRAND — Amber */
-  --color-brand-600: #D97706;
-  --color-brand-700: #B45309;
-  --color-brand-800: #92400E;
-  --color-brand-900: #78350F;
-
-  /* ── SEMANTIC (Status) ── */
-  --color-success-500: #22C55E;
-  --color-success-muted: rgba(34, 197, 94, 0.12);
-  --color-danger-500: #EF4444;
-  --color-danger-muted: rgba(239, 68, 68, 0.12);
-  --color-warning-500: #F59E0B;
+  /* ── SEMANTIC ── */
+  --color-success:       #10B981;
+  --color-success-light: #34D399;
+  --color-success-muted: rgba(16, 185, 129, 0.12);
+  --color-danger:        #F43F5E;
+  --color-danger-light:  #FB7185;
+  --color-danger-muted:  rgba(244, 63, 94, 0.12);
+  --color-warning:       #F59E0B;
   --color-warning-muted: rgba(245, 158, 11, 0.12);
-  --color-info-500: #06B6D4;          /* Cyan — data accent */
-  --color-info-muted: rgba(6, 182, 212, 0.12);
+  --color-cyan:          #06B6D4;
+  --color-cyan-muted:    rgba(6, 182, 212, 0.12);
 
-  /* ── ACCENT (Cyan Data) ── */
-  --color-accent: #06B6D4;
-  --color-accent-muted: rgba(6, 182, 212, 0.15);
-  --color-accent-glow: rgba(6, 182, 212, 0.35);
+  /* ── BORDERS ── */
+  --color-border-default: rgba(99, 102, 241, 0.10);
+  --color-border-subtle:  rgba(99, 102, 241, 0.18);
+  --color-border-strong:  rgba(99, 102, 241, 0.35);
+  --color-border-focus:   rgba(99, 102, 241, 0.60);
+
+  /* ── LEGACY TOKENS (preserved for existing page references) ── */
+  --color-mf-bg-primary:  #080B12;
+  --color-mf-bg-surface:  #0D1117;
+  --color-mf-bg-elevated: #161B27;
+  --color-mf-bg-hover:    #1E2433;
+  --color-mf-ink:         #F1F5F9;
+  --color-mf-dim:         #94A3B8;
+  --color-mf-dimmer:      #475569;
+  --color-mf-violet:      #6366F1;
+  --color-mf-hot:         #818CF8;
+  --color-mf-ice:         #06B6D4;
+  --color-mf-flare:       #A5B4FC;
+  --color-mf-gold:        #F59E0B;
+  --color-mf-gold-hi:     #FCD34D;
+  --color-mf-gold-deep:   #D97706;
+  --color-mf-champagne:   #F1F5F9;
+  --color-mf-obsidian:    #080B12;
+  --color-mf-danger:      #F43F5E;
+  --color-mf-success:     #10B981;
+  --color-mf-warning:     #F59E0B;
+  --color-mf-line:        rgba(99, 102, 241, 0.12);
+  --color-mf-line-gold:   rgba(99, 102, 241, 0.18);
+  --color-mf-glass:       rgba(8, 11, 18, 0.85);
+
+  /* ── CT TOKENS ── */
+  --color-ct-surface:                   #080B12;
+  --color-ct-surface-dim:               #080B12;
+  --color-ct-surface-container-lowest:  #050709;
+  --color-ct-surface-container-low:     #0D1117;
+  --color-ct-surface-container:         #161B27;
+  --color-ct-surface-container-high:    #1E2433;
+  --color-ct-surface-container-highest: #252D3D;
+  --color-ct-on-surface:                #F1F5F9;
+  --color-ct-on-surface-variant:        #94A3B8;
+  --color-ct-outline:                   #475569;
+  --color-ct-outline-variant:           rgba(99, 102, 241, 0.18);
+  --color-ct-primary:                   #818CF8;
+  --color-ct-primary-container:         #6366F1;
+  --color-ct-secondary:                 #06B6D4;
+  --color-ct-secondary-container:       #06B6D4;
+  --color-ct-secondary-fixed-dim:       #0891B2;
+  --color-ct-surface-glass:            rgba(8, 11, 18, 0.75);
+  --color-ct-border-low:               rgba(99, 102, 241, 0.10);
 
   /* ── FONTS ── */
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Exo 2', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-body-inter: 'Exo 2', 'Inter', sans-serif;
+  --font-display:    'Space Grotesk', sans-serif;
+  --font-body:       'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-mono:       'JetBrains Mono', monospace;
+  --font-heading:    'Space Grotesk', sans-serif;
+  --font-body-inter: 'Plus Jakarta Sans', sans-serif;
 
   /* ── MOTION ── */
-  --ease-mf: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 150ms;
+  --ease-mf:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast:   150ms;
   --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-slow:   400ms;
 
   /* ── RADIUS ── */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
   --radius-full: 9999px;
 
-  /* ── SHADOWS (Elevation) ── */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
-  --shadow-glow-gold: 0 0 20px rgba(245,158,11,0.15);
-  --shadow-glow-cyan: 0 0 20px rgba(6,182,212,0.15);
+  /* ── SHADOWS ── */
+  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg:           0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-card:         0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.10);
+  --shadow-elevated:     0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.15);
+  --shadow-glow-indigo:  0 0 20px rgba(99, 102, 241, 0.20);
+  --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.20);
+  --shadow-glow-gold:    0 0 20px rgba(245, 158, 11, 0.15);
+  --shadow-glow-cyan:    0 0 20px rgba(6, 182, 212, 0.15);
 }
 
 html {

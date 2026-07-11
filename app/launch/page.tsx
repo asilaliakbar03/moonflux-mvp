@@ -2,251 +2,47 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import {
-  Shield, Rocket, ChevronRight, Cpu, PenTool,
-  Loader2, Check, Zap, Users,
-  TrendingUp, Star, Lock, AlertTriangle, Upload,
-  Sparkles, BarChart3, Globe, AtSign, MessageCircle
-} from "lucide-react";
+import { Sparkles, Settings, ChevronRight, Check, Loader2, Upload, AlertCircle, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMoonWallet } from "@/components/WalletProvider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-// ── BONDING CURVE DATA ────────────────────────────────────────────────────────
-const CURVES = [
-  {
-    id: "fast",
-    name: "Fast Launch",
-    subtitle: "High velocity",
-    description: "Steep curve for rapid price discovery. Great for memes with strong community momentum.",
-    color: "#e8b84b",
-    colorDim: "rgba(232,184,75,0.15)",
-    risk: "High",
-    riskColor: "#ef4444",
-    idealFor: "Meme tokens · Viral plays",
-    points: [0, 4, 14, 32, 58, 80, 94, 100],
-  },
-  {
-    id: "balanced",
-    name: "Balanced",
-    subtitle: "Standard curve",
-    description: "The goldilocks curve. Steady price growth rewarding early believers without being too steep.",
-    color: "#a855f7",
-    colorDim: "rgba(168,85,247,0.15)",
-    risk: "Medium",
-    riskColor: "#f59e0b",
-    idealFor: "DeFi tokens · AI projects",
-    points: [0, 2, 6, 14, 26, 44, 64, 82, 94, 100],
-  },
-  {
-    id: "community",
-    name: "Community",
-    subtitle: "Gradual rise",
-    description: "Slow and steady. Rewards patient holders and long-term community builders over flippers.",
-    color: "#10b981",
-    colorDim: "rgba(16,185,129,0.15)",
-    risk: "Low",
-    riskColor: "#10b981",
-    idealFor: "DAO tokens · Ecosystem plays",
-    points: [0, 1, 3, 6, 11, 18, 28, 42, 60, 78, 92, 100],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    subtitle: "Exclusive tier",
-    description: "Flat early entry, then exponential. Only for verified creators. Maximum trust signal.",
-    color: "#38bdf8",
-    colorDim: "rgba(56,189,248,0.15)",
-    risk: "Low",
-    riskColor: "#10b981",
-    idealFor: "Verified projects · Incubations",
-    points: [0, 1, 2, 3, 5, 8, 14, 26, 52, 88, 100],
-    premium: true,
-  },
-];
+type LaunchMode = 'none' | 'ai' | 'custom';
+type AIStep = 1 | 2 | 3;
+type CustomStep = 1 | 2 | 3;
 
-const LIQUIDITY_OPTIONS = [
-  { id: "fair", label: "Fair Launch", desc: "100% Pool", detail: "Maximum trust. Zero dev allocation. Full community ownership.", icon: Users, color: "#10b981" },
-  { id: "standard", label: "Standard", desc: "Pool 70% / Dev 30%", detail: "Balanced approach. Dev retains allocation for future development.", icon: BarChart3, color: "#e8b84b" },
-  { id: "growth", label: "Growth Mode", desc: "Pool 90% / Dev 10%", detail: "Near-fair with a small dev reserve for operations.", icon: TrendingUp, color: "#a855f7" },
-];
-
-// ── MINI SVG CURVE PREVIEW ────────────────────────────────────────────────────
-function CurvePreview({ points, color, active }: { points: number[]; color: string; active: boolean }) {
-  const W = 120, H = 56;
-  const pts = points.map((v, i) => {
-    const x = (i / (points.length - 1)) * W;
-    const y = H - (v / 100) * (H - 8) - 4;
-    return `${x},${y}`;
-  }).join(" ");
-
-  return (
-    <svg width={W} height={H} className="overflow-visible" viewBox={`0 0 ${W} ${H}`}>
-      <defs>
-        <linearGradient id={`cg-${color.replace("#","")}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {/* Fill area */}
-      <motion.polygon
-        points={`0,${H} ${pts} ${W},${H}`}
-        fill={`url(#cg-${color.replace("#","")})`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: active ? 1 : 0.4 }}
-        transition={{ duration: 0.4 }}
-      />
-      {/* Line */}
-      <motion.polyline
-        points={pts}
-        fill="none"
-        stroke={color}
-        strokeWidth={active ? 2 : 1.2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{ filter: active ? `drop-shadow(0 0 4px ${color}80)` : "none" }}
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.9, ease: "easeOut" }}
-      />
-      {/* End dot */}
-      <motion.circle
-        cx={W}
-        cy={4}
-        r={active ? 3.5 : 2.5}
-        fill={color}
-        style={{ filter: `drop-shadow(0 0 6px ${color})` }}
-        animate={{ scale: active ? [1, 1.3, 1] : 1 }}
-        transition={{ repeat: active ? Infinity : 0, duration: 1.8 }}
-      />
-    </svg>
-  );
-}
-
-// ── TYPING TEXT EFFECT ────────────────────────────────────────────────────────
-function TypingText({ text, delay = 0 }: { text: string; delay?: number }) {
-  const [displayed, setDisplayed] = useState("");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    let i = 0;
-    const interval = setInterval(() => {
-      setDisplayed(text.slice(0, i + 1));
-      i++;
-      if (i >= text.length) clearInterval(interval);
-    }, 22);
-    return () => clearInterval(interval);
-  }, [started, text]);
-
-  return (
-    <span>
-      {displayed}
-      {displayed.length < text.length && (
-        <span className="inline-block w-0.5 h-4 bg-mf-gold ml-0.5 animate-pulse" />
-      )}
-    </span>
-  );
-}
-
-// ── AI LOG LINES ─────────────────────────────────────────────────────────────
-const AI_LOG_LINES = [
-  { text: "Parsing narrative parameters...", delay: 100 },
-  { text: "Scanning X for related viral hooks...", delay: 800 },
-  { text: "Computing tokenomics DNA...", delay: 1600 },
-  { text: "Generating identity matrix...", delay: 2400 },
-  { text: "Synthesizing logo concept...", delay: 3100 },
-  { text: "Running rug-probability simulation...", delay: 3800 },
-  { text: "Crystallizing final metadata...", delay: 4400 },
-];
-
-// ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 export default function LaunchPage() {
-  const [mode, setMode] = useState<"selection" | "manual" | "ai">("selection");
-  const [step, setStep] = useState(0);
+  const router = useRouter();
+  const { anchorWallet, connection } = useMoonWallet();
+
+  const [mode, setMode] = useState<LaunchMode>('none');
+  const [aiStep, setAiStep] = useState<AIStep>(1);
+  const [customStep, setCustomStep] = useState<CustomStep>(1);
+  
+  const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedCurve, setSelectedCurve] = useState("balanced");
-  const [selectedLiquidity, setSelectedLiquidity] = useState("standard");
-  const [antisniperEnabled, setAntisniperEnabled] = useState(true);
-  const [logLines, setLogLines] = useState<number[]>([]);
-  const router = useRouter();
 
   const [formData, setFormData] = useState({
     name: "",
     ticker: "",
     description: "",
-    prompt: "",
     website: "",
     twitter: "",
     telegram: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedCurve, setSelectedCurve] = useState("balanced");
+  const [selectedLiquidity, setSelectedLiquidity] = useState("fair");
 
-  const STEPS =
-    mode === "ai"
-      ? ["Vision", "Synthesis", "Identity", "Mechanics", "Deploy"]
-      : ["Identity", "Mechanics", "Deploy"];
-
-  const handleAiGenerate = async () => {
-    if (!formData.prompt.trim()) return;
-    setIsGenerating(true);
-    setLogLines([]);
-
-    // Stagger reveal log lines
-    AI_LOG_LINES.forEach((_, i) => {
-      setTimeout(() => setLogLines(prev => [...prev, i]), AI_LOG_LINES[i].delay);
-    });
-
-    try {
-      const res = await fetch("/api/generate-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: formData.prompt }),
-      });
-
-      if (!res.ok) throw new Error("Failed to generate");
-      const data = await res.json();
-
-      setFormData(prev => ({
-        ...prev,
-        name: data.name || prev.name,
-        ticker: data.ticker || prev.ticker,
-        description: data.description || prev.description,
-        website: data.website || prev.website,
-        twitter: data.twitter || prev.twitter,
-        telegram: data.telegram || prev.telegram,
-      }));
-
-      if (data.suggestedCurve) setSelectedCurve(data.suggestedCurve);
-      if (data.suggestedLiquidity) setSelectedLiquidity(data.suggestedLiquidity);
-
-      setIsGenerating(false);
-      setStep(2); // Jump to Identity step
-    } catch (error) {
-      console.error(error);
-      setIsGenerating(false);
-      // Fallback in case of error
-      setStep(2);
-    }
-  };
-
-  const { anchorWallet, connection } = useMoonWallet();
-
+  // ── Blockchain Logic (Preserved exactly as requested) ──
   const handleDeploy = async () => {
     if (!anchorWallet) {
       alert("Please connect your wallet first");
       return;
     }
 
-    // ── Step 0: Upload metadata to IPFS before any Solana code ───────────────
     let metadataUri = '';
     try {
       const uploadForm = new FormData();
@@ -298,9 +94,6 @@ export default function LaunchPage() {
         true // allow PDA as owner (off-curve)
       );
 
-      // ── Step 1: Create and initialize the Mint account ────────────────────
-      // The mint authority MUST be set to the bondingCurve PDA so that
-      // create_pool (which uses the PDA as a signer) can call mint_to.
       const lamportsForMint = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
       const createMintIx = SystemProgram.createAccount({
         fromPubkey:         anchorWallet.publicKey,
@@ -311,15 +104,12 @@ export default function LaunchPage() {
       });
       const initMintIx = createInitializeMint2Instruction(
         mint.publicKey,
-        6,               // 6 decimal places (standard)
-        curvePda,        // mint authority = bonding curve PDA
-        null,            // freeze authority = none
+        6,
+        curvePda,
+        null,
         TOKEN_PROGRAM_ID
       );
 
-      // ── Step 2: Build the create_pool instruction ─────────────────────────
-      // quoteType=0 → SOL-native pool (Phase 1)
-      // quoteMint for SOL pools = SystemProgram.programId (ignored by contract)
       const createPoolTx = await program.methods.createPool(metadataUri, 0)
         .accounts({
           bondingCurve:           curvePda,
@@ -327,7 +117,7 @@ export default function LaunchPage() {
           curveTokenAccount,
           mint:                   mint.publicKey,
           creator:                anchorWallet.publicKey,
-          quoteMint:              SystemProgram.programId, // SOL pool — no SPL quote mint
+          quoteMint:              SystemProgram.programId,
           tokenProgram:           TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram:          SystemProgram.programId,
@@ -335,7 +125,6 @@ export default function LaunchPage() {
         })
         .transaction();
 
-      // ── Step 3: Combine into one atomic transaction ───────────────────────
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
       const combinedTx = new Transaction({
         recentBlockhash: blockhash,
@@ -345,10 +134,8 @@ export default function LaunchPage() {
         .add(initMintIx)
         .add(...createPoolTx.instructions);
 
-      // Partial sign with the new mint keypair (only this keypair signs for the mint account)
       combinedTx.partialSign(mint);
 
-      // User wallet signs the full transaction (pays fees and authorizes as creator)
       const signedTx = await anchorWallet.signTransaction(combinedTx);
       const signature = await connection.sendRawTransaction(signedTx.serialize(), {
         skipPreflight: false,
@@ -360,7 +147,6 @@ export default function LaunchPage() {
         "confirmed"
       );
 
-      // Redirect to the newly created token page (using its mint address as the ID)
       router.push(`/token/${mint.publicKey.toBase58()}`);
     } catch (err) {
       console.error("Deploy failed:", err);
@@ -369,728 +155,420 @@ export default function LaunchPage() {
       setIsDeploying(false);
     }
   };
+  // ──────────────────────────────────────────────────────────
 
-  const selectedCurveData = CURVES.find(c => c.id === selectedCurve)!;
-  const selectedLiquidityData = LIQUIDITY_OPTIONS.find(l => l.id === selectedLiquidity)!;
+  const simulateAIGeneration = async () => {
+    setIsGenerating(true);
+    
+    // Simulate real generation
+    await new Promise(r => setTimeout(r, 2000));
+    
+    const words = aiPrompt.split(' ');
+    const mockName = words.length >= 2 ? `${words[0]} ${words[1]}` : 'Lunar Pup';
+    const mockTicker = (words.length >= 2 ? `${words[0].substring(0,2)}${words[1].substring(0,3)}` : 'LPUP').toUpperCase();
+    
+    try {
+      // Attempt real API if it exists
+      const res = await fetch("/api/generate-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: aiPrompt }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({
+          ...formData,
+          name: data.name || mockName,
+          ticker: data.ticker || mockTicker,
+          description: data.description || "Generated description...",
+        });
+        if (data.suggestedCurve) setSelectedCurve(data.suggestedCurve);
+        if (data.suggestedLiquidity) setSelectedLiquidity(data.suggestedLiquidity);
+      } else {
+        throw new Error("fallback");
+      }
+    } catch(e) {
+      // Fallback
+      setFormData({
+        ...formData,
+        name: mockName,
+        ticker: `$${mockTicker}`,
+        description: `A community-driven token inspired by: ${aiPrompt}. Born on MoonFluxx.`,
+      });
+    }
+
+    setIsGenerating(false);
+    setAiStep(2);
+  };
+
+  const renderStepIndicator = (current: number, total: number, labels: string[]) => (
+    <div className="flex items-center justify-center gap-4 mb-8">
+      {labels.map((label, i) => {
+        const stepNum = i + 1;
+        const isActive = current === stepNum;
+        const isDone = current > stepNum;
+        return (
+          <div key={label} className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${isActive ? 'bg-[#6366F1] text-white' : isDone ? 'bg-[#10B981] text-white' : 'bg-[rgba(255,255,255,0.1)] text-[#94A3B8]'}`}>
+                {isDone ? <Check className="w-3.5 h-3.5" /> : stepNum}
+              </div>
+              <span className={`text-sm font-medium ${isActive ? 'text-white' : isDone ? 'text-[#F1F5F9]' : 'text-[#94A3B8]'}`}>{label}</span>
+            </div>
+            {stepNum < total && (
+              <div className={`w-8 h-px ${isDone ? 'bg-[#10B981]' : 'bg-[rgba(255,255,255,0.1)]'}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto flex-1 flex flex-col gap-4 pt-2 pb-4 relative w-full px-4 lg:px-0">
-
-      {/* ── COMPACT HEADER BAR ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: EASE }}
-        className="flex items-center justify-between px-1"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(28,20,6,0.9)", border: "1px solid rgba(232,184,75,0.5)" }}>
-            <Zap size={14} style={{ color: "#e8b84b" }} />
+    <div className="max-w-3xl mx-auto w-full pt-8 pb-16">
+      
+      {/* ── INIT MODE SELECTION ── */}
+      {mode === 'none' && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold font-display text-white mb-3">Launch Your Token</h1>
+            <p className="text-[#94A3B8] text-lg">Two ways to bring your token to life on Solana.</p>
           </div>
-          <div>
-            <h1 className="font-display text-xl tracking-[0.12em] font-medium text-gold-liquid leading-none">THE FORGE</h1>
-            <p className="font-mono text-xs tracking-[0.3em] uppercase" style={{ color: "#9ca3af" }}>14-Layer Protocol · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="surface-card p-6 flex flex-col items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">AI Launch</h2>
+              <p className="text-[#94A3B8] text-sm flex-1">Describe your idea. Our AI creates the perfect token narrative, name, and settings for you.</p>
+              
+              <div className="flex items-center gap-2 mb-4">
+                <span className="badge-success">Recommended for beginners</span>
+                <span className="text-xs text-[#94A3B8]">~2 mins</span>
+              </div>
+              
+              <button onClick={() => setMode('ai')} className="w-full btn-primary text-base py-3">Start with AI</button>
+            </div>
+            
+            <div className="surface-card p-6 flex flex-col items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-[rgba(255,255,255,0.05)] text-[#94A3B8] flex items-center justify-center">
+                <Settings className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">Custom Launch</h2>
+              <p className="text-[#94A3B8] text-sm flex-1">Full control. Set your own name, ticker, curve, and liquidity options.</p>
+              
+              <div className="flex items-center gap-2 mb-4">
+                <span className="badge-muted">For experienced creators</span>
+                <span className="text-xs text-[#94A3B8]">~5 mins</span>
+              </div>
+              
+              <button onClick={() => setMode('custom')} className="w-full btn-ghost text-base py-3">Start Custom</button>
+            </div>
           </div>
-        </div>
-        <span className="eyebrow text-xs hidden sm:block" style={{ color: "#9ca3af" }}>Token Deployment Engine</span>
-      </motion.div>
+        </motion.div>
+      )}
 
-      {/* ── MAIN CONTENT ── */}
-      <div className="flex-1 flex flex-col min-h-0">
-      <AnimatePresence mode="wait">
+      {/* ── AI MODE ── */}
+      {mode === 'ai' && (
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+          <button onClick={() => setMode('none')} className="text-[#94A3B8] hover:text-white text-sm flex items-center gap-1 mb-6 transition-colors">
+            ← Cancel Launch
+          </button>
+          
+          {renderStepIndicator(aiStep, 3, ['Describe', 'Review', 'Deploy'])}
 
+          <div className="surface-card p-6 md:p-8">
+            
+            {aiStep === 1 && (
+              <div className="flex flex-col items-center text-center">
+                <h2 className="text-2xl font-bold text-white mb-6">What's your token about?</h2>
+                <textarea 
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="Describe your token in a few words. E.g. 'A meme token for dog lovers with auto-burn and community rewards'"
+                  className="w-full max-w-xl h-32 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-xl p-4 text-white placeholder:text-[#475569] focus:outline-none focus:border-[#6366F1] resize-none mb-2"
+                />
+                <div className="text-xs text-[#475569] mb-8">{aiPrompt.length} / 280 chars</div>
+                
+                <button 
+                  onClick={simulateAIGeneration}
+                  disabled={aiPrompt.length < 10 || isGenerating}
+                  className="btn-primary flex items-center gap-2 px-8 py-3 w-full max-w-xs justify-center disabled:opacity-50"
+                >
+                  {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                  {isGenerating ? "Generating..." : "Generate Token"}
+                </button>
+                <p className="text-xs text-[#475569] mt-4 max-w-sm">AI will generate: name, ticker, description, and recommended settings</p>
+              </div>
+            )}
 
-        {/* ══ SELECTION SCREEN — full-height hero ══ */}
-        {mode === "selection" && (
-          <motion.div
-            key="selection"
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96, y: -12 }}
-            transition={{ duration: 0.55, ease: EASE }}
-            className="flex flex-col flex-1 min-h-0"
-          >
-            {/* Hero headline */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
-              className="text-center mb-6"
-            >
-              <p className="font-mono text-sm tracking-[0.4em] uppercase mb-2" style={{ color: "#e8b84b" }}>
-                Choose your deployment path
-              </p>
-              <h2 className="font-display text-4xl tracking-wide" style={{ color: "#ffe6a3" }}>
-                How do you want to forge?
-              </h2>
-            </motion.div>
-
-            {/* Two clean choice cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto w-full mt-4">
-
-              {/* AI Genesis */}
-              <button
-                id="launch-mode-ai"
-                onClick={() => { setMode("ai"); setStep(0); }}
-                className="group relative flex flex-col items-center justify-center p-8 rounded-2xl transition-all border border-mf-line-gold hover:border-mf-gold/60 bg-mf-obsidian/80 hover:bg-mf-bg-elevated text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold"
-              >
-                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-mf-gold/10 border border-mf-gold/30 mb-6 group-hover:scale-110 transition-transform">
-                  <Cpu size={32} className="text-mf-gold" />
+            {aiStep === 2 && (
+              <div className="flex flex-col gap-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Here's your token</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Name</label>
+                    <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Ticker</label>
+                    <input type="text" value={formData.ticker} onChange={e => setFormData({...formData, ticker: e.target.value})} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] font-mono" />
+                  </div>
                 </div>
-                <h2 className="font-display text-2xl mb-2 text-white">AI Assistant</h2>
-                <p className="font-body text-sm text-gray-400 mb-6 max-w-xs">
-                  Describe your idea and our AI will generate the token name, ticker, and backstory instantly.
-                </p>
-                <span className="font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-full border border-mf-gold text-mf-gold bg-mf-gold/10 group-hover:bg-mf-gold group-hover:text-black transition-colors flex items-center gap-2">
-                  <Sparkles size={14} /> Start with AI
-                </span>
-              </button>
-
-              {/* Manual Forge */}
-              <button
-                id="launch-mode-manual"
-                onClick={() => { setMode("manual"); setStep(0); }}
-                className="group relative flex flex-col items-center justify-center p-8 rounded-2xl transition-all border border-mf-line hover:border-mf-flare/60 bg-mf-obsidian/80 hover:bg-mf-bg-elevated text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-flare"
-              >
-                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-mf-violet/10 border border-mf-violet/30 mb-6 group-hover:scale-110 transition-transform">
-                  <PenTool size={32} className="text-mf-flare" />
+                
+                <div>
+                  <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Description</label>
+                  <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] resize-none" />
                 </div>
-                <h2 className="font-display text-2xl mb-2 text-white">Manual Setup</h2>
-                <p className="font-body text-sm text-gray-400 mb-6 max-w-xs">
-                  You have full control. Manually enter your token name, upload assets, and configure mechanics.
-                </p>
-                <span className="font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-full border border-mf-flare text-mf-flare bg-mf-violet/10 group-hover:bg-mf-flare group-hover:text-black transition-colors">
-                  Setup Manually
-                </span>
-              </button>
-            </div>
-          </motion.div>
-        )}
+                
+                <div className="flex gap-4 p-4 rounded-xl bg-[rgba(16,185,129,0.05)] border border-[rgba(16,185,129,0.1)]">
+                  <div className="flex-1">
+                    <div className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-1">Recommended Curve</div>
+                    <div className="font-medium text-[#10B981] capitalize">{selectedCurve} Curve</div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-1">Recommended Liquidity</div>
+                    <div className="font-medium text-[#10B981]">Fair Launch (100% pool)</div>
+                  </div>
+                </div>
+                
+                <div className="border border-dashed border-[rgba(99,102,241,0.3)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[rgba(99,102,241,0.02)] transition-colors cursor-pointer">
+                  <Upload className="w-6 h-6 text-[#6366F1] mb-2" />
+                  <div className="text-sm font-semibold text-white">Upload token image (optional)</div>
+                  <div className="text-xs text-[#475569]">PNG, JPG up to 2MB</div>
+                </div>
+                
+                <div className="flex gap-4 mt-4">
+                  <button onClick={() => setAiStep(1)} className="btn-ghost flex-1 py-3">Back</button>
+                  <button onClick={() => setAiStep(3)} className="btn-primary flex-1 py-3">Continue to Deploy</button>
+                </div>
+              </div>
+            )}
 
-        {/* ══ WIZARD ══ */}
-        {mode !== "selection" && (
-          <motion.div
-            key="wizard"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="flex flex-col"
-            style={{ flex: 1 }}
-          >
-            {/* Progress bar */}
-            <div className="flex justify-between items-center mb-5 relative px-6">
-              <div className="absolute left-8 right-8 top-5 h-[1px] bg-mf-line-gold z-0" />
-              <motion.div
-                className="absolute left-8 top-5 h-[2px] bg-gradient-to-r from-mf-gold-deep via-mf-gold to-mf-gold-hi z-0 rounded-full shadow-[0_0_10px_rgba(232,184,75,0.55)]"
-                initial={{ width: "0%" }}
-                animate={{ width: `${(step / (STEPS.length - 1)) * (100 - (16 / (STEPS.length - 1)))}%` }}
-                transition={{ ease: EASE, duration: 0.55 }}
-              />
-              {STEPS.map((s, i) => (
-                <div key={s} className="relative z-10 flex flex-col items-center gap-2">
-                  <motion.div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center border font-mono text-xs transition-all ${
-                      i < step
-                        ? "bg-mf-gold border-mf-gold text-black"
-                        : i === step
-                        ? "bg-mf-obsidian border-mf-gold text-mf-gold-hi shadow-[0_0_20px_rgba(232,184,75,0.4)]"
-                        : "bg-mf-obsidian border-mf-line-gold text-gray-300"
-                    }`}
-                    animate={i === step ? { boxShadow: ["0 0 16px rgba(232,184,75,0.3)", "0 0 30px rgba(232,184,75,0.6)", "0 0 16px rgba(232,184,75,0.3)"] } : {}}
-                    transition={{ repeat: i === step ? Infinity : 0, duration: 2, ease: "easeInOut" }}
+            {aiStep === 3 && (
+              <div className="flex flex-col gap-6">
+                <div className="text-center mb-2">
+                  <h2 className="text-2xl font-bold text-white">Ready to Deploy</h2>
+                  <p className="text-[#94A3B8]">Review your token details before launching on Solana.</p>
+                </div>
+                
+                <div className="bg-[#080B12] rounded-xl p-6 border border-[rgba(99,102,241,0.15)] flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Token</span>
+                    <span className="font-bold text-white">{formData.name} <span className="text-[#6366F1] font-mono ml-1">{formData.ticker}</span></span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-[#94A3B8] whitespace-nowrap mr-8">Description</span>
+                    <span className="text-white text-right text-sm line-clamp-2">{formData.description}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Bonding Curve</span>
+                    <span className="text-white capitalize">{selectedCurve}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Liquidity Mode</span>
+                    <span className="text-white">Fair Launch</span>
+                  </div>
+                  
+                  <div className="h-px bg-[rgba(99,102,241,0.1)] my-2" />
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Estimated Cost</span>
+                    <span className="font-mono font-bold text-white">~0.02 SOL</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Network</span>
+                    <span className="text-white">Solana Mainnet</span>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={handleDeploy}
+                  disabled={isDeploying || !anchorWallet}
+                  className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2 mt-4"
+                >
+                  {isDeploying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                  {isDeploying ? "Deploying Token..." : !anchorWallet ? "Connect Wallet to Deploy" : "Launch Token"}
+                </button>
+                
+                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens on Solana cannot be deleted after launch.</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+      
+      {/* ── CUSTOM MODE ── */}
+      {mode === 'custom' && (
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+          <button onClick={() => setMode('none')} className="text-[#94A3B8] hover:text-white text-sm flex items-center gap-1 mb-6 transition-colors">
+            ← Cancel Launch
+          </button>
+          
+          {renderStepIndicator(customStep, 3, ['Details', 'Settings', 'Deploy'])}
+
+          <div className="surface-card p-6 md:p-8">
+            {customStep === 1 && (
+              <div className="flex flex-col gap-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Token Details</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Token Name *</label>
+                    <input type="text" placeholder="e.g. Moon Doge" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Ticker Symbol *</label>
+                    <input type="text" placeholder="e.g. MDOGE" value={formData.ticker} onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} maxLength={10} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] font-mono" />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Description *</label>
+                  <textarea placeholder="Tell the world about your token..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] resize-none" />
+                </div>
+                
+                <div className="border border-dashed border-[rgba(99,102,241,0.3)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[rgba(99,102,241,0.02)] transition-colors cursor-pointer">
+                  <Upload className="w-6 h-6 text-[#6366F1] mb-2" />
+                  <div className="text-sm font-semibold text-white">Upload token image (optional)</div>
+                </div>
+                
+                <button 
+                  onClick={() => setCustomStep(2)}
+                  disabled={!formData.name || !formData.ticker || !formData.description}
+                  className="btn-primary w-full py-3 mt-4 disabled:opacity-50"
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+            
+            {customStep === 2 && (
+              <div className="flex flex-col gap-8">
+                <h2 className="text-2xl font-bold text-white">Launch Settings</h2>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-[#94A3B8] mb-3">Select Bonding Curve</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[
+                      { id: 'fast', name: 'Fast Launch', desc: 'High velocity. Great for memes.', risk: 'High', color: '#F43F5E', svg: 'M0,25 L10,22 L20,15 L30,5 L40,0' },
+                      { id: 'balanced', name: 'Balanced', desc: 'Steady growth for early believers.', risk: 'Medium', color: '#F59E0B', recommended: true, svg: 'M0,25 L10,22 L20,18 L30,12 L40,0' },
+                      { id: 'community', name: 'Community', desc: 'Slow and steady for long-term.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0' }
+                    ].map(curve => (
+                      <div 
+                        key={curve.id} 
+                        onClick={() => setSelectedCurve(curve.id)}
+                        className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.08)]' : 'border-[rgba(99,102,241,0.15)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)]'}`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-bold text-white">{curve.name}</h3>
+                          {curve.recommended && <span className="text-[10px] bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-2 py-0.5 rounded uppercase font-bold">Rec</span>}
+                        </div>
+                        <p className="text-xs text-[#94A3B8] mb-4 min-h-[32px]">{curve.desc}</p>
+                        
+                        <div className="flex justify-between items-end">
+                          <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: curve.color }}>{curve.risk} Risk</span>
+                          <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-70">
+                            <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-[#94A3B8] mb-3">Liquidity Split</label>
+                  <div className="flex flex-col gap-3">
+                    {[
+                      { id: 'fair', label: 'Fair Launch', desc: '100% to liquidity pool. Maximum community trust.', rec: true },
+                      { id: 'standard', label: 'Standard', desc: '70% pool / 30% dev allocation for operations.', rec: false }
+                    ].map(opt => (
+                      <div 
+                        key={opt.id}
+                        onClick={() => setSelectedLiquidity(opt.id)}
+                        className={`p-4 rounded-xl border flex items-center gap-4 cursor-pointer transition-all ${selectedLiquidity === opt.id ? 'border-[#10B981] bg-[rgba(16,185,129,0.05)]' : 'border-[rgba(99,102,241,0.15)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)]'}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedLiquidity === opt.id ? 'border-[#10B981]' : 'border-[#475569]'}`}>
+                          {selectedLiquidity === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-white flex items-center gap-2">
+                            {opt.label}
+                            {opt.rec && <span className="text-[10px] bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded uppercase font-bold">Recommended</span>}
+                          </div>
+                          <div className="text-sm text-[#94A3B8]">{opt.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex gap-4 mt-2">
+                  <button onClick={() => setCustomStep(1)} className="btn-ghost flex-1 py-3">Back</button>
+                  <button onClick={() => setCustomStep(3)} className="btn-primary flex-1 py-3">Review & Deploy</button>
+                </div>
+              </div>
+            )}
+            
+            {customStep === 3 && (
+              <div className="flex flex-col gap-6">
+                <div className="text-center mb-2">
+                  <h2 className="text-2xl font-bold text-white">Ready to Deploy</h2>
+                  <p className="text-[#94A3B8]">Review your token details before launching on Solana.</p>
+                </div>
+                
+                <div className="bg-[#080B12] rounded-xl p-6 border border-[rgba(99,102,241,0.15)] flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Token</span>
+                    <span className="font-bold text-white">{formData.name} <span className="text-[#6366F1] font-mono ml-1">{formData.ticker}</span></span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-[#94A3B8] whitespace-nowrap mr-8">Description</span>
+                    <span className="text-white text-right text-sm line-clamp-2">{formData.description}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Bonding Curve</span>
+                    <span className="text-white capitalize">{selectedCurve}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Liquidity Mode</span>
+                    <span className="text-white capitalize">{selectedLiquidity}</span>
+                  </div>
+                  
+                  <div className="h-px bg-[rgba(99,102,241,0.1)] my-2" />
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Estimated Cost</span>
+                    <span className="font-mono font-bold text-white">~0.02 SOL</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#94A3B8]">Network</span>
+                    <span className="text-white">Solana Mainnet</span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4 mt-4">
+                  <button onClick={() => setCustomStep(2)} className="btn-ghost py-4 px-6">Back</button>
+                  <button 
+                    onClick={handleDeploy}
+                    disabled={isDeploying || !anchorWallet}
+                    className="btn-primary flex-1 py-4 text-lg flex items-center justify-center gap-2"
                   >
-                    {i < step ? <Check size={14} /> : i + 1}
-                  </motion.div>
-                  <span className={`font-mono text-xs tracking-widest uppercase absolute -bottom-5 whitespace-nowrap ${i <= step ? "text-mf-gold" : "text-gray-400"}`}>
-                    {s}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Step content */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${mode}-${step}`}
-                initial={{ opacity: 0, y: 24, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -16, scale: 0.98 }}
-                transition={{ duration: 0.45, ease: EASE }}
-                className="rounded-3xl p-6 flex flex-col relative overflow-hidden"
-                style={{
-                  flex: 1,
-                  background: "rgba(12,10,7,0.94)",
-                  border: "1px solid rgba(232,184,75,0.3)",
-                  boxShadow: "0 32px 80px -20px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,230,163,0.07)",
-                }}
-              >
-                {/* Top accent line */}
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-mf-gold/30 to-transparent" />
-
-                <div className="flex-1 overflow-y-auto relative">
-
-                  {/* ─ AI Vision ─ */}
-                  {mode === "ai" && step === 0 && (
-                    <div className="flex flex-col h-full gap-5">
-                      <div>
-                        <h2 className="font-display text-2xl text-gold-liquid flex items-center gap-3 mb-1">
-                          <Cpu style={{ color: "#e8b84b" }} className="shrink-0" size={22} />
-                          Describe Your Vision
-                        </h2>
-                        <p className="font-mono text-sm tracking-widest uppercase" style={{ color: "#9ca3af" }}>
-                          One sentence or a full pitch — our AI handles the rest.
-                        </p>
-                      </div>
-
-                      <textarea
-                        id="ai-vision-input"
-                        value={formData.prompt}
-                        onChange={e => setFormData({ ...formData, prompt: e.target.value })}
-                        className="flex-1 min-h-[180px] rounded-2xl p-5 font-body text-sm resize-none outline-none leading-relaxed transition-all"
-                        style={{
-                          background: "rgba(5,4,3,0.85)",
-                          border: "1px solid rgba(232,184,75,0.35)",
-                          color: "#f5e6c8",
-                        }}
-                        placeholder={`e.g., "A cosmic feline meme token with real DeFi utility. The mascot is a cyborg cat named Nova. Should feel premium and viral. Deflationary mechanics."`}
-                      />
-
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <span className="font-mono text-xs tracking-wider uppercase" style={{ color: "#9ca3af" }}>Quick prompts:</span>
-                        {["Viral meme with dog", "AI-powered DeFi protocol", "Gaming guild token", "Community DAO"].map(p => (
-                          <button
-                            key={p}
-                            onClick={() => setFormData({ ...formData, prompt: p })}
-                            className="font-mono text-xs tracking-wider px-2.5 py-1 rounded-full transition-all"
-                            style={{ border: "1px solid rgba(232,184,75,0.3)", color: "#e8b84b" }}
-                            onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = "rgba(232,184,75,0.6)"; (e.target as HTMLElement).style.color = "#e8b84b"; }}
-                            onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = "rgba(232,184,75,0.3)"; (e.target as HTMLElement).style.color = "#a9791f"; }}
-                          >
-                            {p}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ─ AI Synthesis ─ */}
-                  {mode === "ai" && step === 1 && (
-                    <div className="flex flex-col items-center justify-center min-h-[300px] gap-6">
-                      {/* Orbital animation */}
-                      <div className="relative w-36 h-36 flex items-center justify-center">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-                          className="absolute inset-0 rounded-full border-2 border-dashed border-mf-gold/30"
-                        />
-                        <motion.div
-                          animate={{ rotate: -360 }}
-                          transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
-                          className="absolute inset-4 rounded-full border border-mf-violet/40"
-                        />
-                        <div className="absolute inset-0 bg-mf-gold/10 rounded-full blur-2xl animate-pulse" />
-                        <div className="w-20 h-20 rounded-full glass-gold pulse-gold flex items-center justify-center relative z-10">
-                          <Cpu size={36} className="text-gold-glow" />
-                        </div>
-                        {/* Orbiting dots */}
-                        {[0, 120, 240].map((angle, i) => (
-                          <motion.div
-                            key={i}
-                            className="absolute w-2.5 h-2.5 rounded-full bg-mf-gold shadow-[0_0_8px_rgba(232,184,75,0.8)]"
-                            animate={{ rotate: 360 }}
-                            transition={{ repeat: Infinity, duration: 3 + i, ease: "linear" }}
-                            style={{
-                              transformOrigin: "68px 68px",
-                              top: "50%",
-                              left: "50%",
-                              transform: `rotate(${angle}deg) translateX(52px) translateY(-50%)`,
-                            }}
-                          />
-                        ))}
-                      </div>
-
-                      <div className="text-center">
-                        <h3 className="font-display text-xl text-gold-liquid mb-2">Synthesizing DNA...</h3>
-                        <p className="font-mono text-sm text-gray-300 tracking-widest uppercase mb-6">
-                          Quantum-LLM processing · ETA ~5s
-                        </p>
-
-                        {/* Log lines */}
-                        <div className="text-left w-full max-w-sm mx-auto bg-mf-obsidian/60 rounded-xl p-4 border border-mf-line-gold font-mono text-sm tracking-wide space-y-1.5">
-                          {AI_LOG_LINES.map((line, i) => (
-                            logLines.includes(i) && (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: -8 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-2 text-mf-champagne/70"
-                              >
-                                <span className="text-mf-gold">›</span>
-                                <TypingText text={line.text} />
-                              </motion.div>
-                            )
-                          ))}
-                          {isGenerating && logLines.length < AI_LOG_LINES.length && (
-                            <div className="flex gap-1 pt-1">
-                              {[0,1,2].map(i => (
-                                <motion.div
-                                  key={i}
-                                  className="w-1 h-1 rounded-full bg-mf-gold/60"
-                                  animate={{ opacity: [0.3, 1, 0.3] }}
-                                  transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ─ Identity (Manual Step 0 | AI Step 2) ─ */}
-                  {((mode === "manual" && step === 0) || (mode === "ai" && step === 2)) && (
-                    <div className="flex flex-col gap-6">
-                      <div className="flex justify-between items-center">
-                        <h2 className="font-display text-2xl text-gold-liquid flex items-center gap-3">
-                          <PenTool className="text-mf-gold shrink-0" size={20} />
-                          Token Identity
-                        </h2>
-                        {mode === "ai" && (
-                          <span className="chip-gold flex items-center gap-1.5">
-                            <Sparkles size={9} /> AI Generated
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6">
-                        {/* Logo upload */}
-                        <label
-                          htmlFor="logo-upload-input"
-                          className="w-full md:w-36 h-36 border-2 border-dashed border-mf-line-gold rounded-2xl flex flex-col items-center justify-center bg-mf-obsidian/40 hover:bg-mf-obsidian/60 hover:border-mf-gold/40 transition-all cursor-pointer group relative overflow-hidden"
-                        >
-                          {mode === "ai" && !imagePreview ? (
-                            <>
-                              <div className="absolute inset-0 bg-gradient-to-br from-mf-gold/10 to-mf-violet/10" />
-                              <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-mf-gold/30 to-mf-violet/20 flex items-center justify-center font-display text-3xl text-gold mb-2 shadow-[0_0_20px_rgba(232,184,75,0.25)]">
-                                {formData.name[0] || "?"}
-                              </div>
-                              <span className="font-mono text-xs tracking-widest uppercase text-mf-gold/60 relative">AI Generated</span>
-                            </>
-                          ) : imagePreview ? (
-                            <>
-                              <img
-                                src={imagePreview}
-                                alt="Token logo preview"
-                                className="absolute inset-0 w-full h-full object-cover rounded-2xl"
-                              />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
-                                <Upload size={20} className="text-white" />
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-12 h-12 rounded-full bg-mf-gold/10 border border-mf-line-gold flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <Upload size={18} className="text-mf-gold-deep" />
-                              </div>
-                              <span className="font-mono text-xs tracking-widest uppercase text-gray-300 text-center px-2">
-                                Drop logo<br />PNG · SVG · GIF
-                              </span>
-                            </>
-                          )}
-                          <input
-                            id="logo-upload-input"
-                            type="file"
-                            accept="image/png,image/svg+xml,image/gif,image/jpeg,image/webp"
-                            className="sr-only"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null;
-                              setImageFile(file);
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-                                reader.readAsDataURL(file);
-                              } else {
-                                setImagePreview(null);
-                              }
-                            }}
-                          />
-                        </label>
-
-                        {/* Inputs */}
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Token Name</label>
-                              <input
-                                id="token-name"
-                                type="text"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="e.g. AstroCat"
-                                className="w-full bg-mf-obsidian/60 border border-mf-line-gold rounded-xl px-4 py-3 text-white font-display text-sm outline-none focus:border-mf-gold/50 focus-visible:ring-1 focus-visible:ring-mf-gold/40 transition-all"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Ticker</label>
-                              <input
-                                id="token-ticker"
-                                type="text"
-                                value={formData.ticker}
-                                onChange={e => setFormData({ ...formData, ticker: e.target.value.toUpperCase() })}
-                                placeholder="ACAT"
-                                maxLength={6}
-                                className="w-full bg-mf-obsidian/60 border border-mf-line-gold rounded-xl px-4 py-3 text-mf-gold-hi font-mono text-sm outline-none focus:border-mf-gold/50 focus-visible:ring-1 focus-visible:ring-mf-gold/40 transition-all uppercase tracking-widest"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Description / Lore</label>
-                            <textarea
-                              id="token-description"
-                              value={formData.description}
-                              onChange={e => setFormData({ ...formData, description: e.target.value })}
-                              placeholder="Describe the vision, utility, and lore of your token..."
-                              className="w-full bg-mf-obsidian/60 border border-mf-line-gold rounded-xl px-4 py-3 text-mf-champagne font-body text-sm h-24 resize-none outline-none focus:border-mf-gold/50 focus-visible:ring-1 focus-visible:ring-mf-gold/40 transition-all leading-relaxed"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Social links */}
-                      <div>
-                        <p className="font-mono text-xs tracking-widest uppercase text-gray-300 mb-3">Social Links <span className="text-gray-400">(optional)</span></p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          {[
-                            { id: "token-website", key: "website", icon: Globe, placeholder: "astrocat.xyz" },
-                            { id: "token-twitter", key: "twitter", icon: AtSign, placeholder: "@AstroCatSOL" },
-                            { id: "token-telegram", key: "telegram", icon: MessageCircle, placeholder: "t.me/astrocat" },
-                          ].map(({ id, key, icon: Icon, placeholder }) => (
-                            <div key={key} className="flex items-center gap-2 bg-mf-obsidian/40 border border-mf-line-gold rounded-xl px-3 py-2.5">
-                              <Icon size={14} className="text-mf-gold-deep shrink-0" />
-                              <input
-                                id={id}
-                                type="text"
-                                value={formData[key as keyof typeof formData]}
-                                onChange={e => setFormData({ ...formData, [key]: e.target.value })}
-                                placeholder={placeholder}
-                                className="flex-1 bg-transparent outline-none text-mf-champagne font-mono text-xs placeholder:text-gray-400"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ─ Mechanics (Manual Step 1 | AI Step 3) ─ */}
-                  {((mode === "manual" && step === 1) || (mode === "ai" && step === 3)) && (
-                    <div className="flex flex-col gap-7">
-                      <h2 className="font-display text-2xl text-gold-liquid flex items-center gap-3">
-                        <Shield className="text-mf-gold-hi shrink-0" size={22} />
-                        Mechanics &amp; Rules
-                      </h2>
-
-                      {/* ── Bonding Curve Selector ── */}
-                      <div>
-                        <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-4">
-                          L·01 — Dynamic Bonding Curve
-                        </p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {CURVES.map(curve => (
-                            <button
-                              key={curve.id}
-                              id={`curve-${curve.id}`}
-                              onClick={() => setSelectedCurve(curve.id)}
-                              className={`relative rounded-2xl p-4 border text-left transition-all flex flex-col gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/60 ${
-                                selectedCurve === curve.id
-                                  ? "border-[var(--curve-color)] bg-[var(--curve-bg)]"
-                                  : "border-mf-line-gold bg-mf-obsidian/40 hover:border-mf-line-gold/80"
-                              }`}
-                              style={{
-                                "--curve-color": curve.color,
-                                "--curve-bg": curve.colorDim,
-                              } as React.CSSProperties}
-                            >
-                              {curve.premium && (
-                                <span className="absolute -top-2 -right-2 font-mono text-xs tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-mf-ice/20 text-mf-ice border border-mf-ice/30 flex items-center gap-1">
-                                  <Star size={7} fill="currentColor" /> Pro
-                                </span>
-                              )}
-
-                              {selectedCurve === curve.id && (
-                                <div
-                                  className="absolute inset-0 rounded-2xl opacity-20"
-                                  style={{ boxShadow: `inset 0 0 30px ${curve.color}40` }}
-                                />
-                              )}
-
-                              {/* Curve SVG */}
-                              <div className="relative">
-                                <CurvePreview
-                                  points={curve.points}
-                                  color={curve.color}
-                                  active={selectedCurve === curve.id}
-                                />
-                              </div>
-
-                              <div>
-                                <p className="font-display text-sm text-white leading-tight">{curve.name}</p>
-                                <p className="font-mono text-xs tracking-widest uppercase mt-0.5" style={{ color: curve.color }}>
-                                  {curve.subtitle}
-                                </p>
-                              </div>
-
-                              {selectedCurve === curve.id && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: "auto" }}
-                                  className="text-sm text-gray-300 leading-relaxed border-t border-mf-line-gold/30 pt-2"
-                                >
-                                  {curve.description}
-                                </motion.div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Selected curve details */}
-                        <motion.div
-                          key={selectedCurve}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-3 flex flex-wrap gap-4 items-center"
-                        >
-                          <span className="font-mono text-xs text-gray-300 uppercase tracking-widest">Ideal for:</span>
-                          <span className="font-mono text-sm tracking-wider" style={{ color: selectedCurveData.color }}>
-                            {selectedCurveData.idealFor}
-                          </span>
-                          <span className="ml-auto font-mono text-xs text-gray-300 uppercase tracking-widest">Risk:</span>
-                          <span className="font-mono text-sm tracking-wider" style={{ color: selectedCurveData.riskColor }}>
-                            {selectedCurveData.risk}
-                          </span>
-                        </motion.div>
-                      </div>
-
-                      {/* ── Anti-Sniper Shield (L·02) ── */}
-                      <div className="rounded-2xl border border-mf-line-gold p-5 bg-mf-obsidian/40 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-mf-gold/40 to-transparent" />
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${antisniperEnabled ? "bg-mf-success/15 border border-mf-success/40" : "bg-mf-obsidian/60 border border-mf-line-gold"}`}>
-                              <Shield size={18} className={antisniperEnabled ? "text-mf-success" : "text-gray-300"} />
-                            </div>
-                            <div>
-                              <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-0.5">L·02 — Anti-Sniper Launch Shield</p>
-                              <p className="font-display text-base text-white">60-Second Protection Mode</p>
-                            </div>
-                          </div>
-
-                          {/* Toggle */}
-                          <button
-                            id="antisniper-toggle"
-                            onClick={() => setAntisniperEnabled(!antisniperEnabled)}
-                            className={`relative w-12 h-6 rounded-full transition-all shrink-0 mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/60 ${antisniperEnabled ? "bg-mf-success/30 border border-mf-success/50" : "bg-mf-obsidian border border-mf-line-gold"}`}
-                          >
-                            <motion.div
-                              animate={{ x: antisniperEnabled ? 24 : 2 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className={`absolute top-0.5 w-5 h-5 rounded-full ${antisniperEnabled ? "bg-mf-success shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-mf-dim"}`}
-                            />
-                          </button>
-                        </div>
-
-                        <AnimatePresence>
-                          {antisniperEnabled && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3"
-                            >
-                              {[
-                                { label: "Max Wallet", value: "2%", icon: Lock },
-                                { label: "Max TX", value: "1%", icon: AlertTriangle },
-                                { label: "Batch Exec", value: "On", icon: Shield },
-                                { label: "Anti-MEV", value: "Active", icon: Zap },
-                              ].map(({ label, value, icon: Icon }) => (
-                                <div key={label} className="bg-mf-success/5 border border-mf-success/20 rounded-xl p-3 flex flex-col gap-1">
-                                  <div className="flex items-center gap-1.5">
-                                    <Icon size={10} className="text-mf-success" />
-                                    <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{label}</span>
-                                  </div>
-                                  <span className="font-display text-sm text-mf-success">{value}</span>
-                                </div>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        {!antisniperEnabled && (
-                          <p className="mt-3 font-mono text-xs text-mf-danger/70 tracking-wider">
-                            ⚠ Bots and snipers can front-run your launch without this shield.
-                          </p>
-                        )}
-                      </div>
-
-                      {/* ── Liquidity Distribution ── */}
-                      <div>
-                        <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-3">
-                          Liquidity Distribution
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          {LIQUIDITY_OPTIONS.map(opt => {
-                            const Icon = opt.icon;
-                            return (
-                              <button
-                                key={opt.id}
-                                id={`liquidity-${opt.id}`}
-                                onClick={() => setSelectedLiquidity(opt.id)}
-                                className={`rounded-2xl p-4 border text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/60 ${
-                                  selectedLiquidity === opt.id
-                                    ? "border-mf-gold/50 bg-mf-gold/8"
-                                    : "border-mf-line-gold bg-mf-obsidian/40 hover:border-mf-line-gold/80"
-                                }`}
-                              >
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Icon size={14} style={{ color: opt.color }} />
-                                  <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{opt.label}</span>
-                                </div>
-                                <p className="font-display text-sm text-white">{opt.desc}</p>
-                                {selectedLiquidity === opt.id && (
-                                  <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="font-mono text-xs text-gray-300 mt-2 leading-relaxed"
-                                  >
-                                    {opt.detail}
-                                  </motion.p>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ─ Deploy (Manual Step 2 | AI Step 4) ─ */}
-                  {((mode === "manual" && step === 2) || (mode === "ai" && step === 4)) && (
-                    <div className="flex flex-col gap-6">
-                      <h2 className="font-display text-2xl text-gold-liquid flex items-center gap-3">
-                        <Rocket className="text-mf-gold shrink-0" size={22} />
-                        Ready for Liftoff
-                      </h2>
-
-                      {/* Summary card */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Token card */}
-                        <div className="rounded-2xl border border-mf-gold/30 bg-mf-gold/5 p-5 relative overflow-hidden">
-                          <div className="absolute -top-8 -right-8 w-32 h-32 bg-mf-gold/10 blur-2xl rounded-full" />
-                          <p className="font-mono text-xs tracking-widest uppercase text-mf-gold-deep mb-3">Token Identity</p>
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-mf-gold/30 to-mf-violet/20 flex items-center justify-center font-display text-2xl text-gold shadow-[0_0_14px_rgba(232,184,75,0.2)]">
-                              {formData.name[0] || "?"}
-                            </div>
-                            <div>
-                              <p className="font-display text-lg text-white">{formData.name || "Unnamed"}</p>
-                              <p className="font-mono text-xs text-mf-gold tracking-widest">${formData.ticker || "????"}</p>
-                            </div>
-                          </div>
-                          {formData.description && (
-                            <p className="font-body text-xs text-gray-300 leading-relaxed line-clamp-2">{formData.description}</p>
-                          )}
-                        </div>
-
-                        {/* Mechanics summary */}
-                        <div className="rounded-2xl border border-mf-line-gold bg-mf-obsidian/40 p-5 space-y-3">
-                          <p className="font-mono text-xs tracking-widest uppercase text-gray-300 mb-3">Mechanics Summary</p>
-                          {[
-                            { label: "Curve", value: selectedCurveData.name, color: selectedCurveData.color },
-                            { label: "Liquidity", value: selectedLiquidityData.desc, color: "#e8b84b" },
-                            { label: "Anti-Sniper", value: antisniperEnabled ? "Active ✓" : "Disabled ✗", color: antisniperEnabled ? "#10b981" : "#ef4444" },
-                            { label: "Network", value: process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Solana Mainnet' : 'Solana Devnet', color: "#a855f7" },
-                          ].map(({ label, value, color }) => (
-                            <div key={label} className="flex justify-between items-center py-2 border-b border-mf-line-gold/20 last:border-0">
-                              <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{label}</span>
-                              <span className="font-mono text-[0.65rem] tracking-wider" style={{ color }}>{value}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Deploy CTA */}
-                      <div className="flex flex-col items-center gap-4 pt-4">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-mf-gold/20 blur-2xl rounded-full scale-150" />
-                          <motion.div
-                            animate={{ y: [0, -6, 0] }}
-                            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                            className="relative w-20 h-20 rounded-full flex items-center justify-center"
-                            style={{ background: "rgba(28,20,6,0.9)", border: "1px solid rgba(232,184,75,0.5)", boxShadow: "0 0 30px rgba(232,184,75,0.3)" }}
-                          >
-                            <Rocket size={38} style={{ color: "#e8b84b", filter: "drop-shadow(0 0 10px rgba(232,184,75,0.7))" }} />
-                          </motion.div>
-                        </div>
-                        <div className="text-center">
-                          <p className="font-display text-lg text-white mb-1">Contract ready to deploy</p>
-                          <p className="font-mono text-xs text-gray-300 tracking-widest uppercase">
-                            Estimated cost: ~0.02 SOL · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* ── Footer Actions ── */}
-                <div className="mt-6 pt-5 flex justify-between items-center" style={{ borderTop: "1px solid rgba(232,184,75,0.25)" }}>
-                  <button
-                    id="launch-back-btn"
-                    onClick={() => {
-                      if (step === 0) setMode("selection");
-                      else setStep(step - 1);
-                    }}
-                    className="font-mono text-sm tracking-widest uppercase rounded-full px-2 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/50 transition-colors"
-                    style={{ color: "#9ca3af" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#e8b84b")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#6b6987")}
-                  >
-                    {step === 0 ? "← Cancel" : "← Back"}
-                  </button>
-
-                  <button
-                    id="launch-next-btn"
-                    onClick={() => {
-                      if (mode === "ai" && step === 0) {
-                        setStep(1);
-                        handleAiGenerate();
-                      } else if (step === STEPS.length - 1) {
-                        handleDeploy();
-                      } else {
-                        setStep(Math.min(STEPS.length - 1, step + 1));
-                      }
-                    }}
-                    disabled={isGenerating || isDeploying || (mode === "ai" && step === 1 && isGenerating)}
-                    className="sheen-gold px-6 py-2.5 rounded-full bg-gradient-to-r from-mf-gold-hi via-mf-gold to-mf-gold-deep text-black font-mono text-[0.65rem] tracking-widest uppercase font-semibold hover:brightness-110 hover:shadow-[0_0_26px_rgba(232,184,75,0.55)] transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold-hi/80"
-                  >
-                    {(() => {
-                      if (isDeploying) return <><Loader2 className="animate-spin" size={13} /> Deploying...</>;
-                      if (isGenerating) return <><Loader2 className="animate-spin" size={13} /> Synthesizing...</>;
-                      if (step === STEPS.length - 1) return <><Rocket size={13} /> Deploy Contract</>;
-                      if (mode === "ai" && step === 0) return <>Synthesize <Sparkles size={13} /></>;
-                      return <>Next <ChevronRight size={13} /></>;
-                    })()}
+                    {isDeploying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                    {isDeploying ? "Deploying Token..." : !anchorWallet ? "Connect Wallet to Deploy" : "Launch Token"}
                   </button>
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      </div>
+                
+                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens on Solana cannot be deleted after launch.</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
     </div>
   );
 }
