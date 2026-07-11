@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 45;
 
@@ -133,37 +134,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'tokenId is required' }, { status: 400 });
     }
 
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (isAIConfigured()) {
       try {
-        const { anthropic }      = await import('@ai-sdk/anthropic');
-        const { generateObject } = await import('ai');
-        const { z }              = await import('zod');
+        const isMoonFluxxToken = !!mintAddress;
 
-        const DimensionSchema = z.object({
-          id:     z.string(),
-          label:  z.string(),
-          detail: z.string().describe('1-2 sentence specific finding. Include plausible numbers (wallet %, $ amounts, timeframes).'),
-          score:  z.number().int().min(0).max(100).describe('Risk score 0-100. Higher = riskier. Mint authority if revoked = 0.'),
-          status: z.enum(['safe', 'warn', 'danger', 'critical']),
-          icon:   z.string().describe('A single relevant emoji for this dimension'),
-        });
+        const result = await aiGenerate<Omit<RiskReportData, 'lastUpdated'>>({
+          model: MODELS.SMART,
+          temperature: 0.2,
+          maxTokens: 800,
+          cacheTtlMs: 3600000, // 1 hour per token
+          system: `You are MoonFluxx AI Risk Engine — an institutional-grade Solana token risk scanner.
 
-        const ReportSchema = z.object({
-          level:               z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
-          score:               z.number().int().min(0).max(100).describe('Composite risk score (weighted average of all 7 dimensions)'),
-          dimensions:          z.array(DimensionSchema).length(7),
-          rugPullIndicators:   z.array(z.string()).describe('List of specific red flags. Empty array if LOW risk.'),
-          recoverySignals:     z.array(z.string()).describe('List of bullish/safe signals. Empty if CRITICAL.'),
-          summary:             z.string().describe('2-3 sentence authoritative risk analysis in crypto-native language.'),
-          mintAuthorityRevoked: z.boolean().describe('Is the mint authority permanently revoked? For MoonFluxx-launched tokens this is always true.'),
-        });
+Return a JSON object with EXACTLY these fields:
 
-        const isMoonFluxxToken = !!mintAddress; // tokens with a mint address came from our program
-
-        const { object } = await generateObject({
-          model: anthropic('claude-3-5-sonnet-20241022'),
-          schema: ReportSchema,
-          prompt: `You are MoonFluxx AI Risk Engine — an institutional-grade Solana token risk scanner. Generate a deep risk report for this token.
+{
+  "level": (string, one of "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"),
+  "score": (integer 0-100, composite risk score — weighted average of all 7 dimension scores),
+  "dimensions": [
+    (exactly 7 objects, each with:)
+    {
+      "id": (string, dimension identifier),
+      "label": (string, human-readable label),
+      "detail": (string, 1-2 sentence specific finding — include plausible numbers like wallet %, $ amounts, timeframes),
+      "score": (integer 0-100, risk score — higher = riskier. Mint authority if revoked = 0),
+      "status": (string, one of "safe" | "warn" | "danger" | "critical"),
+      "icon": (string, a single relevant emoji for this dimension)
+    }
+  ],
+  "rugPullIndicators": (array of strings, specific red flags detected — empty array if LOW risk),
+  "recoverySignals": (array of strings, bullish/safe signals — empty array if CRITICAL),
+  "summary": (string, 2-3 sentence authoritative risk analysis in crypto-native language),
+  "mintAuthorityRevoked": (boolean, is mint authority permanently revoked? For MoonFluxx-launched tokens this is always true)
+}`,
+          prompt: `Generate a deep risk report for this token.
 
 Token: ${tokenName ?? tokenId} (ticker: $${ticker ?? tokenId})
 Token ID: ${tokenId}
@@ -182,9 +185,12 @@ Evaluate exactly these 7 risk dimensions in order:
 Make the data realistic and specific. Vary the risk levels across dimensions — not all should be the same. The composite score must logically reflect the individual scores. Rug pull indicators should be empty for LOW risk.`,
         });
 
-        return NextResponse.json({ ...object, lastUpdated: new Date().toISOString() });
+        return NextResponse.json(
+          { ...result.data, lastUpdated: new Date().toISOString() },
+          { headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' } }
+        );
       } catch (err) {
-        console.warn('[risk-report] Claude failed, using mock:', err);
+        console.warn('[risk-report] AI failed, using mock:', err);
         return NextResponse.json(buildMockReport(tokenId, tokenName));
       }
     }

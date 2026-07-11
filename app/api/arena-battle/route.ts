@@ -1,9 +1,18 @@
-import { anthropic } from '@ai-sdk/anthropic';
-import { generateObject } from 'ai';
-import { z } from 'zod';
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 60;
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface ArenaBattleResponse {
+  paragraphs: string[];   // 3 dramatic sports-commentator-style analysis paragraphs
+  winner:     string;     // ticker of the predicted winner
+  confidence: number;     // win probability % for the winner (50-99)
+  loser:      string;     // ticker of the underdog
+}
+
+// ── Mock data ─────────────────────────────────────────────────────────────────
 
 const MOCK_ANALYSES: Record<string, string[]> = {
   default: [
@@ -18,11 +27,13 @@ const MOCK_ANALYSES: Record<string, string[]> = {
   ],
 };
 
+// ── Route handler ─────────────────────────────────────────────────────────────
+
 export async function POST(req: Request) {
   try {
     const { tokenA, tokenB } = await req.json() as { tokenA: string; tokenB: string };
 
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!isAIConfigured()) {
       await new Promise(resolve => setTimeout(resolve, 1800));
       const analyses = MOCK_ANALYSES.default;
       return NextResponse.json({
@@ -33,19 +44,16 @@ export async function POST(req: Request) {
       });
     }
 
-    const { object } = await generateObject({
-      model: anthropic('claude-3-5-sonnet-20240620'),
-      schema: z.object({
-        paragraphs: z.array(z.string()).length(3).describe(
-          'Three dramatic sports-commentator-style analysis paragraphs. First covers tokenA strengths. Second covers tokenB counter-narrative. Third is the AI prediction.'
-        ),
-        winner: z.string().describe('Ticker of the predicted winner.'),
-        confidence: z.number().min(50).max(99).describe('Win probability % for the winner.'),
-        loser: z.string().describe('Ticker of the underdog.'),
-      }),
-      prompt: `You are the MoonFluxx Arena AI — a dramatic, hyper-enthusiastic crypto battle commentator blending sports punditry with on-chain analysis. 
-      
-Token A: ${tokenA}
+    try {
+      const result = await aiGenerate<ArenaBattleResponse>({
+        system: `You are the MoonFluxx Arena AI — a dramatic, hyper-enthusiastic crypto battle commentator blending sports punditry with on-chain analysis.
+
+Respond with a JSON object containing these fields:
+- "paragraphs" (array of exactly 3 strings): Three dramatic sports-commentator-style analysis paragraphs. First covers tokenA strengths. Second covers tokenB counter-narrative. Third is the AI prediction.
+- "winner" (string): Ticker of the predicted winner.
+- "confidence" (integer 50-99): Win probability % for the winner.
+- "loser" (string): Ticker of the underdog.`,
+        prompt: `Token A: ${tokenA}
 Token B: ${tokenB}
 
 Write a 3-paragraph battle analysis as if you are calling a live championship fight. 
@@ -54,9 +62,25 @@ Write a 3-paragraph battle analysis as if you are calling a live championship fi
 - Para 3: Your AI prediction with a specific win probability, and what condition would cause a surprise upset.
 
 Use crypto-native language (Battle Power, memetic potential, social velocity, narrative meta, on-chain signals, whale accumulation). Keep it thrilling and shareable.`,
-    });
+        model: MODELS.SMART,
+        temperature: 0.4,
+        maxTokens: 400,
+        cacheTtlMs: 3600000,
+      });
 
-    return NextResponse.json(object);
+      return NextResponse.json(result.data, {
+        headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' },
+      });
+    } catch (err) {
+      console.warn('[arena-battle] AI failed, using mock:', err);
+      await new Promise(resolve => setTimeout(resolve, 1800));
+      return NextResponse.json({
+        paragraphs: MOCK_ANALYSES.default,
+        winner: tokenA ?? 'LDOGE',
+        confidence: 73,
+        loser: tokenB ?? 'PEPE2',
+      });
+    }
   } catch (error) {
     console.error('Arena battle error:', error);
     return NextResponse.json({ error: 'Failed to generate battle analysis' }, { status: 500 });

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { aiChat, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 45;
 
@@ -106,12 +107,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
     }
 
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (isAIConfigured()) {
       try {
-        const { anthropic }   = await import('@ai-sdk/anthropic');
-        const { generateText } = await import('ai');
-
-        // Build rich market context block injected as first user message
+        // Build rich market context block injected into the user prompt
         const ctxLines = tokenContext ? [
           `Token: $${tokenContext.ticker ?? 'Unknown'}`,
           tokenContext.price            ? `Price: $${tokenContext.price}`                                      : null,
@@ -125,27 +123,30 @@ export async function POST(req: Request) {
           tokenContext.rsi                  ? `RSI (14): ${tokenContext.rsi}`                                  : null,
         ].filter(Boolean).join('\n') : 'No token context provided — general Solana trading mode.';
 
-        // Build messages array for multi-turn conversation
-        const messages = [
-          // Inject market context as a system-level context note
-          { role: 'user' as const, content: `[MARKET CONTEXT]\n${ctxLines}\n[/MARKET CONTEXT]\n\n${message}` },
-          ...history.slice(1).map(m => ({ role: m.role, content: m.content })), // skip first if it's a context injection
-        ];
-
-        // For multi-turn: rebuild properly
-        const fullMessages = history.length > 0
+        // Build conversation history for multi-turn
+        // If there's prior history, inject market context as a leading exchange, then append history + new message
+        const chatHistory = history.length > 0
           ? [
               { role: 'user' as const, content: `[MARKET CONTEXT]\n${ctxLines}\n[/MARKET CONTEXT]` },
               { role: 'assistant' as const, content: 'Market context received. Ready to analyze.' },
               ...history.map(m => ({ role: m.role, content: m.content })),
-              { role: 'user' as const, content: message },
             ]
-          : messages;
+          : [
+              // First message: embed context inline
+            ];
 
-        const { text } = await generateText({
-          model:    anthropic('claude-3-5-haiku-20241022'), // Haiku for speed — copilot must feel instant
-          system:   SYSTEM_PROMPT_V2,
-          messages: fullMessages,
+        // The user prompt: either just the message (if context is in history), or context + message
+        const userPrompt = history.length > 0
+          ? message
+          : `[MARKET CONTEXT]\n${ctxLines}\n[/MARKET CONTEXT]\n\n${message}`;
+
+        const { text } = await aiChat({
+          system:      SYSTEM_PROMPT_V2,
+          prompt:      userPrompt,
+          model:       MODELS.FAST,
+          temperature: 0.3,
+          maxTokens:   300,
+          history:     chatHistory,
         });
 
         // Parse chips from formatted output
@@ -157,7 +158,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ response, chips });
       } catch (err) {
-        console.warn('[trade-copilot] Claude failed, using mock:', err);
+        console.warn('[trade-copilot] AI call failed, using mock:', err);
         return NextResponse.json(getMockResponse(message, tokenContext));
       }
     }

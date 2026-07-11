@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 45;
 
@@ -70,48 +71,37 @@ const MOCK: PumpForecastResponse = {
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function GET() {
-  if (process.env.ANTHROPIC_API_KEY) {
+  if (isAIConfigured()) {
     try {
-      const { anthropic }      = await import('@ai-sdk/anthropic');
-      const { generateObject } = await import('ai');
-      const { z }              = await import('zod');
+      const result = await aiGenerate<Omit<PumpForecastResponse, 'generatedAt'>>({
+        system: `You are MoonFluxx AI Pump Forecaster — an expert Solana narrative analyst. Generate a real-time market pulse report.
 
-      const NarrativeSchema = z.object({
-        id:               z.string(),
-        name:             z.string(),
-        emoji:            z.string().describe('A single relevant emoji'),
-        confidence:       z.number().int().min(0).max(100),
-        momentumScore:    z.number().int().min(0).max(100).describe('Current momentum strength 0-100'),
-        trend:            z.enum(['Heating Up', 'Stable', 'Cooling', 'PEAK', 'Awakening']),
-        timeframe:        z.enum(['Next 24h', 'Next 3d', 'Next 7d']),
-        tag:              z.enum(['AI Pick', 'High Risk', 'Watch', 'Fading']),
-        color:            z.string().describe('A hex color that visually represents this narrative'),
-        volumeChange24h:  z.number().describe('% volume change vs 24h ago — can be negative'),
-        mentionVelocity:  z.number().int().min(0).max(100).describe('Social mention velocity relative score 0-100'),
-        keyDrivers:       z.array(z.string()).min(1).max(3).describe('Token tickers or events driving this narrative'),
-        aiInsight:        z.string().describe('1 punchy sentence AI analysis of this narrative — crypto-native, specific, actionable'),
-      });
-
-      const { object } = await generateObject({
-        model: anthropic('claude-3-5-haiku-20241022'),
-        schema: z.object({
-          narratives: z.array(NarrativeSchema).length(8),
-          marketSentiment: z.object({
-            regime:            z.enum(['Bull Run', 'Bear Market', 'Sideways', 'Euphoria', 'Recovery']),
-            regimeConfidence:  z.number().int().min(0).max(100),
-            overallSignal:     z.enum(['STRONG BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG SELL']),
-            signalStrength:    z.number().int().min(0).max(100),
-            fearGreedIndex:    z.number().int().min(0).max(100).describe('Crypto Fear & Greed index proxy — higher = more greed'),
-            dominantNarrative: z.string().describe('Name of the strongest narrative right now'),
-          }),
-          breakoutAlert: z.object({
-            narrativeId: z.string(),
-            reason:      z.string().describe('1-2 sentences explaining why this narrative is spiking unusually'),
-          }).nullable().describe('The single narrative showing the most unusual velocity spike. Null if none stand out.'),
-        }),
-        prompt: `You are MoonFluxx AI Pump Forecaster — an expert Solana narrative analyst. Generate a real-time market pulse report.
-
-Analyze these 8 narratives for the current Solana meta:
+Respond with a JSON object containing these fields:
+- "narratives" (array of exactly 8 objects): Each narrative object contains:
+  - "id" (string): narrative slug (e.g. "dog_meta", "ai_agents")
+  - "name" (string): human-readable name
+  - "emoji" (string): a single relevant emoji
+  - "confidence" (integer 0-100): prediction confidence (50-95 range realistic)
+  - "momentumScore" (integer 0-100): current momentum strength, make them varied
+  - "trend" (string): one of "Heating Up", "Stable", "Cooling", "PEAK", "Awakening"
+  - "timeframe" (string): one of "Next 24h", "Next 3d", "Next 7d"
+  - "tag" (string): one of "AI Pick", "High Risk", "Watch", "Fading"
+  - "color" (string): hex color for UI
+  - "volumeChange24h" (number): % volume change vs 24h ago — can be negative
+  - "mentionVelocity" (integer 0-100): social mention velocity relative score
+  - "keyDrivers" (array of 1-3 strings): token tickers or events driving this narrative
+  - "aiInsight" (string): 1 punchy sentence AI analysis — crypto-native, specific, actionable
+- "marketSentiment" (object):
+  - "regime" (string): one of "Bull Run", "Bear Market", "Sideways", "Euphoria", "Recovery"
+  - "regimeConfidence" (integer 0-100)
+  - "overallSignal" (string): one of "STRONG BUY", "BUY", "NEUTRAL", "SELL", "STRONG SELL"
+  - "signalStrength" (integer 0-100)
+  - "fearGreedIndex" (integer 0-100): crypto Fear & Greed index proxy — higher = more greed
+  - "dominantNarrative" (string): name of the strongest narrative right now
+- "breakoutAlert" (object or null): the single narrative showing the most unusual velocity spike, or null if none stand out
+  - "narrativeId" (string)
+  - "reason" (string): 1-2 sentences explaining why this narrative is spiking unusually`,
+        prompt: `Analyze these 8 narratives for the current Solana meta:
 1. dog_meta — Dog Meta (BARK, BONK derivatives, LDOGE)
 2. ai_agents — AI Agents (autonomous on-chain AI tokens)
 3. meme_season — Meme Season (broad meme market health)
@@ -131,11 +121,18 @@ For each narrative:
 
 For marketSentiment: be realistic about the current cycle phase.
 For breakoutAlert: pick the ONE narrative with the most unusual/surprising signal.`,
+        model: MODELS.FAST,
+        temperature: 0.3,
+        maxTokens: 600,
+        cacheTtlMs: 300000,
       });
 
-      return NextResponse.json({ ...object, generatedAt: new Date().toISOString() } as PumpForecastResponse);
+      return NextResponse.json(
+        { ...result.data, generatedAt: new Date().toISOString() } as PumpForecastResponse,
+        { headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' } },
+      );
     } catch (err) {
-      console.warn('[pump-forecast] Claude failed, using mock:', err);
+      console.warn('[pump-forecast] AI failed, using mock:', err);
     }
   }
 

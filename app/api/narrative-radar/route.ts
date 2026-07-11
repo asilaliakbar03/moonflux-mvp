@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 45;
 
-// Cache the response for 60 seconds to avoid hammering the LLM on every poll
-let cache: { data: NarrativeRadarResponse; expiresAt: number } | null = null;
 const CACHE_TTL_MS = 60_000; // 60 seconds
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -88,61 +87,40 @@ function buildMock(): NarrativeRadarResponse {
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function GET() {
-  // Serve from cache if still fresh
-  if (cache && Date.now() < cache.expiresAt) {
-    return NextResponse.json(cache.data, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
-        'X-Cache': 'HIT',
-      },
-    });
-  }
-
-  if (process.env.ANTHROPIC_API_KEY) {
+  if (isAIConfigured()) {
     try {
-      const { anthropic }      = await import('@ai-sdk/anthropic');
-      const { generateObject } = await import('ai');
-      const { z }              = await import('zod');
+      const result = await aiGenerate<Omit<NarrativeRadarResponse, 'lastUpdated' | 'nextRefresh'>>({
+        system: `You are MoonFluxx L·13 Narrative Radar — a real-time Solana market intelligence engine. You analyze social velocity, on-chain flows, and narrative momentum across all major Solana meta categories.
 
-      const SignalSchema = z.object({
-        id:             z.string(),
-        name:           z.string(),
-        emoji:          z.string(),
-        score:          z.number().int().min(0).max(100),
-        delta:          z.number().int().describe('Change in score vs 1 hour ago (can be negative)'),
-        trend:          z.enum(['up', 'down', 'flat', 'spike']).describe('spike = dramatic unusual movement'),
-        sources:        z.array(z.enum(['X', 'Telegram', 'Reddit', 'OnChain', 'Discord'])).min(1).max(3),
-        topToken:       z.string().describe('Ticker of the token currently leading this narrative'),
-        topTokenChange: z.string().describe('24h price change of topToken, e.g. "+142%" or "-18%"'),
-        sentimentBias:  z.number().int().min(-100).max(100).describe('Net sentiment: -100=max bearish, +100=max bullish'),
-        botPercentage:  z.number().int().min(0).max(100).describe('Estimated % of mentions that are bot-generated'),
-        insight:        z.string().describe('1 sharp, crypto-native insight about this narrative RIGHT NOW'),
-        alertLevel:     z.enum(['none', 'watch', 'warning', 'critical']).describe('none=normal, watch=monitor, warning=act soon, critical=act now'),
-      });
-
-      const { object } = await generateObject({
-        model: anthropic('claude-3-5-haiku-20241022'),
-        schema: z.object({
-          narratives: z.array(SignalSchema).length(8),
-          marketSentiment: z.object({
-            regime:            z.enum(['Bull Run', 'Bear Market', 'Sideways', 'Euphoria', 'Recovery', 'Distribution']),
-            regimeConfidence:  z.number().int().min(0).max(100),
-            signal:            z.enum(['STRONG BUY', 'BUY', 'NEUTRAL', 'SELL', 'STRONG SELL']),
-            signalStrength:    z.number().int().min(0).max(100),
-            fearGreedIndex:    z.number().int().min(0).max(100),
-            dominantNarrative: z.string(),
-            rotationTarget:    z.string().describe('One sentence: "Funds rotating FROM X TO Y" based on current signals'),
-          }),
-          breakoutAlert: z.object({
-            id:      z.string(),
-            name:    z.string(),
-            reason:  z.string().describe('2 sentences: what is happening and why it matters right now'),
-            urgency: z.enum(['low', 'medium', 'high', 'critical']),
-          }).nullable(),
-        }),
-        prompt: `You are MoonFluxx L·13 Narrative Radar — a real-time Solana market intelligence engine. You analyze social velocity, on-chain flows, and narrative momentum across all major Solana meta categories.
-
-Generate a live pulse of these 8 narratives. IDs and names:
+Respond with a JSON object containing these fields:
+- "narratives" (array of exactly 8 objects): Each signal object contains:
+  - "id" (string): narrative slug
+  - "name" (string): human-readable name
+  - "emoji" (string): a single relevant emoji
+  - "score" (integer 0-100): real-time narrative strength
+  - "delta" (integer): change in score vs 1 hour ago (can be negative)
+  - "trend" (string): one of "up", "down", "flat", "spike" — spike = dramatic unusual movement
+  - "sources" (array of 1-3 strings): each one of "X", "Telegram", "Reddit", "OnChain", "Discord"
+  - "topToken" (string): ticker of the token currently leading this narrative
+  - "topTokenChange" (string): 24h price change of topToken, e.g. "+142%" or "-18%"
+  - "sentimentBias" (integer -100 to +100): net sentiment: -100=max bearish, +100=max bullish
+  - "botPercentage" (integer 0-100): estimated % of mentions that are bot-generated
+  - "insight" (string): 1 sharp, crypto-native insight about this narrative RIGHT NOW
+  - "alertLevel" (string): one of "none", "watch", "warning", "critical" — critical for at most 1-2 narratives
+- "marketSentiment" (object):
+  - "regime" (string): one of "Bull Run", "Bear Market", "Sideways", "Euphoria", "Recovery", "Distribution"
+  - "regimeConfidence" (integer 0-100)
+  - "signal" (string): one of "STRONG BUY", "BUY", "NEUTRAL", "SELL", "STRONG SELL"
+  - "signalStrength" (integer 0-100)
+  - "fearGreedIndex" (integer 0-100)
+  - "dominantNarrative" (string)
+  - "rotationTarget" (string): one sentence: "Funds rotating FROM X TO Y" based on current signals
+- "breakoutAlert" (object or null): the ONE most unusual signal, or null if nothing stands out
+  - "id" (string)
+  - "name" (string)
+  - "reason" (string): 2 sentences: what is happening and why it matters right now
+  - "urgency" (string): one of "low", "medium", "high", "critical"`,
+        prompt: `Generate a live pulse of these 8 narratives. IDs and names:
 - dog_meta: Dog Meta (BARK, BONK, LDOGE, SHIB derivatives)
 - meme_season: Meme Season (broad meme market)
 - ai_agents: AI Agents (autonomous on-chain AI tokens)
@@ -160,33 +138,34 @@ For each narrative:
 - alertLevel 'critical' for at most 1-2 narratives
 
 For breakoutAlert: choose the ONE most unusual signal. Can be null if nothing stands out.`,
+        model: MODELS.FAST,
+        temperature: 0.3,
+        maxTokens: 600,
+        cacheTtlMs: CACHE_TTL_MS,
       });
 
+      const now = new Date();
       const response: NarrativeRadarResponse = {
-        ...object,
-        lastUpdated: new Date().toISOString(),
-        nextRefresh: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
+        ...result.data,
+        lastUpdated: now.toISOString(),
+        nextRefresh: new Date(now.getTime() + CACHE_TTL_MS).toISOString(),
       };
-
-      // Update cache
-      cache = { data: response, expiresAt: Date.now() + CACHE_TTL_MS };
 
       return NextResponse.json(response, {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
-          'X-Cache': 'MISS',
+          'X-Cache': result.cached ? 'HIT' : 'MISS',
         },
       });
     } catch (err) {
-      console.warn('[narrative-radar] Claude failed, using mock:', err);
+      console.warn('[narrative-radar] AI failed, using mock:', err);
     }
   }
 
   const mock = buildMock();
-  cache = { data: mock, expiresAt: Date.now() + CACHE_TTL_MS };
 
   await new Promise(r => setTimeout(r, 200));
   return NextResponse.json(mock, {
-    headers: { 'Cache-Control': 'public, s-maxage=60' },
+    headers: { 'Cache-Control': 'public, s-maxage=60', 'X-Cache': 'MOCK' },
   });
 }

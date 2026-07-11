@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 30;
 
@@ -85,32 +86,21 @@ export async function POST(req: NextRequest) {
     body = await req.json();
   } catch { /* proceed with defaults */ }
 
-  if (process.env.ANTHROPIC_API_KEY) {
+  if (isAIConfigured()) {
     try {
-      const { anthropic }      = await import('@ai-sdk/anthropic');
-      const { generateObject } = await import('ai');
-      const { z }              = await import('zod');
+      const result = await aiGenerate<PersonalizedFeedResponse>({
+        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Solana traders.
 
-      const FeedTokenSchema = z.object({
-        id:            z.string().describe('Must be one of the exact token IDs from the token universe list'),
-        matchScore:    z.number().int().min(0).max(100),
-        urgencySignal: z.enum(['Buy Window', 'Watch', 'Avoid', 'Strong Buy']).describe(
-          'Buy Window = entry opportunity open now, Watch = monitor but not urgent, Avoid = risk too high, Strong Buy = strong conviction'
-        ),
-        matchReasons:  z.array(z.string()).min(2).max(3).describe('2-3 specific reasons this token matches this user (15 words max each)'),
-        explanation:   z.string().describe('1-2 sentences in crypto-native voice explaining why this token is recommended for this specific user'),
-      });
-
-      const { object } = await generateObject({
-        model: anthropic('claude-3-5-haiku-20241022'),
-        schema: z.object({
-          tokens:     z.array(FeedTokenSchema).min(4).max(6),
-          profileTag: z.string().describe('A creative 2-3 word label for this trader\'s style, e.g. "Degen Ape", "Diamond Hand Maxi", "AI-First Trader"'),
-          insight:    z.string().describe('1 strategic sentence — what should this trader focus on right now based on their profile and the current market?'),
-        }),
-        prompt: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Solana traders.
-
-User Profile:
+Respond with a JSON object containing these fields:
+- "tokens" (array of 4-6 objects): Each token object contains:
+  - "id" (string): must be one of the exact token IDs from the token universe list provided in the prompt
+  - "matchScore" (integer 0-100): personalization fit score
+  - "urgencySignal" (string): one of "Buy Window", "Watch", "Avoid", "Strong Buy" — "Buy Window" = entry opportunity open now, "Watch" = monitor but not urgent, "Avoid" = risk too high, "Strong Buy" = strong conviction
+  - "matchReasons" (array of 2-3 strings): specific reasons this token matches this user (15 words max each)
+  - "explanation" (string): 1-2 sentences in crypto-native voice explaining why this token is recommended for this specific user
+- "profileTag" (string): a creative 2-3 word label for this trader's style, e.g. "Degen Ape", "Diamond Hand Maxi", "AI-First Trader"
+- "insight" (string): 1 strategic sentence — what should this trader focus on right now based on their profile and the current market?`,
+        prompt: `User Profile:
 - Wallet: ${body.walletAddress ?? 'anonymous'}
 - Recently viewed tokens: ${(body.recentViews ?? []).join(', ') || 'none'}
 - Recently bought tokens: ${(body.recentBuys ?? []).join(', ') || 'none'}
@@ -120,11 +110,17 @@ Token Universe (select 4-6 tokens to recommend, use exact IDs):
 ${TOKEN_UNIVERSE.map(t => `- ${t.id}: ${t.name} (${t.ticker}) — ${t.category}, ${t.change} 24h, ${t.status}, risk: ${t.risk}`).join('\n')}
 
 Rank tokens by fit for this user. Consider: their viewing/buying history, stated preferences, current narrative momentum, and risk tolerance inferred from their history. Give specific, personalized reasons — not generic ones. The urgencySignal must reflect actual current market conditions.`,
+        model: MODELS.FAST,
+        temperature: 0.3,
+        maxTokens: 400,
+        cacheTtlMs: 300000,
       });
 
-      return NextResponse.json(object as PersonalizedFeedResponse);
+      return NextResponse.json(result.data, {
+        headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' },
+      });
     } catch (err) {
-      console.warn('[personalized-feed] Claude failed, using mock:', err);
+      console.warn('[personalized-feed] AI failed, using mock:', err);
       return NextResponse.json(getMockFeed(body.preferences));
     }
   }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 60;
 
@@ -93,8 +94,7 @@ export async function POST(req: Request) {
     }
 
     // Simulate fetching on-chain data (in production: call Helius API here)
-    // For now we pass just the address — Claude invents a plausible history
-    // When HELIUS_API_KEY is set, this would inject real token names and trade history
+    // When HELIUS_API_KEY is set, this injects real token names and trade history
     const hasHelius   = Boolean(process.env.HELIUS_API_KEY);
     let realTxContext = '';
 
@@ -119,38 +119,38 @@ export async function POST(req: Request) {
       }
     }
 
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (isAIConfigured()) {
       try {
-        const { anthropic }      = await import('@ai-sdk/anthropic');
-        const { generateObject } = await import('ai');
-        const { z }              = await import('zod');
-
         // Simulate latency for "deep scan" UX
         await new Promise(r => setTimeout(r, 800));
 
-        const { object } = await generateObject({
-          model: anthropic('claude-3-5-sonnet-20241022'),
-          schema: z.object({
-            persona: z.string().describe('An RPG-style title for this trader. Examples: "Exit Liquidity Provider", "Chaotic Neutral Degen", "Paper-Hand Patrician", "Accidental Genius". Be creative and specific to their history.'),
-            roast:   z.string().describe('3-4 sentences: brutal, hilarious, deeply personal roast of their trading history. Reference specific crypto disasters (LUNA, FTX, rugs, buying tops). Make it shareable.'),
-            portfolioScore:  z.number().int().min(0).max(100).describe('Overall portfolio quality score 0-100. 0=complete disaster, 100=sigma trading god. Most wallets score 15-45.'),
-            winRate:         z.string().describe('Realistic (usually low) win rate percentage as a string, e.g. "12%". Rarely above 35%.'),
-            rugCount:        z.number().int().min(0).max(30).describe('How many rug pulls they\'ve experienced. Random between 3-20 for a normal degen.'),
-            biggestBag:      z.string().describe('The name of a dead, embarrassing, or funny meme coin they probably still hold. Be specific.'),
-            tradingStyle: z.enum(['Diamond Hands', 'Paper Hands', 'Ape Brain', 'Contrarian', 'Sniper', 'Bot Fodder', 'Exit Liquidity Provider', 'Accidental Genius']),
-            advice: z.string().describe('1 sentence of genuinely useful trading advice delivered in a funny, crypto-native way. Actually helpful, just wrapped in roast energy.'),
-            nftEquivalent: z.string().describe('Complete the sentence: "You are the [famous NFT collection] of traders because [funny comparison]."'),
-          }),
-          prompt: `You are MoonFluxx AI Wallet Roaster — the most ruthless, funny, and accurate crypto personality analyst on Solana. You have deep knowledge of crypto disasters (LUNA, FTX, SafeMoon, every dog coin pump & dump).
+        const result = await aiGenerate<WalletRoast>({
+          system: `You are MoonFluxx AI Wallet Roaster — the most ruthless, funny, and accurate crypto personality analyst on Solana. You have deep knowledge of crypto disasters (LUNA, FTX, SafeMoon, every dog coin pump & dump).
 
-Wallet address: ${address}${realTxContext}
+Respond with a JSON object containing these fields:
+- "persona" (string): An RPG-style title for this trader. Examples: "Exit Liquidity Provider", "Chaotic Neutral Degen", "Paper-Hand Patrician", "Accidental Genius". Be creative and specific to their history.
+- "roast" (string): 3-4 sentences: brutal, hilarious, deeply personal roast of their trading history. Reference specific crypto disasters (LUNA, FTX, rugs, buying tops). Make it shareable.
+- "portfolioScore" (integer 0-100): Overall portfolio quality score. 0=complete disaster, 100=sigma trading god. Most wallets score 15-45.
+- "winRate" (string): Realistic (usually low) win rate percentage, e.g. "12%". Rarely above 35%.
+- "rugCount" (integer 0-30): How many rug pulls they've experienced. Random between 3-20 for a normal degen.
+- "biggestBag" (string): The name of a dead, embarrassing, or funny meme coin they probably still hold. Be specific.
+- "tradingStyle" (string): One of: "Diamond Hands", "Paper Hands", "Ape Brain", "Contrarian", "Sniper", "Bot Fodder", "Exit Liquidity Provider", "Accidental Genius"
+- "advice" (string): 1 sentence of genuinely useful trading advice delivered in a funny, crypto-native way. Actually helpful, just wrapped in roast energy.
+- "nftEquivalent" (string): Complete the sentence: "You are the [famous NFT collection] of traders because [funny comparison]."`,
+          prompt: `Wallet address: ${address}${realTxContext}
 
 Roast this wallet holder. Invent a completely plausible but devastating trading history. Reference real events they probably suffered through. Make it highly shareable — the kind of roast people screenshot and post on X. Be brutal but not mean-spirited — more "Comedy Central roast" than "personal attack". The advice should be ACTUALLY useful.`,
+          model: MODELS.SMART,
+          temperature: 0.3,
+          maxTokens: 400,
+          cacheTtlMs: 3600000,
         });
 
-        return NextResponse.json(object as WalletRoast);
+        return NextResponse.json(result.data, {
+          headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' },
+        });
       } catch (err) {
-        console.warn('[roast-wallet] Claude failed, using mock:', err);
+        console.warn('[roast-wallet] AI failed, using mock:', err);
         await new Promise(r => setTimeout(r, 1500)); // maintain "scanning" UX
         return NextResponse.json(buildMockRoast(address));
       }

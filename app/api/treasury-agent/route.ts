@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aiChat, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 30;
 
@@ -30,23 +31,22 @@ export async function POST(req: NextRequest) {
     if (!message || typeof message !== "string") {
       return NextResponse.json({ error: "Invalid message" }, { status: 400 });
     }
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (isAIConfigured()) {
       try {
-        const { anthropic } = await import('@ai-sdk/anthropic');
-        const { generateText } = await import('ai');
-
         const systemPrompt = "You are the MoonFluxx Autonomous Treasury Agent. You are a razor-sharp DAO governance AI. You analyze proposals, model vote outcomes, check treasury health, and make autonomous recommendations. You are decisive, quantitative, and crypto-native. Keep responses under 4 sentences.";
         const contextSummary = context ? `\n\nContext: ${JSON.stringify(context)}` : "";
 
-        const { text } = await generateText({
-          model: anthropic('claude-3-5-haiku-20241022'),
+        const { text } = await aiChat({
           system: systemPrompt,
           prompt: message + contextSummary,
+          model: MODELS.FAST,
+          temperature: 0.3,
+          maxTokens: 300,
         });
 
         return NextResponse.json({ response: text });
       } catch (err) {
-        console.warn('Claude failed, using mock:', err);
+        console.warn('[treasury-agent] AI failed, using mock:', err);
       }
     }
     const mock = getMockResponse(message);

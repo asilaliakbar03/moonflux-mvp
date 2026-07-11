@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
 
 export const maxDuration = 30;
 
@@ -80,37 +81,40 @@ export async function POST(req: Request) {
     const pct      = Math.abs(priceChange ?? 0);
     const severity: CrashSeverity = pct >= 40 ? 'extreme' : pct >= 25 ? 'severe' : 'moderate';
 
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (isAIConfigured()) {
       try {
-        const { anthropic }      = await import('@ai-sdk/anthropic');
-        const { generateObject } = await import('ai');
-        const { z }              = await import('zod');
+        const result = await aiGenerate<Omit<FlashCrashReport, 'severity'>>({
+          system: `You are MoonFluxx AI Crash Analyst — the first responder when a Solana token crashes.
 
-        const { object } = await generateObject({
-          model: anthropic('claude-3-5-sonnet-20241022'),
-          schema: z.object({
-            causeType: z.enum(['whale_dump', 'coordinated_exit', 'liquidity_drain', 'market_wide', 'panic_cascade', 'bot_attack']),
-            causeLabel: z.string().describe('Short 3-5 word human-readable label for the cause'),
-            explanation: z.string().describe('2-3 sentences in crypto-native voice. Include specific plausible data: wallet %, token amounts, timing. End with a note on contract safety.'),
-            contractSafe: z.boolean().describe('Is the smart contract itself safe? Usually true unless there are clear rug indicators.'),
-            affectedWallets: z.number().int().describe('Estimated number of wallets impacted by the crash'),
-            solOutflow: z.string().describe('Estimated SOL that left the liquidity pool, e.g. "12.4 SOL"'),
-            recoveryTimeEstimate: z.string().describe('Realistic estimate of recovery time, e.g. "2-6 hours" or "Unlikely — avoid"'),
-            actionRecommendation: z.string().describe('1 specific, actionable sentence: what should the user DO right now? Be direct.'),
-            priceTargetIfRecovery: z.string().nullable().describe('Recovery price target if bullish, or null if the outlook is bearish'),
-          }),
-          prompt: `You are MoonFluxx AI Crash Analyst — the first responder when a Solana token crashes. Analyze this flash crash.
+Respond with a JSON object containing these fields:
+- "causeType" (string): one of "whale_dump", "coordinated_exit", "liquidity_drain", "market_wide", "panic_cascade", "bot_attack"
+- "causeLabel" (string): short 3-5 word human-readable label for the cause
+- "explanation" (string): 2-3 sentences in crypto-native voice. Include specific plausible data: wallet %, token amounts, timing. End with a note on contract safety.
+- "contractSafe" (boolean): is the smart contract itself safe? Usually true unless there are clear rug indicators.
+- "affectedWallets" (integer): estimated number of wallets impacted by the crash
+- "solOutflow" (string): estimated SOL that left the liquidity pool, e.g. "12.4 SOL"
+- "recoveryTimeEstimate" (string): realistic estimate, e.g. "2-6 hours" or "Unlikely — avoid"
+- "actionRecommendation" (string): 1 specific, actionable sentence: what should the user DO right now? Be direct.
+- "priceTargetIfRecovery" (string or null): recovery price target if bullish, or null if the outlook is bearish`,
+          prompt: `Analyze this flash crash.
 
 Token: ${tokenName ?? tokenId}
 Price Drop: -${pct.toFixed(1)}%
 Severity: ${severity.toUpperCase()}
 
 Generate a realistic crash analysis. Be specific with numbers (wallet percentages, SOL amounts, timestamps). Sound like an experienced on-chain analyst, not a bot. The contractSafe field should be true in most cases (it's rarely the contract). Give a genuinely useful action recommendation.`,
+          model: MODELS.FAST,
+          temperature: 0.2,
+          maxTokens: 400,
+          cacheTtlMs: 300000,
         });
 
-        return NextResponse.json({ ...object, severity } as FlashCrashReport);
+        return NextResponse.json(
+          { ...result.data, severity } as FlashCrashReport,
+          { headers: { 'X-Cache': result.cached ? 'HIT' : 'MISS' } },
+        );
       } catch (err) {
-        console.warn('[flash-crash] Claude failed, using mock:', err);
+        console.warn('[flash-crash] AI failed, using mock:', err);
         return NextResponse.json(buildMock(priceChange ?? 0, tokenName ?? tokenId));
       }
     }
