@@ -1,0 +1,374 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-mf-bg-primary: #000000;
+  --color-mf-bg-surface: #0a0a12;
+  --color-mf-bg-elevated: #12111f;
+  --color-mf-bg-hover: #1a1830;
+
+  --color-mf-ink: #f4f2ff;
+  --color-mf-dim: #6b6987;
+  --color-mf-dimmer: #35334a;
+
+  --color-mf-violet: #7c3aed;
+  --color-mf-hot: #a855f7;
+  --color-mf-ice: #38bdf8;
+  --color-mf-flare: #c4b5fd;
+
+  /* ── OBSIDIAN & LIQUID GOLD — flagship language ── */
+  --color-mf-gold: #e8b84b;      /* primary molten gold */
+  --color-mf-gold-hi: #ffe6a3;   /* highlight / champagne sheen */
+  --color-mf-gold-deep: #a9791f; /* shadowed gold for depth */
+  --color-mf-champagne: #f5e6c8; /* warm ivory */
+  --color-mf-obsidian: #050403;  /* warm-black surface */
+
+  --color-mf-danger: #ef4444;
+  --color-mf-success: #10b981;
+  --color-mf-warning: #f59e0b;
+
+  --color-mf-line: rgba(140, 90, 255, 0.13);
+  --color-mf-line-gold: rgba(232, 184, 75, 0.18);
+  --color-mf-glass: rgba(4, 3, 10, 0.75);
+
+  --font-display: 'Clash Display', 'Satoshi', sans-serif;
+  --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  --ease-mf: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  font-size: 17px; /* bump all rem-based sizes by ~6% app-wide */
+}
+
+html, body {
+  background-color: var(--color-mf-bg-primary);
+  color: var(--color-mf-ink);
+  font-family: var(--font-body);
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* Tabular figures for all monospace / data numbers */
+.font-mono, [class*="font-mono"] {
+  font-feature-settings: 'tnum' 1, 'zero' 1, 'ss01' 1, 'liga' 0;
+  letter-spacing: 0.015em;
+}
+
+/* Display font — tighten tracking slightly for large headings */
+.font-display, [class*="font-display"] {
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+
+::selection {
+  background: rgba(124, 58, 237, 0.4);
+  color: #fff;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-mf-violet), var(--color-mf-dimmer));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-mf-hot); }
+
+/* ═══════════ KEYFRAMES ═══════════ */
+@keyframes mf-shimmer {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+@keyframes mf-border-spin {
+  to { --mf-angle: 360deg; }
+}
+@keyframes mf-pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.25); }
+  50% { box-shadow: 0 0 44px rgba(168, 85, 247, 0.55); }
+}
+@keyframes mf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes mf-flare-pulse {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; filter: blur(0.4px); }
+}
+@keyframes mf-liquid-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes mf-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes mf-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@keyframes mf-ripple {
+  to { box-shadow: 0 0 0 16px rgba(168, 85, 247, 0); }
+}
+@keyframes mf-gold-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes mf-gold-glow {
+  0%, 100% { box-shadow: 0 0 22px rgba(232, 184, 75, 0.22), inset 0 0 12px rgba(232,184,75,0.06); }
+  50% { box-shadow: 0 0 52px rgba(232, 184, 75, 0.5), inset 0 0 18px rgba(232,184,75,0.12); }
+}
+@keyframes mf-aurora-drift {
+  0% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
+  50% { transform: translate3d(4%, 3%, 0) rotate(4deg); }
+  100% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
+}
+@keyframes mf-count-shine {
+  0% { background-position: -140% 0; }
+  100% { background-position: 240% 0; }
+}
+@keyframes mf-scan {
+  0% { transform: translateY(-120%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(1200%); opacity: 0; }
+}
+@keyframes mf-mesh-a { 0%,100% { transform: translate3d(-8%,-6%,0) scale(1.1); } 50% { transform: translate3d(10%,8%,0) scale(1.35); } }
+@keyframes mf-mesh-b { 0%,100% { transform: translate3d(12%,10%,0) scale(1.2); } 50% { transform: translate3d(-10%,-8%,0) scale(0.95); } }
+@keyframes mf-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.06); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes mf-tick { 0%,100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+@property --mf-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ═══════════ UTILITIES ═══════════ */
+@layer utilities {
+  .text-glow { text-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+
+  .glass-panel {
+    @apply bg-mf-bg-surface/80 backdrop-blur-xl border border-mf-line shadow-2xl;
+  }
+
+  /* liquid gradient text — brand signature */
+  .text-liquid {
+    background: linear-gradient(100deg, #e9d5ff, #a855f7 25%, #6366f1 50%, #f5f3ff 62%, #38bdf8 80%, #e9d5ff);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: mf-liquid-flow 8s ease-in-out infinite;
+  }
+
+  /* hollow outline display text */
+  .text-hollow {
+    color: transparent;
+    -webkit-text-stroke: 1.2px rgba(196, 181, 253, 0.65);
+  }
+
+  /* animated conic gradient border — wrap content in a relative child */
+  .border-flow {
+    position: relative;
+    background:
+      linear-gradient(var(--color-mf-bg-surface), var(--color-mf-bg-surface)) padding-box,
+      conic-gradient(from var(--mf-angle), rgba(124,58,237,.05), #a855f7, rgba(56,189,248,.7), rgba(124,58,237,.05)) border-box;
+    border: 1px solid transparent;
+    animation: mf-border-spin 5s linear infinite;
+  }
+
+  /* sheen sweep on hover */
+  .sheen { position: relative; overflow: hidden; }
+  .sheen::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 40%; height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(196, 181, 253, 0.16), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+  }
+  .sheen:hover::after { animation: mf-shimmer 0.9s ease-in-out; }
+
+  .pulse-glow { animation: mf-pulse-glow 3.2s ease-in-out infinite; }
+  .animate-float { animation: mf-float 5s ease-in-out infinite; }
+  .animate-blink { animation: mf-blink 1.8s infinite; }
+  .animate-mf-marquee { animation: mf-marquee 28s linear infinite; }
+
+  /* star-flare beams (brand mark) */
+  .flare-v {
+    background: linear-gradient(180deg, transparent, #a855f7, #fff, #a855f7, transparent);
+    box-shadow: 0 0 14px 2px rgba(168, 85, 247, 0.75);
+    animation: mf-flare-pulse 4s ease-in-out infinite;
+  }
+  .flare-h {
+    background: linear-gradient(90deg, transparent, #a855f7, #fff, #a855f7, transparent);
+    box-shadow: 0 0 14px 2px rgba(168, 85, 247, 0.75);
+    animation: mf-flare-pulse 4s 0.5s ease-in-out infinite;
+  }
+
+  /* spotlight cards: set --sx/--sy via JS pointermove */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(480px circle at var(--sx, 50%) var(--sy, 50%), rgba(139, 92, 246, 0.14), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .spotlight:hover::before { opacity: 1; }
+
+  /* ── OBSIDIAN-GOLD SIGNATURE UTILITIES ── */
+
+  /* molten liquid-gold gradient text — flagship headline treatment */
+  .text-gold-liquid {
+    background: linear-gradient(100deg, #7a5c1e, #e8b84b 22%, #ffe6a3 42%, #fffef6 50%, #ffe6a3 58%, #e8b84b 78%, #7a5c1e);
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: mf-gold-flow 7s ease-in-out infinite;
+  }
+
+  /* flat brushed-gold fill (no animation) for smaller labels */
+  .text-gold {
+    background: linear-gradient(180deg, #ffe6a3, #e8b84b 55%, #a9791f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gold-glow { text-shadow: 0 0 16px rgba(232, 184, 75, 0.45); }
+
+  /* obsidian glass with a warm gilded rim */
+  .glass-gold {
+    background: linear-gradient(180deg, rgba(12,10,7,0.72), rgba(5,4,3,0.82));
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-mf-line-gold);
+    box-shadow: 0 24px 70px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,230,163,0.06);
+  }
+
+  /* animated gilded conic border — wrap content in a relative child */
+  .border-gold-flow {
+    position: relative;
+    background:
+      linear-gradient(var(--color-mf-obsidian), var(--color-mf-obsidian)) padding-box,
+      conic-gradient(from var(--mf-angle), rgba(169,121,31,.05), #e8b84b, #ffe6a3, rgba(169,121,31,.05)) border-box;
+    border: 1px solid transparent;
+    animation: mf-border-spin 6s linear infinite;
+  }
+
+  .pulse-gold { animation: mf-gold-glow 3.4s ease-in-out infinite; }
+
+  /* gold sheen sweep on hover */
+  .sheen-gold { position: relative; overflow: hidden; }
+  .sheen-gold::after {
+    content: "";
+    position: absolute; top: 0; left: 0;
+    width: 40%; height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(255, 230, 163, 0.28), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+  }
+  .sheen-gold:hover::after { animation: mf-shimmer 0.9s ease-in-out; }
+
+  /* thin hairline gold rule */
+  .rule-gold { background: linear-gradient(90deg, transparent, rgba(232,184,75,0.55), transparent); }
+
+  /* gold spotlight cards: set --sx/--sy via JS pointermove */
+  .spotlight-gold { position: relative; }
+  .spotlight-gold::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(460px circle at var(--sx, 50%) var(--sy, 50%), rgba(232, 184, 75, 0.12), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.45s;
+    pointer-events: none;
+  }
+  .spotlight-gold:hover::before { opacity: 1; }
+
+  /* animated aurora mesh — drop as an absolute layer inside a panel/hero */
+  .aurora-mesh { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .aurora-mesh::before, .aurora-mesh::after {
+    content: ""; position: absolute; border-radius: 9999px; filter: blur(90px);
+  }
+  .aurora-mesh::before {
+    width: 46%; height: 60%; top: -10%; right: -6%;
+    background: radial-gradient(circle, rgba(232,184,75,0.28), transparent 70%);
+    animation: mf-mesh-a 16s ease-in-out infinite;
+  }
+  .aurora-mesh::after {
+    width: 40%; height: 55%; bottom: -12%; left: -8%;
+    background: radial-gradient(circle, rgba(124,58,237,0.22), transparent 70%);
+    animation: mf-mesh-b 20s ease-in-out infinite;
+  }
+
+  /* faint gold data grid backdrop */
+  .grid-gold {
+    background-image:
+      linear-gradient(rgba(232,184,75,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,184,75,0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  /* travelling scanline — put inside a relative overflow-hidden container */
+  .scanline { position: absolute; left: 0; right: 0; height: 2px; top: 0;
+    background: linear-gradient(90deg, transparent, rgba(232,184,75,0.6), transparent);
+    animation: mf-scan 6s linear infinite; pointer-events: none; }
+
+  /* huge hollow gold display text — for section watermarks */
+  .text-outline-gold {
+    color: transparent;
+    -webkit-text-stroke: 1.2px rgba(232,184,75,0.5);
+  }
+
+  .pop-in { animation: mf-pop 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .hover-lift { transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s; }
+  .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 26px 60px -26px rgba(232,184,75,0.4); }
+
+  /* gilded chip */
+  .chip-gold {
+    font-family: var(--font-mono);
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #ffe6a3;
+    border: 1px solid rgba(232,184,75,0.3);
+    background: rgba(232,184,75,0.08);
+    border-radius: 9999px; padding: 0.25rem 0.65rem;
+  }
+
+  /* mono eyebrow label */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-mf-dim);
+  }
+}
+
+/* visible keyboard focus */
+:focus-visible {
+  outline: 1.5px solid var(--color-mf-hot);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    transition-duration: 0.001s !important;
+  }
+}
