@@ -11,15 +11,15 @@ export default function HomePage() {
   const { address } = useMoonWallet();
 
   const MOCK_TRENDING = [
-    { id:'tok_ai_swarm', name:'AI Swarm', ticker:'$SWRM', icon:'🤖', change:+211.4, price:'$0.00671', category:'AI', color:'#6366F1' },
-    { id:'tok_degen_ape', name:'DegenApe', ticker:'$DAPE', icon:'💎', change:+388.2, price:'$0.00156', category:'Meme', color:'#F43F5E' },
-    { id:'tok_nova_flux', name:'NovaFlux', ticker:'$NVFX', icon:'⚡', change:+67.8, price:'$0.0445', category:'DeFi', color:'#10B981' },
+    { id:'tok_ai_swarm', name:'AI Swarm', ticker:'$SWRM', icon:'🤖', change:+211.4, price:'$0.00671', category:'AI', color:'#FF2A6D', marketCap:2300000, riskScore:5, holders:4821, progress:85, sparkline:[5,8,12,15,14,18,25,32,28,40,55,70,90,85,110] },
+    { id:'tok_degen_ape', name:'DegenApe', ticker:'$DAPE', icon:'💎', change:+388.2, price:'$0.00156', category:'Meme', color:'#05D5FA', marketCap:970000, riskScore:9, holders:2109, progress:60, sparkline:[2,3,4,5,6,10,15,12,20,30,25,40,60,50,80] },
+    { id:'tok_nova_flux', name:'NovaFlux', ticker:'$NVFX', icon:'⚡', change:+67.8, price:'$0.0445', category:'DeFi', color:'#39FF14', marketCap:8900000, riskScore:3, holders:11432, progress:100, sparkline:[30,35,38,42,48,52,58,65,70,68,75,80,90,95,100] },
   ];
 
   const MOCK_LAUNCHES = [
-    { id:'tok_luna_doge', name:'Luna Doge', ticker:'$LDOGE', icon:'🐶', creator:'@moondev', timeAgo:'2h ago', progress:73 },
-    { id:'tok_pixel_cat', name:'PixelCat', ticker:'$PCAT', icon:'🐱', creator:'@pixelwiz', timeAgo:'4h ago', progress:31 },
-    { id:'tok_storm_cat', name:'StormCat', ticker:'$STMC', icon:'⚡', creator:'@stormking', timeAgo:'6h ago', progress:18 },
+    { id:'tok_luna_doge', name:'Luna Doge', ticker:'$LDOGE', icon:'🐶', creator:'@moondev', timeAgo:'2h ago', progress:73, color:'#FF2A6D', change:+142.5, price:'$0.00234', marketCap:1870000, riskScore:3, sparkline:[8,12,19,25,31,44,52,71,65,89,95,120,110,140] },
+    { id:'tok_pixel_cat', name:'PixelCat', ticker:'$PCAT', icon:'🐱', creator:'@pixelwiz', timeAgo:'4h ago', progress:31, color:'#C8A2C8', change:-5.4, price:'$0.00329', marketCap:1100000, riskScore:6, sparkline:[50,48,45,46,44,42,40,41,39,37,35,33,34,32] },
+    { id:'tok_storm_cat', name:'StormCat', ticker:'$STMC', icon:'⚡', creator:'@stormking', timeAgo:'6h ago', progress:18, color:'#FF2A6D', change:-23.1, price:'$0.00082', marketCap:440000, riskScore:8, sparkline:[80,75,70,65,60,55,68,72,65,58,50,45,48,42] },
   ];
 
   return (
@@ -33,35 +33,35 @@ export default function HomePage() {
         className="flex flex-col md:flex-row items-center gap-12 pt-8"
       >
         <div className="flex-1 flex flex-col gap-6">
-          <div className="inline-flex items-center gap-2 bg-[#161B27] border border-[rgba(99,102,241,0.2)] rounded-full px-4 py-1.5 w-fit">
-            <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-pulse" />
-            <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">The memecoin launchpad on Solana</span>
+          <div className="inline-flex items-center gap-2 bg-[#120721] border border-[rgba(255,42,109,0.3)] rounded-full px-4 py-1.5 w-fit shadow-[0_0_15px_rgba(255,42,109,0.15)]">
+            <span className="w-2 h-2 rounded-full bg-[#FF2A6D] animate-pulse shadow-[0_0_10px_#FF2A6D]" />
+            <span className="text-xs font-bold text-[#F8F0FF] uppercase tracking-wider">The memecoin launchpad on Solana</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight">
             Discover & Launch <br/>
-            Tokens That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#818CF8] to-[#4F46E5]">Move</span>
+            Tokens That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2A6D] to-[#05D5FA] drop-shadow-[0_0_10px_rgba(255,42,109,0.3)]">Move</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-[#94A3B8] max-w-xl leading-relaxed">
+          <p className="text-lg md:text-xl text-[#C8A2C8] max-w-xl leading-relaxed">
             Find the next 100x before it pumps. Launch your own token in minutes with AI assistance.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
-            <Link href="/explore" className="w-full sm:w-auto px-8 py-3.5 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <Link href="/explore" className="w-full sm:w-auto px-8 py-3.5 btn-primary font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
               <Search className="w-5 h-5" />
               Explore Tokens
             </Link>
-            <Link href="/launch" className="w-full sm:w-auto px-8 py-3.5 bg-transparent hover:bg-[rgba(99,102,241,0.08)] border border-[rgba(99,102,241,0.3)] text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <Link href="/launch" className="w-full sm:w-auto px-8 py-3.5 btn-ghost font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
               <Rocket className="w-5 h-5" />
               Launch a Token
             </Link>
           </div>
           
-          <div className="flex items-center gap-6 mt-4 text-sm text-[#94A3B8] font-medium">
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#10B981]" /> No coding required</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#10B981]" /> AI-powered</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#10B981]" /> Solana-native</div>
+          <div className="flex items-center gap-6 mt-4 text-sm text-[#8B6A8B] font-mono font-bold">
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> No coding required</div>
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> AI-powered</div>
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> Solana-native</div>
           </div>
         </div>
         
@@ -122,34 +122,68 @@ export default function HomePage() {
       >
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-2xl font-bold font-display flex items-center gap-2">
-            <TrendingUp className="text-[#6366F1]" /> Trending Now
+            <TrendingUp className="text-[#FF2A6D]" /> Trending Now
           </h2>
-          <Link href="/explore" className="text-[#818CF8] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
+          <Link href="/explore" className="text-[#05D5FA] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
             View all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {MOCK_TRENDING.map((token) => (
-            <Link href={`/token/${token.id}`} key={token.id} className="surface-card p-5 group hover:border-[rgba(99,102,241,0.4)] hover:-translate-y-1 transition-all flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl" style={{ backgroundColor: `${token.color}20` }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {MOCK_TRENDING.map((token, i) => (
+            <Link href={`/token/${token.id}`} key={token.id} className="surface-glass p-5 group hover:border-[#05D5FA] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(5,213,250,0.2)] transition-all flex flex-col h-full relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(5,213,250,0.8),transparent_50%)]" />
+              
+              {/* Top */}
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_0_15px_rgba(255,42,109,0.2)]" style={{ backgroundColor: `${token.color}20` }}>
                   {token.icon}
                 </div>
-                <div>
-                  <div className="font-bold flex items-center gap-2">
-                    {token.name}
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(99,102,241,0.1)] text-[#818CF8] uppercase tracking-wider">{token.category}</span>
-                  </div>
-                  <div className="text-[#94A3B8] text-sm font-mono mt-0.5">{token.ticker}</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-mono font-medium">{token.price}</div>
-                <div className={`text-sm font-mono font-semibold ${token.change >= 0 ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
+                <div className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${token.change >= 0 ? 'bg-[rgba(57,255,20,0.1)] text-[#39FF14] border-[rgba(57,255,20,0.3)] shadow-[0_0_10px_rgba(57,255,20,0.2)]' : 'bg-[rgba(255,42,109,0.1)] text-[#FF2A6D] border-[rgba(255,42,109,0.3)] shadow-[0_0_10px_rgba(255,42,109,0.2)]'}`}>
                   {token.change > 0 ? '+' : ''}{token.change}%
                 </div>
               </div>
+
+              {/* Middle */}
+              <div className="mb-4 flex-1 relative z-10">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+                  {token.name}
+                  <span className="text-[10px] px-2 py-0.5 rounded-sm bg-[rgba(5,213,250,0.15)] text-[#05D5FA] uppercase tracking-wider font-semibold border border-[rgba(5,213,250,0.3)]">{token.category}</span>
+                </h3>
+                <div className="text-[#C8A2C8] text-sm font-mono mt-1">{token.ticker}</div>
+              </div>
+
+              {/* Market Data */}
+              <div className="flex justify-between items-end mb-4 relative z-10">
+                <div>
+                  <div className="text-xl font-mono text-[#F8F0FF] font-bold drop-shadow-[0_0_8px_rgba(248,240,255,0.3)]">{token.price}</div>
+                  <div className="text-xs text-[#8B6A8B] mt-1 font-mono">MCap ${(token.marketCap / 1000000).toFixed(2)}M</div>
+                </div>
+                
+                {/* Mini sparkline */}
+                <svg viewBox="0 0 80 32" className="w-[80px] h-[32px] overflow-visible drop-shadow-[0_0_5px_currentColor]">
+                  <path 
+                    d={`M0,${32 - (token.sparkline[0]/140)*32} ${token.sparkline.map((val, idx) => `L${(idx / (token.sparkline.length - 1)) * 80},${32 - (val/140)*32}`).join(' ')}`}
+                    fill="none" 
+                    stroke={token.change >= 0 ? '#39FF14' : '#FF2A6D'} 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                  />
+                </svg>
+              </div>
+
+              {/* Bonding Curve Quick Look */}
+              <div className="mb-4 relative z-10">
+                <div className="flex justify-between text-[10px] font-mono text-[#C8A2C8] mb-1.5 uppercase">
+                  <span>Curve Progress</span>
+                  <span className="text-[#05D5FA]">{token.progress}%</span>
+                </div>
+                <div className="h-1.5 bg-[#0B0414] rounded-full overflow-hidden border border-[rgba(5,213,250,0.2)]">
+                  <div className="h-full bg-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.8)]" style={{ width: `${token.progress}%` }} />
+                </div>
+              </div>
+
             </Link>
           ))}
         </div>
@@ -163,41 +197,43 @@ export default function HomePage() {
       >
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-2xl font-bold font-display flex items-center gap-2">
-            <Zap className="text-[#F59E0B]" /> Just Launched
+            <Zap className="text-[#FFEA00]" /> Just Launched
           </h2>
-          <Link href="/explore" className="text-[#818CF8] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
+          <Link href="/explore" className="text-[#05D5FA] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
             See all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {MOCK_LAUNCHES.map((token) => (
-            <Link href={`/token/${token.id}`} key={token.id} className="surface-card p-5 group hover:border-[rgba(99,102,241,0.4)] hover:-translate-y-1 transition-all flex flex-col gap-4">
-              <div className="flex justify-between items-start">
+            <Link href={`/token/${token.id}`} key={token.id} className="surface-glass p-5 group hover:border-[#FF2A6D] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(255,42,109,0.2)] transition-all flex flex-col h-full relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(255,42,109,0.8),transparent_50%)]" />
+              
+              <div className="flex justify-between items-start relative z-10 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[rgba(241,245,249,0.05)] flex items-center justify-center text-xl">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_0_15px_rgba(255,42,109,0.2)]" style={{ backgroundColor: `${token.color}20` }}>
                     {token.icon}
                   </div>
                   <div>
-                    <div className="font-bold">{token.name}</div>
-                    <div className="text-[#94A3B8] text-sm font-mono">{token.ticker}</div>
+                    <div className="font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{token.name}</div>
+                    <div className="text-[#C8A2C8] text-sm font-mono">{token.ticker}</div>
                   </div>
                 </div>
-                <div className="bg-[rgba(16,185,129,0.15)] text-[#10B981] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">NEW</div>
+                <div className="bg-[rgba(57,255,20,0.15)] text-[#39FF14] border border-[rgba(57,255,20,0.3)] shadow-[0_0_10px_rgba(57,255,20,0.2)] text-[10px] px-2 py-1 rounded-md font-bold uppercase">NEW</div>
               </div>
               
-              <div className="text-sm text-[#94A3B8] flex items-center justify-between">
-                <span>by {token.creator}</span>
+              <div className="text-sm text-[#8B6A8B] flex items-center justify-between relative z-10 mb-6 font-mono">
+                <span>by <span className="text-[#05D5FA]">{token.creator}</span></span>
                 <span>{token.timeAgo}</span>
               </div>
               
-              <div>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-[#94A3B8]">Bonding Curve</span>
-                  <span className="font-mono text-[#818CF8]">{token.progress}%</span>
+              <div className="relative z-10 mt-auto">
+                <div className="flex justify-between text-[10px] font-mono text-[#C8A2C8] mb-1.5 uppercase">
+                  <span>Bonding Curve</span>
+                  <span className="text-[#39FF14]">{token.progress}%</span>
                 </div>
-                <div className="w-full h-2 bg-[#161B27] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#6366F1] rounded-full" style={{ width: `${token.progress}%` }} />
+                <div className="h-1.5 bg-[#0B0414] rounded-full overflow-hidden border border-[rgba(57,255,20,0.2)]">
+                  <div className="h-full bg-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.8)]" style={{ width: `${token.progress}%` }} />
                 </div>
               </div>
             </Link>

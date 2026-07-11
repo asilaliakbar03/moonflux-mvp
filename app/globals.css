@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   MoonFluxx — "Midnight Indigo" Design System
+   MoonFluxx — "Neon Cyberpunk" Design System
    Tailwind CSS v4 · globals.css
    ══════════════════════════════════════════════════════════════ */
 
@@ -12,52 +12,52 @@
 @theme {
 
   /* ── SURFACES ── */
-  --color-surface-base:  #080B12;
-  --color-surface-1:     #0D1117;
-  --color-surface-2:     #161B27;
-  --color-surface-3:     #1E2433;
-  --color-surface-4:     #252D3D;
-  --color-surface-hover: #2A3347;
+  --color-surface-base:  #0B0414;
+  --color-surface-1:     #120721;
+  --color-surface-2:     #1C0B33;
+  --color-surface-3:     #250E45;
+  --color-surface-4:     #2F1257;
+  --color-surface-hover: #3A166B;
 
   /* ── TEXT ── */
-  --color-text-primary:   #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted:     #475569;
-  --color-text-faint:     #334155;
+  --color-text-primary:   #F8F0FF;
+  --color-text-secondary: #C8A2C8;
+  --color-text-muted:     #8B6A8B;
+  --color-text-faint:     #5C405C;
 
-  /* ── BRAND INDIGO ── */
-  --color-indigo-50:  #EEF2FF;
-  --color-indigo-100: #E0E7FF;
-  --color-indigo-200: #C7D2FE;
-  --color-indigo-300: #A5B4FC;
-  --color-indigo-400: #818CF8;
-  --color-indigo-500: #6366F1;
-  --color-indigo-600: #4F46E5;
-  --color-indigo-700: #4338CA;
-  --color-indigo-800: #3730A3;
-  --color-indigo-900: #312E81;
+  /* ── BRAND CYBERPUNK ── */
+  --color-indigo-50:  #FFF0F5;
+  --color-indigo-100: #FFD6E8;
+  --color-indigo-200: #FFADCD;
+  --color-indigo-300: #FF85B2;
+  --color-indigo-400: #FF5C97;
+  --color-indigo-500: #FF2A6D;
+  --color-indigo-600: #E61E5B;
+  --color-indigo-700: #CC1249;
+  --color-indigo-800: #B30637;
+  --color-indigo-900: #990025;
 
   /* ── SEMANTIC ── */
-  --color-success:       #10B981;
-  --color-success-light: #34D399;
-  --color-success-muted: rgba(16, 185, 129, 0.12);
-  --color-danger:        #F43F5E;
-  --color-danger-light:  #FB7185;
-  --color-danger-muted:  rgba(244, 63, 94, 0.12);
-  --color-warning:       #F59E0B;
-  --color-warning-muted: rgba(245, 158, 11, 0.12);
-  --color-cyan:          #06B6D4;
-  --color-cyan-muted:    rgba(6, 182, 212, 0.12);
+  --color-success:       #39FF14;
+  --color-success-light: #6EFF4F;
+  --color-success-muted: rgba(57, 255, 20, 0.12);
+  --color-danger:        #FF2A6D;
+  --color-danger-light:  #FF5C97;
+  --color-danger-muted:  rgba(255, 42, 109, 0.12);
+  --color-warning:       #FFEA00;
+  --color-warning-muted: rgba(255, 234, 0, 0.12);
+  --color-cyan:          #05D5FA;
+  --color-cyan-muted:    rgba(5, 213, 250, 0.12);
 
   /* ── BORDERS ── */
-  --color-border-default: rgba(99, 102, 241, 0.10);
-  --color-border-subtle:  rgba(99, 102, 241, 0.18);
-  --color-border-strong:  rgba(99, 102, 241, 0.35);
-  --color-border-focus:   rgba(99, 102, 241, 0.60);
+  --color-border-default: rgba(255, 42, 109, 0.15);
+  --color-border-subtle:  rgba(255, 42, 109, 0.25);
+  --color-border-strong:  rgba(255, 42, 109, 0.45);
+  --color-border-focus:   rgba(255, 42, 109, 0.70);
 
   /* ── LEGACY TOKENS (preserved for existing page references) ── */
-  --color-mf-bg-primary:  #080B12;
-  --color-mf-bg-surface:  #0D1117;
+  --color-mf-bg-primary:  #0B0414;
+  --color-mf-bg-surface:  #120721;
   --color-mf-bg-elevated: #161B27;
   --color-mf-bg-hover:    #1E2433;
   --color-mf-ink:         #F1F5F9;
@@ -167,7 +167,7 @@ html, body {
   color: #fff;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--color-mf-violet), var(--color-mf-dimmer));

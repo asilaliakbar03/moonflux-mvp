@@ -45,7 +45,7 @@ const SECTIONS: Section[] = [
   {
     title: "Display", icon: Palette,
     items: [
-      { label: "Theme", value: "Midnight Indigo", type: "select" },
+      { label: "Theme", value: "Neon Cyberpunk", type: "select" },
       { label: "Chart Type", value: "Area", type: "select" },
       { label: "Performance Animations", value: true, type: "toggle" },
     ],
@@ -70,20 +70,20 @@ export default function SettingsPage() {
       {/* ── HEADER ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 text-center md:text-left">
         <div>
-          <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3">
-            <Settings className="w-8 h-8 text-[#818CF8]" />
+          <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+            <Settings className="w-8 h-8 text-[#05D5FA]" />
             Settings
           </h1>
-          <p className="text-[#94A3B8]">Manage your account, trading preferences, and alerts.</p>
+          <p className="text-[#C8A2C8]">Manage your account, trading preferences, and alerts.</p>
         </div>
         
-        <div className="flex p-1 bg-[#161B27] border border-[rgba(99,102,241,0.15)] rounded-xl">
+        <div className="flex p-1 bg-[#120721] border border-[rgba(5,213,250,0.2)] rounded-xl shadow-[0_0_15px_rgba(5,213,250,0.1)]">
           <button
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
               activeTab === 'general'
-                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8]' 
-                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' 
+                : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             General Settings
@@ -92,8 +92,8 @@ export default function SettingsPage() {
             onClick={() => setActiveTab('alerts')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
               activeTab === 'alerts'
-                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8]' 
-                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' 
+                : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             Price Alerts
@@ -105,35 +105,35 @@ export default function SettingsPage() {
       {activeTab === 'general' && (
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {SECTIONS.map((sec, i) => (
-            <div key={i} className="surface-card flex flex-col overflow-hidden border border-[rgba(99,102,241,0.15)] hover:border-[rgba(99,102,241,0.3)] transition-colors">
-              <div className="p-4 border-b border-[rgba(99,102,241,0.1)] bg-[#161B27] flex items-center gap-3">
-                <sec.icon className="w-5 h-5 text-[#818CF8]" />
-                <h3 className="font-bold text-white">{sec.title}</h3>
+            <div key={i} className="surface-glass flex flex-col overflow-hidden border border-[rgba(5,213,250,0.2)] hover:border-[rgba(5,213,250,0.4)] hover:shadow-[0_0_15px_rgba(5,213,250,0.15)] transition-all">
+              <div className="p-4 border-b border-[rgba(5,213,250,0.15)] bg-[#120721] flex items-center gap-3">
+                <sec.icon className="w-5 h-5 text-[#05D5FA] drop-shadow-[0_0_5px_rgba(5,213,250,0.3)]" />
+                <h3 className="font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">{sec.title}</h3>
               </div>
               
               <div className="flex flex-col p-2">
                 {sec.items.map((item, idx) => (
-                  <div key={idx} className={`flex justify-between items-center p-3 rounded-lg hover:bg-[rgba(99,102,241,0.03)] transition-colors ${idx !== sec.items.length - 1 ? 'border-b border-[rgba(99,102,241,0.05)]' : ''}`}>
-                    <span className="text-sm font-medium text-[#94A3B8]">{item.label}</span>
+                  <div key={idx} className={`flex justify-between items-center p-3 rounded-lg hover:bg-[rgba(5,213,250,0.05)] transition-colors ${idx !== sec.items.length - 1 ? 'border-b border-[rgba(255,255,255,0.05)]' : ''}`}>
+                    <span className="text-sm font-medium text-[#C8A2C8]">{item.label}</span>
                     
                     {item.type === 'value' && (
-                      <span className="text-sm text-white font-mono bg-[#161B27] px-2 py-1 rounded">{item.value === '0x71C...9711' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}</span>
+                      <span className="text-sm text-white font-mono bg-[#0B0414] border border-[rgba(255,255,255,0.1)] px-2 py-1 rounded shadow-inner">{item.value === '0x71C...9711' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}</span>
                     )}
                     
                     {item.type === 'toggle' && (
-                      <div className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-colors ${item.value ? 'bg-[#10B981]' : 'bg-[#475569]'}`}>
-                        <div className={`w-4 h-4 rounded-full bg-white transition-transform ${item.value ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-colors border ${item.value ? 'bg-[rgba(57,255,20,0.2)] border-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.3)]' : 'bg-[#0B0414] border-[rgba(255,255,255,0.2)]'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white transition-transform ${item.value ? 'translate-x-5 shadow-[0_0_5px_#fff]' : 'translate-x-0 opacity-50'}`} />
                       </div>
                     )}
                     
                     {item.type === 'select' && (
-                      <div className="flex items-center gap-1 text-sm font-medium text-white bg-[#161B27] px-3 py-1 rounded cursor-pointer border border-[rgba(99,102,241,0.15)] hover:border-[#6366F1] transition-colors">
-                        {item.value} <ChevronRight className="w-3.5 h-3.5 text-[#475569]" />
+                      <div className="flex items-center gap-1 text-sm font-medium text-white bg-[#0B0414] px-3 py-1 rounded cursor-pointer border border-[rgba(5,213,250,0.2)] hover:border-[#05D5FA] hover:shadow-[0_0_10px_rgba(5,213,250,0.2)] transition-all">
+                        {item.value} <ChevronRight className="w-3.5 h-3.5 text-[#8B6A8B]" />
                       </div>
                     )}
                     
                     {item.type === 'action' && (
-                      <button className={`px-3 py-1 rounded text-sm font-medium transition-colors ${item.actionLabel === 'Disconnect' ? 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E] hover:bg-[rgba(244,63,94,0.2)]' : 'bg-[rgba(99,102,241,0.1)] text-[#818CF8] hover:bg-[rgba(99,102,241,0.2)]'}`}>
+                      <button className={`px-3 py-1 rounded text-sm font-bold transition-all border ${item.actionLabel === 'Disconnect' ? 'bg-[rgba(255,42,109,0.1)] text-[#FF2A6D] border-[rgba(255,42,109,0.3)] hover:bg-[rgba(255,42,109,0.2)] hover:shadow-[0_0_10px_rgba(255,42,109,0.2)]' : 'bg-[rgba(5,213,250,0.1)] text-[#05D5FA] border-[rgba(5,213,250,0.3)] hover:bg-[rgba(5,213,250,0.2)] hover:shadow-[0_0_10px_rgba(5,213,250,0.2)]'}`}>
                         {item.actionLabel}
                       </button>
                     )}
@@ -148,40 +148,40 @@ export default function SettingsPage() {
       {/* ── PRICE ALERTS ── */}
       {activeTab === 'alerts' && (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
-          <div className="surface-card p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="surface-card p-6 flex flex-col md:flex-row justify-between items-center gap-4 border border-[rgba(5,213,250,0.3)] bg-[rgba(5,213,250,0.02)] shadow-[0_0_15px_rgba(5,213,250,0.05)]">
             <div>
-              <h3 className="text-xl font-bold text-white mb-1">Create New Alert</h3>
-              <p className="text-sm text-[#94A3B8]">Get notified when a token hits your target price.</p>
+              <h3 className="text-xl font-bold text-white mb-1 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Create New Alert</h3>
+              <p className="text-sm text-[#C8A2C8]">Get notified when a token hits your target price.</p>
             </div>
-            <button className="btn-primary flex items-center gap-2">
+            <button className="bg-[rgba(5,213,250,0.15)] hover:bg-[rgba(5,213,250,0.25)] border border-[rgba(5,213,250,0.5)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)] rounded-lg font-bold px-4 py-2 transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(5,213,250,0.4)]">
               <Plus className="w-4 h-4" /> Add Alert
             </button>
           </div>
 
-          <div className="surface-card overflow-hidden">
-            <div className="p-5 border-b border-[rgba(99,102,241,0.15)] bg-[#161B27] flex items-center gap-2">
-              <BellRing className="w-5 h-5 text-[#818CF8]" />
-              <h3 className="text-lg font-bold text-white">Active Alerts</h3>
+          <div className="surface-glass overflow-hidden">
+            <div className="p-5 border-b border-[rgba(5,213,250,0.2)] bg-[#120721] flex items-center gap-2">
+              <BellRing className="w-5 h-5 text-[#05D5FA] drop-shadow-[0_0_5px_rgba(5,213,250,0.3)]" />
+              <h3 className="text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">Active Alerts</h3>
             </div>
             <div className="flex flex-col p-2">
               {alerts.length === 0 ? (
-                <div className="p-8 text-center text-[#475569]">No active price alerts.</div>
+                <div className="p-8 text-center text-[#8B6A8B]">No active price alerts.</div>
               ) : (
                 alerts.map((alert) => (
-                  <div key={alert.id} className="flex justify-between items-center p-4 border-b border-[rgba(99,102,241,0.05)] hover:bg-[rgba(99,102,241,0.03)] transition-colors rounded-lg">
+                  <div key={alert.id} className="flex justify-between items-center p-4 border-b border-[rgba(255,255,255,0.05)] hover:bg-[rgba(5,213,250,0.05)] transition-colors rounded-lg group">
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-colors ${alert.active ? 'bg-[#10B981]' : 'bg-[#475569]'}`}>
-                        <div className={`w-4 h-4 rounded-full bg-white transition-transform ${alert.active ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-all border ${alert.active ? 'bg-[rgba(57,255,20,0.2)] border-[#39FF14] shadow-[0_0_10px_rgba(57,255,20,0.3)]' : 'bg-[#0B0414] border-[rgba(255,255,255,0.2)]'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white transition-transform ${alert.active ? 'translate-x-5 shadow-[0_0_5px_#fff]' : 'translate-x-0 opacity-50'}`} />
                       </div>
                       <div>
-                        <div className="font-bold text-white">${alert.token}</div>
-                        <div className="text-xs text-[#94A3B8] font-mono">
+                        <div className="font-bold text-white group-hover:text-[#05D5FA] transition-colors">${alert.token}</div>
+                        <div className="text-xs text-[#C8A2C8] font-mono">
                           {alert.condition === 'above' ? 'Goes above ' : 'Drops below '}
-                          <span className="font-bold text-white">${alert.price}</span>
+                          <span className="font-bold text-[#39FF14] drop-shadow-[0_0_5px_rgba(57,255,20,0.3)]">${alert.price}</span>
                         </div>
                       </div>
                     </div>
-                    <button className="p-2 text-[#475569] hover:text-[#F43F5E] hover:bg-[rgba(244,63,94,0.1)] rounded transition-colors">
+                    <button className="p-2 text-[#8B6A8B] hover:text-[#FF2A6D] hover:bg-[rgba(255,42,109,0.1)] rounded transition-colors border border-transparent hover:border-[rgba(255,42,109,0.3)]">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
