@@ -30,9 +30,9 @@ export function useSOLPrice(): SOLPriceState {
 
   async function fetchPrice() {
     try {
-      // Jupiter v4 price API — free, no key needed
+      // Jupiter v6 price API — free, no key needed
       const res = await fetch(
-        `https://price.jup.ag/v4/price?ids=${SOL_MINT}`,
+        `https://api.jup.ag/price/v2?ids=${SOL_MINT}`,
         { cache: 'no-store' }
       );
       if (!res.ok) throw new Error(`Jupiter ${res.status}`);
@@ -45,11 +45,30 @@ export function useSOLPrice(): SOLPriceState {
 
       setState({
         price,
-        change24h: Number(info.priceChange24h ?? 0),
+        change24h: Number(info.extraInfo?.lastSwappedPrice?.lastJupiterSellPrice
+          ? ((info.price - info.extraInfo.lastSwappedPrice.lastJupiterSellPrice) /
+             info.extraInfo.lastSwappedPrice.lastJupiterSellPrice) * 100
+          : 0),
         isLive: true,
       });
-    } catch (err) {
-      console.warn('[useSOLPrice] Fetch failed:', err);
+    } catch {
+      // CoinGecko fallback
+      try {
+        const cg = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd&include_24hr_change=true',
+          { cache: 'no-store' }
+        );
+        if (cg.ok) {
+          const cgData = await cg.json();
+          const price = Number(cgData?.solana?.usd ?? 0);
+          const change24h = Number(cgData?.solana?.usd_24h_change ?? 0);
+          if (price > 0) {
+            lastKnown.current = price;
+            setState({ price, change24h, isLive: true });
+            return;
+          }
+        }
+      } catch {}
       // Keep last known price visible; just mark as not-live
       if (lastKnown.current > 0) {
         setState(prev => ({ ...prev, isLive: false }));
