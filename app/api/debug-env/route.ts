@@ -1,30 +1,42 @@
 import { NextResponse } from 'next/server';
-import { isAIConfigured, aiGenerate } from '@/lib/ai';
+import { isAIConfigured, aiGenerate, MODELS } from '@/lib/ai';
 
 export async function GET() {
   const key = process.env.OPENROUTER_API_KEY;
-  let aiTestResult = null;
-  let aiTestError = null;
+  let fastTestResult = null;
+  let fastTestError = null;
+  let smartTestResult = null;
+  let smartTestError = null;
 
   if (isAIConfigured()) {
     try {
-      const result = await aiGenerate({
-        system: "You are a test bot.",
-        prompt: "Say hello and return a JSON object like {'hello': 'world'}",
-        maxTokens: 50,
+      fastTestResult = await aiGenerate({
+        system: "Test",
+        prompt: "Say 1",
+        maxTokens: 5,
+        model: MODELS.FAST
       });
-      aiTestResult = result;
     } catch (e: any) {
-      aiTestError = e.message;
+      fastTestError = e.message;
+    }
+    try {
+      smartTestResult = await aiGenerate({
+        system: "Test",
+        prompt: "Say 1",
+        maxTokens: 5,
+        model: MODELS.SMART
+      });
+    } catch (e: any) {
+      smartTestError = e.message;
     }
   }
 
   return NextResponse.json({
     aiConfigured: isAIConfigured(),
-    keyPresent: !!key,
     keyLength: key?.length ?? 0,
-    keyPrefix: key?.substring(0, 12) ?? 'NOT_SET',
-    aiTestResult,
-    aiTestError
+    fastTestError,
+    smartTestError,
+    fastTestResult,
+    smartTestResult
   });
 }
