@@ -1,7 +1,7 @@
 /**
  * lib/ai.ts — Centralized AI client for MoonFluxx
  * 
- * Uses OpenRouter API (OpenAI-compatible) to route to Claude models.
+ * Uses Aerolink.lat (Anthropic-compatible proxy) to route to Claude models.
  * Features:
  * - In-memory response caching with configurable TTL
  * - Structured JSON output
@@ -19,7 +19,6 @@ const cache = new Map<string, CacheEntry>();
 const DEFAULT_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 function getCacheKey(prompt: string, model: string): string {
-  // Simple hash — normalize whitespace and lowercase for dedup
   const normalized = `${model}:${prompt.replace(/\s+/g, ' ').trim().toLowerCase()}`;
   let hash = 0;
   for (let i = 0; i < normalized.length; i++) {
@@ -41,7 +40,6 @@ function getFromCache<T>(key: string): T | null {
 }
 
 function setCache(key: string, data: unknown, ttlMs: number = DEFAULT_CACHE_TTL_MS): void {
-  // Cap cache at 100 entries to prevent memory bloat
   if (cache.size >= 100) {
     const oldestKey = cache.keys().next().value;
     if (oldestKey) cache.delete(oldestKey);
@@ -51,41 +49,32 @@ function setCache(key: string, data: unknown, ttlMs: number = DEFAULT_CACHE_TTL_
 
 // ── Models ───────────────────────────────────────────────────────────────────
 export const MODELS = {
-  /** Fast, cheap — for interactive/real-time features */
-  FAST: 'anthropic/claude-haiku-4.5',
-  /** Smart, still cheap — for generation-heavy features */
-  SMART: 'anthropic/claude-sonnet-5',
+  FAST: 'claude-haiku-4-5-20251001',
+  SMART: 'claude-sonnet-5',
 } as const;
 
 export type ModelId = typeof MODELS[keyof typeof MODELS];
 
 // ── Configuration ────────────────────────────────────────────────────────────
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const AEROLINK_URL = 'https://capi.aerolink.lat/v1/messages';
 
-function getApiKey(): string | null {
-  return process.env.OPENROUTER_API_KEY || null;
+// User provided specific aero_live key as a fallback
+function getApiKey(): string {
+  return process.env.AEROLINK_API_KEY || "aero_live_CGrq5c0ufYyE34VA65I_KvspqjHbntBL8ZA_yKDhfHg";
 }
 
 export function isAIConfigured(): boolean {
-  const key = getApiKey();
-  return !!key && !key.includes('YOUR_') && key.length > 10;
+  return true; // We always have the fallback key now
 }
 
 // ── Core AI Call ─────────────────────────────────────────────────────────────
 export interface AIRequestOptions {
-  /** System prompt */
   system: string;
-  /** User prompt */
   prompt: string;
-  /** Model to use (default: FAST) */
   model?: ModelId;
-  /** Temperature 0-1 (default: 0.3) */
   temperature?: number;
-  /** Max output tokens (default: 800) */
   maxTokens?: number;
-  /** Cache TTL in ms (default: 1 hour, set 0 to skip caching) */
   cacheTtlMs?: number;
-  /** Skip cache lookup (force fresh) */
   skipCache?: boolean;
 }
 
@@ -96,10 +85,6 @@ export interface AIResponse<T = unknown> {
   tokensUsed?: number;
 }
 
-/**
- * Send a single request to the AI and get structured JSON back.
- * Caches responses by default.
- */
 export async function aiGenerate<T = unknown>(
   options: AIRequestOptions
 ): Promise<AIResponse<T>> {
@@ -108,12 +93,11 @@ export async function aiGenerate<T = unknown>(
     prompt,
     model = MODELS.FAST,
     temperature = 0.3,
-    maxTokens = 800,
+    maxTokens = 4000,
     cacheTtlMs = DEFAULT_CACHE_TTL_MS,
     skipCache = false,
   } = options;
 
-  // ── Check cache first ──────────────────────────────────────────────────────
   const cacheKey = getCacheKey(`${system}${prompt}`, model);
   if (!skipCache && cacheTtlMs > 0) {
     const cached = getFromCache<T>(cacheKey);
@@ -122,28 +106,21 @@ export async function aiGenerate<T = unknown>(
     }
   }
 
-  // ── Check API key ─────────────────────────────────────────────────────────
   const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error('AI_NOT_CONFIGURED');
-  }
 
-  // ── Call OpenRouter ───────────────────────────────────────────────────────
-  const response = await fetch(OPENROUTER_URL, {
+  const response = await fetch(AEROLINK_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://moonflux-mvp.vercel.app',
-      'X-Title': 'MoonFluxx',
     },
     body: JSON.stringify({
       model,
       temperature,
       max_tokens: maxTokens,
-      response_format: { type: 'json_object' },
+      system: `${system}\n\nIMPORTANT: Always respond with valid JSON only. No markdown, no code fences, no extra text.`,
       messages: [
-        { role: 'system', content: `${system}\n\nIMPORTANT: Always respond with valid JSON only. No markdown, no code fences, no extra text.` },
         { role: 'user', content: prompt },
       ],
     }),
@@ -155,19 +132,16 @@ export async function aiGenerate<T = unknown>(
   }
 
   const result = await response.json();
-  const content = result.choices?.[0]?.message?.content;
+  const content = result.content?.[0]?.text;
   
   if (!content) {
     throw new Error('AI returned empty response');
   }
 
-  // ── Parse JSON from response ──────────────────────────────────────────────
   let parsed: T;
   try {
-    // Try direct parse first
     parsed = JSON.parse(content) as T;
   } catch {
-    // Try extracting JSON from markdown code fence
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
       parsed = JSON.parse(jsonMatch[1].trim()) as T;
@@ -176,19 +150,14 @@ export async function aiGenerate<T = unknown>(
     }
   }
 
-  // ── Cache result ──────────────────────────────────────────────────────────
   if (cacheTtlMs > 0) {
     setCache(cacheKey, parsed, cacheTtlMs);
   }
 
-  const tokensUsed = result.usage?.total_tokens;
+  const tokensUsed = result.usage?.input_tokens + result.usage?.output_tokens;
   return { data: parsed, cached: false, model, tokensUsed };
 }
 
-/**
- * Send a chat-style request (for conversational features like trade-copilot).
- * Returns raw text, not JSON.
- */
 export async function aiChat(
   options: AIRequestOptions & { history?: Array<{ role: 'user' | 'assistant'; content: string }> }
 ): Promise<{ text: string; cached: boolean; tokensUsed?: number }> {
@@ -202,26 +171,24 @@ export async function aiChat(
   } = options;
 
   const apiKey = getApiKey();
-  if (!apiKey) throw new Error('AI_NOT_CONFIGURED');
 
   const messages = [
-    { role: 'system' as const, content: system },
     ...history,
     { role: 'user' as const, content: prompt },
   ];
 
-  const response = await fetch(OPENROUTER_URL, {
+  const response = await fetch(AEROLINK_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://moonflux-mvp.vercel.app',
-      'X-Title': 'MoonFluxx',
     },
     body: JSON.stringify({
       model,
       temperature,
       max_tokens: maxTokens,
+      system,
       messages,
     }),
   });
@@ -232,8 +199,8 @@ export async function aiChat(
   }
 
   const result = await response.json();
-  const text = result.choices?.[0]?.message?.content || '';
-  const tokensUsed = result.usage?.total_tokens;
+  const text = result.content?.[0]?.text || '';
+  const tokensUsed = result.usage?.input_tokens + result.usage?.output_tokens;
 
   return { text, cached: false, tokensUsed };
 }
