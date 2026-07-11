@@ -389,7 +389,7 @@ export default function LaunchPage() {
           </div>
           <div>
             <h1 className="font-display text-xl tracking-[0.12em] font-medium text-gold-liquid leading-none">THE FORGE</h1>
-            <p className="font-mono text-[0.5rem] tracking-[0.3em] uppercase" style={{ color: "#6b6987" }}>14-Layer Protocol · Solana Mainnet</p>
+            <p className="font-mono text-[0.5rem] tracking-[0.3em] uppercase" style={{ color: "#6b6987" }}>14-Layer Protocol · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}</p>
           </div>
         </div>
         <span className="eyebrow text-[0.5rem] hidden sm:block" style={{ color: "#6b6987" }}>Token Deployment Engine</span>
@@ -1096,7 +1096,7 @@ export default function LaunchPage() {
                             { label: "Curve", value: selectedCurveData.name, color: selectedCurveData.color },
                             { label: "Liquidity", value: selectedLiquidityData.desc, color: "#e8b84b" },
                             { label: "Anti-Sniper", value: antisniperEnabled ? "Active ✓" : "Disabled ✗", color: antisniperEnabled ? "#10b981" : "#ef4444" },
-                            { label: "Network", value: "Solana Mainnet", color: "#a855f7" },
+                            { label: "Network", value: process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Solana Mainnet' : 'Solana Devnet', color: "#a855f7" },
                           ].map(({ label, value, color }) => (
                             <div key={label} className="flex justify-between items-center py-2 border-b border-mf-line-gold/20 last:border-0">
                               <span className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">{label}</span>
@@ -1122,7 +1122,7 @@ export default function LaunchPage() {
                         <div className="text-center">
                           <p className="font-display text-lg text-white mb-1">Contract ready to deploy</p>
                           <p className="font-mono text-[0.58rem] text-mf-dim tracking-widest uppercase">
-                            Estimated cost: ~0.02 SOL · Solana Mainnet
+                            Estimated cost: ~0.02 SOL · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}
                           </p>
                         </div>
                       </div>
