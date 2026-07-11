@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased min-h-screen text-[#e5e2e3] selection:bg-mf-violet/40 selection:text-white" style={{ background: "#131314" }}>
+      <body className="antialiased min-h-screen selection:bg-[#F59E0B]/30 selection:text-white" style={{ background: "#0C0A14", color: "#F0ECE5" }}>
         
         {/* WebGL Background */}
         <FluidBackground />

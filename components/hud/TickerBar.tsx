@@ -25,37 +25,72 @@ export default function TickerBar() {
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  // Double the items for seamless loop
+  /* Double items for seamless infinite scroll */
   const items = [...MOCK_TICKERS, ...MOCK_TICKERS];
 
   return (
     <div
-      className="w-full border-b overflow-hidden whitespace-nowrap py-2"
+      className="relative w-full overflow-hidden whitespace-nowrap"
       style={{
-        background: '#131314',
-        borderColor: '#4e4636',
+        background: 'rgba(12, 10, 20, 0.95)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderTop: '1px solid rgba(248, 211, 103, 0.06)',
+        borderBottom: '1px solid rgba(248, 211, 103, 0.06)',
+        maskImage:
+          'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+        WebkitMaskImage:
+          'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
       }}
     >
-      <div className="animate-ct-ticker flex items-center gap-8 px-5">
+      <div
+        className="flex items-center gap-0 py-2 px-4 animate-ct-ticker"
+        style={{ animationDuration: '40s' }}
+      >
         {items.map((item, i) => {
           const up = item.change > 0;
           return (
             <span
               key={`${item.symbol}-${i}`}
-              className="flex items-center gap-2"
-              style={{
-                fontFamily: "'Space Grotesk', monospace",
-                fontSize: '14px',
-                fontWeight: 500,
-                lineHeight: '20px',
-                letterSpacing: '0.02em',
-              }}
+              className="flex items-center shrink-0"
             >
-              <span style={{ color: up ? '#4ade80' : '#f87171' }}>
+              {/* Dot separator (skip before first item) */}
+              {i > 0 && (
+                <span
+                  className="mx-4 select-none"
+                  style={{ color: '#44403C', fontSize: '14px' }}
+                  aria-hidden="true"
+                >
+                  ·
+                </span>
+              )}
+
+              {/* Symbol */}
+              <span
+                style={{
+                  color: '#A8A29E',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  letterSpacing: '0.05em',
+                  marginRight: '6px',
+                }}
+              >
                 {item.symbol}
               </span>
-              <span style={{ color: up ? '#22c55e' : '#ef4444' }}>
-                {up ? '+' : ''}{item.change.toFixed(1)}%
+
+              {/* Price change */}
+              <span
+                style={{
+                  color: up ? '#22C55E' : '#EF4444',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  letterSpacing: '0.05em',
+                }}
+              >
+                {up ? '+' : ''}
+                {item.change.toFixed(1)}%
               </span>
             </span>
           );

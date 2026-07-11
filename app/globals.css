@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
+  /* ── EXISTING MF TOKENS (preserved) ── */
   --color-mf-bg-primary: #000000;
   --color-mf-bg-surface: #0a0a12;
   --color-mf-bg-elevated: #12111f;
@@ -32,13 +33,7 @@
   --color-mf-line-gold: rgba(232, 184, 75, 0.18);
   --color-mf-glass: rgba(4, 3, 10, 0.75);
 
-  --font-display: 'Space Grotesk', 'Clash Display', 'Satoshi', sans-serif;
-  --font-body: 'Inter', 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-
-  --ease-mf: cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* ── STITCH CYBER-TERMINAL DESIGN SYSTEM ── */
+  /* ── EXISTING CT TOKENS (preserved) ── */
   --color-ct-surface: #131314;
   --color-ct-surface-dim: #131314;
   --color-ct-surface-container-lowest: #0e0e0f;
@@ -62,8 +57,86 @@
   --color-ct-surface-glass: rgba(20, 20, 22, 0.7);
   --color-ct-border-low: rgba(255, 255, 255, 0.08);
 
-  --font-heading: 'Space Grotesk', 'Clash Display', sans-serif;
-  --font-body-inter: 'Inter', 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* ══════════════════════════════════════════════════════════════
+     PRO MAX DESIGN SYSTEM — Fintech/Crypto Profile
+     Domain: Trading floor × Cyberpunk terminal × Liquid gold
+     ══════════════════════════════════════════════════════════════ */
+
+  /* ── FOREGROUND (Text Hierarchy) ── */
+  --color-fg-primary: #F0ECE5;        /* primary text — warm off-white */
+  --color-fg-secondary: #A8A29E;      /* secondary — stone-400 */
+  --color-fg-tertiary: #78716C;       /* tertiary — stone-500 */
+  --color-fg-muted: #44403C;          /* muted — stone-700 */
+
+  /* ── BACKGROUND (Surface Elevation Scale) ── */
+  --color-bg-base: #0C0A14;           /* deepest — near-black with blue tint */
+  --color-bg-raised: #12101E;         /* cards, panels */
+  --color-bg-overlay: #1A1730;        /* dropdowns, modals */
+  --color-bg-elevated: #221F38;       /* highest elevation */
+  --color-bg-hover: #2A2650;          /* interactive hover */
+  --color-bg-active: #332E5C;         /* active/pressed */
+
+  /* ── BORDER (Separation Scale) ── */
+  --color-border-default: rgba(248, 211, 103, 0.08);   /* barely visible */
+  --color-border-subtle: rgba(248, 211, 103, 0.14);    /* card edges */
+  --color-border-strong: rgba(248, 211, 103, 0.25);    /* focus proximity */
+  --color-border-strongest: rgba(248, 211, 103, 0.45); /* focus rings */
+
+  /* ── BRAND (Liquid Gold) ── */
+  --color-brand-50: #FFFBEB;
+  --color-brand-100: #FEF3C7;
+  --color-brand-200: #FDE68A;
+  --color-brand-300: #FCD34D;
+  --color-brand-400: #FBBF24;
+  --color-brand-500: #F59E0B;         /* PRIMARY BRAND — Amber */
+  --color-brand-600: #D97706;
+  --color-brand-700: #B45309;
+  --color-brand-800: #92400E;
+  --color-brand-900: #78350F;
+
+  /* ── SEMANTIC (Status) ── */
+  --color-success-500: #22C55E;
+  --color-success-muted: rgba(34, 197, 94, 0.12);
+  --color-danger-500: #EF4444;
+  --color-danger-muted: rgba(239, 68, 68, 0.12);
+  --color-warning-500: #F59E0B;
+  --color-warning-muted: rgba(245, 158, 11, 0.12);
+  --color-info-500: #06B6D4;          /* Cyan — data accent */
+  --color-info-muted: rgba(6, 182, 212, 0.12);
+
+  /* ── ACCENT (Cyan Data) ── */
+  --color-accent: #06B6D4;
+  --color-accent-muted: rgba(6, 182, 212, 0.15);
+  --color-accent-glow: rgba(6, 182, 212, 0.35);
+
+  /* ── FONTS ── */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Exo 2', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body-inter: 'Exo 2', 'Inter', sans-serif;
+
+  /* ── MOTION ── */
+  --ease-mf: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ── RADIUS ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── SHADOWS (Elevation) ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+  --shadow-glow-gold: 0 0 20px rgba(245,158,11,0.15);
+  --shadow-glow-cyan: 0 0 20px rgba(6,182,212,0.15);
 }
 
 html {
@@ -71,8 +144,8 @@ html {
 }
 
 html, body {
-  background-color: #131314;
-  color: #e5e2e3;
+  background-color: var(--color-bg-base, #0C0A14);
+  color: var(--color-fg-primary, #F0ECE5);
   font-family: var(--font-body);
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
@@ -409,6 +482,82 @@ html, body {
     width: fit-content;
     animation: ct-ticker 30s linear infinite;
   }
+
+  /* ══════════════════════════════════════════════════════════════
+     PRO MAX UTILITIES — Fintech/Crypto Profile
+     ══════════════════════════════════════════════════════════════ */
+
+  .pm-surface {
+    background: var(--color-bg-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+  }
+  .pm-surface-glass {
+    background: rgba(18, 16, 30, 0.75);
+    backdrop-filter: blur(16px) saturate(1.2);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+  }
+  .pm-surface-elevated {
+    background: var(--color-bg-overlay);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .pm-glow-gold {
+    box-shadow: var(--shadow-glow-gold);
+  }
+  .pm-glow-cyan {
+    box-shadow: var(--shadow-glow-cyan);
+  }
+  .pm-text-gradient-gold {
+    background: linear-gradient(135deg, #FDE68A, #F59E0B, #D97706);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pm-text-gradient-cyan {
+    background: linear-gradient(135deg, #67E8F9, #06B6D4, #0891B2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pm-border-glow {
+    position: relative;
+  }
+  .pm-border-glow::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(6,182,212,0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .pm-data-glow {
+    text-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+  }
+  .pm-interactive {
+    transition: all var(--duration-normal) var(--ease-out-expo);
+    cursor: pointer;
+  }
+  .pm-interactive:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-border-strong);
+  }
+
+  .ct-launch-pulse {
+    animation: ct-gold-pulse 2.5s ease-in-out infinite;
+  }
+}
+
+@keyframes ct-gold-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.15); }
+  50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.4), 0 0 44px rgba(245, 158, 11, 0.15); }
 }
 
 /* visible keyboard focus */
