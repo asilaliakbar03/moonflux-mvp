@@ -145,7 +145,7 @@ export async function POST(req: Request) {
         return response;
       } catch (err: any) {
         console.warn('[generate-token] AI failed, using mock fallback:', err);
-        return NextResponse.json(getMockToken(prompt));
+        return NextResponse.json({ ...getMockToken(prompt), _error: err.message });
       }
     }
 
