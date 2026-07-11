@@ -3,27 +3,15 @@ import { isAIConfigured, aiGenerate, MODELS } from '@/lib/ai';
 
 export async function GET() {
   const key = process.env.OPENROUTER_API_KEY;
-  let fastTestResult = null;
-  let fastTestError = null;
   let smartTestResult = null;
   let smartTestError = null;
 
   if (isAIConfigured()) {
     try {
-      fastTestResult = await aiGenerate({
-        system: "Test",
-        prompt: "Say 1",
-        maxTokens: 5,
-        model: MODELS.FAST
-      });
-    } catch (e: any) {
-      fastTestError = e.message;
-    }
-    try {
       smartTestResult = await aiGenerate({
-        system: "Test",
-        prompt: "Say 1",
-        maxTokens: 5,
+        system: "You are a test bot.",
+        prompt: "Say hello and return a JSON object with a single key 'hello' and value 'world'. No markdown, no quotes outside JSON.",
+        maxTokens: 50,
         model: MODELS.SMART
       });
     } catch (e: any) {
@@ -33,10 +21,7 @@ export async function GET() {
 
   return NextResponse.json({
     aiConfigured: isAIConfigured(),
-    keyLength: key?.length ?? 0,
-    fastTestError,
     smartTestError,
-    fastTestResult,
     smartTestResult
   });
 }
