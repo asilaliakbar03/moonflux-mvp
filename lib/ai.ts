@@ -52,9 +52,9 @@ function setCache(key: string, data: unknown, ttlMs: number = DEFAULT_CACHE_TTL_
 // ── Models ───────────────────────────────────────────────────────────────────
 export const MODELS = {
   /** Fast, cheap — for interactive/real-time features */
-  FAST: 'anthropic/claude-3-5-haiku-20241022',
+  FAST: 'anthropic/claude-3-haiku',
   /** Smart, still cheap — for generation-heavy features */
-  SMART: 'anthropic/claude-sonnet-4-20250514',
+  SMART: 'anthropic/claude-3.5-sonnet',
 } as const;
 
 export type ModelId = typeof MODELS[keyof typeof MODELS];
