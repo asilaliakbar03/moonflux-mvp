@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import FluidBackground from "@/components/hud/FluidBackground";
 import Dock from "@/components/hud/Dock";
+import Sidebar from "@/components/hud/Sidebar";
+import TickerBar from "@/components/hud/TickerBar";
 import TopBar from "@/components/hud/TopBar";
 import { ToastProvider } from "@/components/ToastProvider";
 import { SolanaProvider } from "@/components/SolanaProvider";
@@ -18,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased min-h-screen text-mf-ink selection:bg-mf-violet/40 selection:text-white">
+      <body className="antialiased min-h-screen text-[#e5e2e3] selection:bg-mf-violet/40 selection:text-white" style={{ background: "#131314" }}>
         
         {/* WebGL Background */}
         <FluidBackground />
@@ -30,10 +32,23 @@ export default function RootLayout({
           <ToastProvider>
             {/* HUD Navigation */}
             <TopBar />
+
+            {/* Stitch Redesign: Left Sidebar (desktop only) */}
+            <Sidebar />
+
+            {/* Stitch Redesign: Scrolling Ticker Bar */}
+            <div className="fixed top-20 left-0 md:left-20 right-0 z-30">
+              <TickerBar />
+            </div>
+
+            {/* Legacy bottom Dock (mobile only — Sidebar handles desktop) */}
             <Dock />
     
-            {/* Main Content Area */}
-            <main className="relative pt-20 pb-16 md:pb-24 px-4 md:px-6 flex flex-col" style={{ height: "100vh", overflow: "hidden auto" }}>
+            {/* Main Content Area — offset for top bar + ticker + sidebar */}
+            <main
+              className="relative pt-32 pb-16 md:pb-8 md:pl-20 px-4 md:px-6 flex flex-col"
+              style={{ height: "100vh", overflow: "hidden auto" }}
+            >
               {children}
             </main>
           </ToastProvider>

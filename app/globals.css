@@ -1,4 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
@@ -32,20 +32,47 @@
   --color-mf-line-gold: rgba(232, 184, 75, 0.18);
   --color-mf-glass: rgba(4, 3, 10, 0.75);
 
-  --font-display: 'Clash Display', 'Satoshi', sans-serif;
-  --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Clash Display', 'Satoshi', sans-serif;
+  --font-body: 'Inter', 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
   --ease-mf: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── STITCH CYBER-TERMINAL DESIGN SYSTEM ── */
+  --color-ct-surface: #131314;
+  --color-ct-surface-dim: #131314;
+  --color-ct-surface-container-lowest: #0e0e0f;
+  --color-ct-surface-container-low: #1c1b1c;
+  --color-ct-surface-container: #201f20;
+  --color-ct-surface-container-high: #2a2a2b;
+  --color-ct-surface-container-highest: #353436;
+  --color-ct-on-surface: #e5e2e3;
+  --color-ct-on-surface-variant: #d1c5b1;
+  --color-ct-outline: #9a907d;
+  --color-ct-outline-variant: #4e4636;
+  --color-ct-primary: #fff3e1;
+  --color-ct-on-primary: #3f2e00;
+  --color-ct-primary-container: #ffd369;
+  --color-ct-on-primary-container: #775a00;
+  --color-ct-primary-fixed-dim: #ecc159;
+  --color-ct-secondary: #e6feff;
+  --color-ct-secondary-container: #00f4fe;
+  --color-ct-secondary-fixed-dim: #00dce5;
+  --color-ct-tertiary-fixed-dim: #d0bcff;
+  --color-ct-surface-glass: rgba(20, 20, 22, 0.7);
+  --color-ct-border-low: rgba(255, 255, 255, 0.08);
+
+  --font-heading: 'Space Grotesk', 'Clash Display', sans-serif;
+  --font-body-inter: 'Inter', 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 html {
-  font-size: 17px; /* bump all rem-based sizes by ~6% app-wide */
+  font-size: 16px;
 }
 
 html, body {
-  background-color: var(--color-mf-bg-primary);
-  color: var(--color-mf-ink);
+  background-color: #131314;
+  color: #e5e2e3;
   font-family: var(--font-body);
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
@@ -143,6 +170,10 @@ html, body {
 @keyframes mf-mesh-b { 0%,100% { transform: translate3d(12%,10%,0) scale(1.2); } 50% { transform: translate3d(-10%,-8%,0) scale(0.95); } }
 @keyframes mf-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.06); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes mf-tick { 0%,100% { opacity: 0.25; } 50% { opacity: 1; } }
+@keyframes ct-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
 @property --mf-angle {
   syntax: '<angle>';
@@ -356,6 +387,27 @@ html, body {
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--color-mf-dim);
+  }
+
+  /* ── STITCH CYBER-TERMINAL UTILITIES ── */
+  .ct-glass-panel {
+    background: rgba(20, 20, 22, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .ct-flux-glow-primary {
+    box-shadow: 0 0 15px 0px rgba(236, 193, 89, 0.2);
+  }
+  .ct-flux-glow-secondary {
+    box-shadow: 0 0 15px 0px rgba(0, 220, 229, 0.2);
+  }
+  .ct-hide-scrollbar::-webkit-scrollbar { display: none; }
+  .ct-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .animate-ct-ticker {
+    display: flex;
+    width: fit-content;
+    animation: ct-ticker 30s linear infinite;
   }
 }
 
