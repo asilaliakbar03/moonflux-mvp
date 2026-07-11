@@ -134,12 +134,10 @@ export async function POST(req: Request) {
     if (isAIConfigured()) {
       try {
         const result = await aiGenerate<GeneratedToken>({
-          system: SYSTEM_PROMPT,
-          prompt: `User's prompt: "${prompt}"\n\nGenerate the perfect, ready-to-launch Solana token. The lore should be unique, specific, and shareable. The ticker should be memorable. The description should make someone WANT to buy immediately. The narrative tags must reflect genuine 2025 Solana meta trends. The whitepaper should feel authentic but degen. The roadmap should be ambitious but plausible. The tweets should be fire.`,
+          system: "You are the MoonFluxx Terminal AI. Generate completely unique, engaging token metadata based on the prompt. You must strictly return a valid JSON object matching the requested schema. Be creative, witty, and deeply enmeshed in crypto/web3 culture. The whitepaper should be detailed, the roadmap should have 4 quarters, and the xPosts should be funny/degen.",
+          prompt: `Generate token data for: ${prompt}`,
           model: MODELS.SMART,
-          temperature: 0.3,
-          maxTokens: 1200,
-          cacheTtlMs: 3600000, // 1 hour
+          maxTokens: 4000,
         });
 
         const response = NextResponse.json(result.data);
@@ -147,7 +145,7 @@ export async function POST(req: Request) {
         return response;
       } catch (err: any) {
         console.warn('[generate-token] AI failed, using mock fallback:', err);
-        return NextResponse.json({ ...getMockToken(prompt), _error: err.message });
+        return NextResponse.json(getMockToken(prompt));
       }
     }
 
