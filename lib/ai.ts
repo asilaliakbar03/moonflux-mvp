@@ -114,6 +114,7 @@ export async function aiGenerate<T = unknown>(
       'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
       'Content-Type': 'application/json',
+      'Accept-Encoding': 'identity'
     },
     body: JSON.stringify({
       model,
@@ -132,10 +133,11 @@ export async function aiGenerate<T = unknown>(
   }
 
   const result = await response.json();
-  const content = result.content?.[0]?.text;
+  const textBlock = result.content?.find((c: any) => c.type === 'text');
+  const content = textBlock?.text;
   
   if (!content) {
-    throw new Error('AI returned empty response');
+    throw new Error(`AI returned empty response. Raw: ${JSON.stringify(result)}`);
   }
 
   let parsed: T;
@@ -144,9 +146,13 @@ export async function aiGenerate<T = unknown>(
   } catch {
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
-      parsed = JSON.parse(jsonMatch[1].trim()) as T;
+      try {
+        parsed = JSON.parse(jsonMatch[1].trim()) as T;
+      } catch {
+        throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
+      }
     } else {
-      throw new Error(`Failed to parse AI JSON response: ${content.slice(0, 200)}`);
+      throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
     }
   }
 
@@ -183,6 +189,7 @@ export async function aiChat(
       'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
       'Content-Type': 'application/json',
+      'Accept-Encoding': 'identity'
     },
     body: JSON.stringify({
       model,
@@ -199,7 +206,8 @@ export async function aiChat(
   }
 
   const result = await response.json();
-  const text = result.content?.[0]?.text || '';
+  const textBlock = result.content?.find((c: any) => c.type === 'text');
+  const text = textBlock?.text || '';
   const tokensUsed = result.usage?.input_tokens + result.usage?.output_tokens;
 
   return { text, cached: false, tokensUsed };
