@@ -389,10 +389,10 @@ export default function LaunchPage() {
           </div>
           <div>
             <h1 className="font-display text-xl tracking-[0.12em] font-medium text-gold-liquid leading-none">THE FORGE</h1>
-            <p className="font-mono text-[0.5rem] tracking-[0.3em] uppercase" style={{ color: "#6b6987" }}>14-Layer Protocol · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}</p>
+            <p className="font-mono text-xs tracking-[0.3em] uppercase" style={{ color: "#9ca3af" }}>14-Layer Protocol · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}</p>
           </div>
         </div>
-        <span className="eyebrow text-[0.5rem] hidden sm:block" style={{ color: "#6b6987" }}>Token Deployment Engine</span>
+        <span className="eyebrow text-xs hidden sm:block" style={{ color: "#9ca3af" }}>Token Deployment Engine</span>
       </motion.div>
 
       {/* ── MAIN CONTENT ── */}
@@ -417,7 +417,7 @@ export default function LaunchPage() {
               transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
               className="text-center mb-6"
             >
-              <p className="font-mono text-[0.6rem] tracking-[0.4em] uppercase mb-2" style={{ color: "#a9791f" }}>
+              <p className="font-mono text-sm tracking-[0.4em] uppercase mb-2" style={{ color: "#e8b84b" }}>
                 Choose your deployment path
               </p>
               <h2 className="font-display text-4xl tracking-wide" style={{ color: "#ffe6a3" }}>
@@ -425,128 +425,44 @@ export default function LaunchPage() {
               </h2>
             </motion.div>
 
-            {/* Two big hero cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1 min-h-0">
+            {/* Two clean choice cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto w-full mt-4">
 
               {/* AI Genesis */}
-              <motion.button
+              <button
                 id="launch-mode-ai"
-                initial={{ opacity: 0, x: -24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
-                whileHover={{ scale: 1.015, y: -4 }}
-                whileTap={{ scale: 0.99 }}
                 onClick={() => { setMode("ai"); setStep(0); }}
-                className="rounded-3xl transition-all group relative overflow-hidden flex flex-col items-center justify-center gap-7 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/70 p-10"
-                style={{
-                  background: "rgba(18,14,8,0.95)",
-                  border: "1px solid rgba(232,184,75,0.5)",
-                  boxShadow: "0 0 60px -12px rgba(232,184,75,0.25), inset 0 1px 0 rgba(255,230,163,0.1)",
-                }}
+                className="group relative flex flex-col items-center justify-center p-8 rounded-2xl transition-all border border-mf-line-gold hover:border-mf-gold/60 bg-mf-obsidian/80 hover:bg-mf-bg-elevated text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold"
               >
-                <div className="absolute inset-0 aurora-mesh opacity-50 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-br from-mf-gold/10 via-transparent to-mf-violet/8 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-mf-gold/80 to-transparent" />
-                <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-mf-gold/40 to-transparent" />
-
-                <div className="relative flex items-center justify-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
-                    className="absolute w-36 h-36 rounded-full blur-2xl"
-                    style={{ background: "rgba(232,184,75,0.2)" }}
-                  />
-                  <div className="relative w-28 h-28 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
-                    style={{ background: "rgba(30,22,8,0.9)", border: "2px solid rgba(232,184,75,0.5)", boxShadow: "0 0 40px rgba(232,184,75,0.3)" }}>
-                    <div className="absolute inset-0 rounded-full bg-mf-gold/15 blur-xl animate-pulse" />
-                    <Cpu size={44} className="relative" style={{ color: "#e8b84b", filter: "drop-shadow(0 0 12px rgba(232,184,75,0.8))" }} />
-                  </div>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-mf-gold/10 border border-mf-gold/30 mb-6 group-hover:scale-110 transition-transform">
+                  <Cpu size={32} className="text-mf-gold" />
                 </div>
-
-                <div className="text-center relative z-10">
-                  <span className="mb-4 inline-flex items-center gap-1.5 font-mono text-[0.62rem] tracking-widest uppercase px-3 py-1.5 rounded-full"
-                    style={{ color: "#ffe6a3", background: "rgba(232,184,75,0.15)", border: "1px solid rgba(232,184,75,0.4)" }}>
-                    <Sparkles size={10} /> Recommended
-                  </span>
-                  <h2 className="font-display text-4xl mb-3 text-gold-liquid">AI Genesis</h2>
-                  <p className="font-mono text-sm tracking-widest uppercase leading-loose" style={{ color: "#8a8099" }}>
-                    Describe your idea.<br />
-                    Our Quantum-LLM forges the name,<br />
-                    lore, logo &amp; mechanics.
-                  </p>
-                </div>
-
-                <div className="flex gap-2 flex-wrap justify-center relative z-10">
-                  {["Name", "Ticker", "Logo", "Roadmap", "Memes"].map(tag => (
-                    <span key={tag} className="font-mono text-[0.6rem] tracking-widest uppercase px-3 py-1.5 rounded-full"
-                      style={{ color: "#e8b84b", background: "rgba(232,184,75,0.12)", border: "1px solid rgba(232,184,75,0.3)" }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-2 relative z-10" style={{ color: "#e8b84b" }}>
-                  <span className="font-mono text-[0.6rem] tracking-widest uppercase">Click to begin</span>
-                  <ChevronRight size={14} />
-                </div>
-              </motion.button>
+                <h2 className="font-display text-2xl mb-2 text-white">AI Assistant</h2>
+                <p className="font-body text-sm text-gray-400 mb-6 max-w-xs">
+                  Describe your idea and our AI will generate the token name, ticker, and backstory instantly.
+                </p>
+                <span className="font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-full border border-mf-gold text-mf-gold bg-mf-gold/10 group-hover:bg-mf-gold group-hover:text-black transition-colors flex items-center gap-2">
+                  <Sparkles size={14} /> Start with AI
+                </span>
+              </button>
 
               {/* Manual Forge */}
-              <motion.button
+              <button
                 id="launch-mode-manual"
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-                whileHover={{ scale: 1.015, y: -4 }}
-                whileTap={{ scale: 0.99 }}
                 onClick={() => { setMode("manual"); setStep(0); }}
-                className="rounded-3xl transition-all group relative overflow-hidden flex flex-col items-center justify-center gap-7 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-champagne/60 p-10"
-                style={{
-                  background: "rgba(14,12,20,0.95)",
-                  border: "1px solid rgba(196,181,253,0.3)",
-                  boxShadow: "0 0 60px -12px rgba(124,58,237,0.2), inset 0 1px 0 rgba(196,181,253,0.08)",
-                }}
+                className="group relative flex flex-col items-center justify-center p-8 rounded-2xl transition-all border border-mf-line hover:border-mf-flare/60 bg-mf-obsidian/80 hover:bg-mf-bg-elevated text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-flare"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-mf-flare/6 via-transparent to-mf-violet/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
-                <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-purple-400/25 to-transparent" />
-
-                <div className="relative flex items-center justify-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.12, 1], opacity: [0.2, 0.4, 0.2] }}
-                    transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut" }}
-                    className="absolute w-36 h-36 rounded-full blur-2xl"
-                    style={{ background: "rgba(168,85,247,0.2)" }}
-                  />
-                  <div className="relative w-28 h-28 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
-                    style={{ background: "rgba(20,16,28,0.9)", border: "2px solid rgba(196,181,253,0.4)", boxShadow: "0 0 40px rgba(168,85,247,0.2)" }}>
-                    <PenTool size={44} style={{ color: "#c4b5fd", filter: "drop-shadow(0 0 10px rgba(168,85,247,0.6))" }} />
-                  </div>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-mf-violet/10 border border-mf-violet/30 mb-6 group-hover:scale-110 transition-transform">
+                  <PenTool size={32} className="text-mf-flare" />
                 </div>
-
-                <div className="text-center relative z-10">
-                  <h2 className="font-display text-4xl mb-3" style={{ color: "#f5e6c8" }}>Manual Forge</h2>
-                  <p className="font-mono text-sm tracking-widest uppercase leading-loose" style={{ color: "#8a8099" }}>
-                    Absolute control.<br />
-                    Configure every parameter,<br />
-                    upload assets &amp; tune mechanics.
-                  </p>
-                </div>
-
-                <div className="flex gap-2 flex-wrap justify-center relative z-10">
-                  {["Full Control", "Custom Assets", "Fine-Tuned"].map(tag => (
-                    <span key={tag} className="font-mono text-[0.6rem] tracking-widest uppercase px-3 py-1.5 rounded-full"
-                      style={{ color: "#c4b5fd", background: "rgba(196,181,253,0.08)", border: "1px solid rgba(196,181,253,0.3)" }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-2 relative z-10" style={{ color: "#c4b5fd" }}>
-                  <span className="font-mono text-[0.6rem] tracking-widest uppercase">Click to begin</span>
-                  <ChevronRight size={14} />
-                </div>
-              </motion.button>
+                <h2 className="font-display text-2xl mb-2 text-white">Manual Setup</h2>
+                <p className="font-body text-sm text-gray-400 mb-6 max-w-xs">
+                  You have full control. Manually enter your token name, upload assets, and configure mechanics.
+                </p>
+                <span className="font-mono text-xs tracking-wider uppercase px-4 py-2 rounded-full border border-mf-flare text-mf-flare bg-mf-violet/10 group-hover:bg-mf-flare group-hover:text-black transition-colors">
+                  Setup Manually
+                </span>
+              </button>
             </div>
           </motion.div>
         )}
@@ -579,14 +495,14 @@ export default function LaunchPage() {
                         ? "bg-mf-gold border-mf-gold text-black"
                         : i === step
                         ? "bg-mf-obsidian border-mf-gold text-mf-gold-hi shadow-[0_0_20px_rgba(232,184,75,0.4)]"
-                        : "bg-mf-obsidian border-mf-line-gold text-mf-dim"
+                        : "bg-mf-obsidian border-mf-line-gold text-gray-300"
                     }`}
                     animate={i === step ? { boxShadow: ["0 0 16px rgba(232,184,75,0.3)", "0 0 30px rgba(232,184,75,0.6)", "0 0 16px rgba(232,184,75,0.3)"] } : {}}
                     transition={{ repeat: i === step ? Infinity : 0, duration: 2, ease: "easeInOut" }}
                   >
                     {i < step ? <Check size={14} /> : i + 1}
                   </motion.div>
-                  <span className={`font-mono text-[0.5rem] tracking-widest uppercase absolute -bottom-5 whitespace-nowrap ${i <= step ? "text-mf-gold" : "text-mf-dimmer"}`}>
+                  <span className={`font-mono text-xs tracking-widest uppercase absolute -bottom-5 whitespace-nowrap ${i <= step ? "text-mf-gold" : "text-gray-400"}`}>
                     {s}
                   </span>
                 </div>
@@ -610,9 +526,7 @@ export default function LaunchPage() {
                 }}
               >
                 {/* Top accent line */}
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-mf-gold/50 to-transparent" />
-                <div className="pointer-events-none absolute -top-20 -right-14 w-56 h-56 bg-mf-gold/12 blur-[80px] rounded-full" />
-                <div className="pointer-events-none absolute -bottom-20 -left-14 w-48 h-48 bg-mf-violet/10 blur-[70px] rounded-full" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-mf-gold/30 to-transparent" />
 
                 <div className="flex-1 overflow-y-auto relative">
 
@@ -624,7 +538,7 @@ export default function LaunchPage() {
                           <Cpu style={{ color: "#e8b84b" }} className="shrink-0" size={22} />
                           Describe Your Vision
                         </h2>
-                        <p className="font-mono text-[0.6rem] tracking-widest uppercase" style={{ color: "#6b6987" }}>
+                        <p className="font-mono text-sm tracking-widest uppercase" style={{ color: "#9ca3af" }}>
                           One sentence or a full pitch — our AI handles the rest.
                         </p>
                       </div>
@@ -643,13 +557,13 @@ export default function LaunchPage() {
                       />
 
                       <div className="flex flex-wrap gap-2 items-center">
-                        <span className="font-mono text-[0.55rem] tracking-wider uppercase" style={{ color: "#6b6987" }}>Quick prompts:</span>
+                        <span className="font-mono text-xs tracking-wider uppercase" style={{ color: "#9ca3af" }}>Quick prompts:</span>
                         {["Viral meme with dog", "AI-powered DeFi protocol", "Gaming guild token", "Community DAO"].map(p => (
                           <button
                             key={p}
                             onClick={() => setFormData({ ...formData, prompt: p })}
-                            className="font-mono text-[0.55rem] tracking-wider px-2.5 py-1 rounded-full transition-all"
-                            style={{ border: "1px solid rgba(232,184,75,0.3)", color: "#a9791f" }}
+                            className="font-mono text-xs tracking-wider px-2.5 py-1 rounded-full transition-all"
+                            style={{ border: "1px solid rgba(232,184,75,0.3)", color: "#e8b84b" }}
                             onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = "rgba(232,184,75,0.6)"; (e.target as HTMLElement).style.color = "#e8b84b"; }}
                             onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = "rgba(232,184,75,0.3)"; (e.target as HTMLElement).style.color = "#a9791f"; }}
                           >
@@ -698,12 +612,12 @@ export default function LaunchPage() {
 
                       <div className="text-center">
                         <h3 className="font-display text-xl text-gold-liquid mb-2">Synthesizing DNA...</h3>
-                        <p className="font-mono text-[0.6rem] text-mf-dim tracking-widest uppercase mb-6">
+                        <p className="font-mono text-sm text-gray-300 tracking-widest uppercase mb-6">
                           Quantum-LLM processing · ETA ~5s
                         </p>
 
                         {/* Log lines */}
-                        <div className="text-left w-full max-w-sm mx-auto bg-mf-obsidian/60 rounded-xl p-4 border border-mf-line-gold font-mono text-[0.6rem] tracking-wide space-y-1.5">
+                        <div className="text-left w-full max-w-sm mx-auto bg-mf-obsidian/60 rounded-xl p-4 border border-mf-line-gold font-mono text-sm tracking-wide space-y-1.5">
                           {AI_LOG_LINES.map((line, i) => (
                             logLines.includes(i) && (
                               <motion.div
@@ -761,7 +675,7 @@ export default function LaunchPage() {
                               <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-mf-gold/30 to-mf-violet/20 flex items-center justify-center font-display text-3xl text-gold mb-2 shadow-[0_0_20px_rgba(232,184,75,0.25)]">
                                 {formData.name[0] || "?"}
                               </div>
-                              <span className="font-mono text-[0.5rem] tracking-widest uppercase text-mf-gold/60 relative">AI Generated</span>
+                              <span className="font-mono text-xs tracking-widest uppercase text-mf-gold/60 relative">AI Generated</span>
                             </>
                           ) : imagePreview ? (
                             <>
@@ -779,7 +693,7 @@ export default function LaunchPage() {
                               <div className="w-12 h-12 rounded-full bg-mf-gold/10 border border-mf-line-gold flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                 <Upload size={18} className="text-mf-gold-deep" />
                               </div>
-                              <span className="font-mono text-[0.55rem] tracking-widest uppercase text-mf-dim text-center px-2">
+                              <span className="font-mono text-xs tracking-widest uppercase text-gray-300 text-center px-2">
                                 Drop logo<br />PNG · SVG · GIF
                               </span>
                             </>
@@ -807,7 +721,7 @@ export default function LaunchPage() {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">Token Name</label>
+                              <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Token Name</label>
                               <input
                                 id="token-name"
                                 type="text"
@@ -818,7 +732,7 @@ export default function LaunchPage() {
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">Ticker</label>
+                              <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Ticker</label>
                               <input
                                 id="token-ticker"
                                 type="text"
@@ -832,7 +746,7 @@ export default function LaunchPage() {
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">Description / Lore</label>
+                            <label className="font-mono text-xs tracking-widest uppercase text-gray-300">Description / Lore</label>
                             <textarea
                               id="token-description"
                               value={formData.description}
@@ -846,7 +760,7 @@ export default function LaunchPage() {
 
                       {/* Social links */}
                       <div>
-                        <p className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim mb-3">Social Links <span className="text-mf-dimmer">(optional)</span></p>
+                        <p className="font-mono text-xs tracking-widest uppercase text-gray-300 mb-3">Social Links <span className="text-gray-400">(optional)</span></p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           {[
                             { id: "token-website", key: "website", icon: Globe, placeholder: "astrocat.xyz" },
@@ -861,7 +775,7 @@ export default function LaunchPage() {
                                 value={formData[key as keyof typeof formData]}
                                 onChange={e => setFormData({ ...formData, [key]: e.target.value })}
                                 placeholder={placeholder}
-                                className="flex-1 bg-transparent outline-none text-mf-champagne font-mono text-xs placeholder:text-mf-dimmer"
+                                className="flex-1 bg-transparent outline-none text-mf-champagne font-mono text-xs placeholder:text-gray-400"
                               />
                             </div>
                           ))}
@@ -880,7 +794,7 @@ export default function LaunchPage() {
 
                       {/* ── Bonding Curve Selector ── */}
                       <div>
-                        <p className="font-mono text-[0.6rem] tracking-widest uppercase text-mf-dim mb-4">
+                        <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-4">
                           L·01 — Dynamic Bonding Curve
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -900,7 +814,7 @@ export default function LaunchPage() {
                               } as React.CSSProperties}
                             >
                               {curve.premium && (
-                                <span className="absolute -top-2 -right-2 font-mono text-[0.5rem] tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-mf-ice/20 text-mf-ice border border-mf-ice/30 flex items-center gap-1">
+                                <span className="absolute -top-2 -right-2 font-mono text-xs tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-mf-ice/20 text-mf-ice border border-mf-ice/30 flex items-center gap-1">
                                   <Star size={7} fill="currentColor" /> Pro
                                 </span>
                               )}
@@ -923,7 +837,7 @@ export default function LaunchPage() {
 
                               <div>
                                 <p className="font-display text-sm text-white leading-tight">{curve.name}</p>
-                                <p className="font-mono text-[0.55rem] tracking-widest uppercase mt-0.5" style={{ color: curve.color }}>
+                                <p className="font-mono text-xs tracking-widest uppercase mt-0.5" style={{ color: curve.color }}>
                                   {curve.subtitle}
                                 </p>
                               </div>
@@ -932,7 +846,7 @@ export default function LaunchPage() {
                                 <motion.div
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: "auto" }}
-                                  className="text-[0.6rem] text-mf-dim leading-relaxed border-t border-mf-line-gold/30 pt-2"
+                                  className="text-sm text-gray-300 leading-relaxed border-t border-mf-line-gold/30 pt-2"
                                 >
                                   {curve.description}
                                 </motion.div>
@@ -948,12 +862,12 @@ export default function LaunchPage() {
                           animate={{ opacity: 1, y: 0 }}
                           className="mt-3 flex flex-wrap gap-4 items-center"
                         >
-                          <span className="font-mono text-[0.58rem] text-mf-dim uppercase tracking-widest">Ideal for:</span>
-                          <span className="font-mono text-[0.6rem] tracking-wider" style={{ color: selectedCurveData.color }}>
+                          <span className="font-mono text-xs text-gray-300 uppercase tracking-widest">Ideal for:</span>
+                          <span className="font-mono text-sm tracking-wider" style={{ color: selectedCurveData.color }}>
                             {selectedCurveData.idealFor}
                           </span>
-                          <span className="ml-auto font-mono text-[0.58rem] text-mf-dim uppercase tracking-widest">Risk:</span>
-                          <span className="font-mono text-[0.6rem] tracking-wider" style={{ color: selectedCurveData.riskColor }}>
+                          <span className="ml-auto font-mono text-xs text-gray-300 uppercase tracking-widest">Risk:</span>
+                          <span className="font-mono text-sm tracking-wider" style={{ color: selectedCurveData.riskColor }}>
                             {selectedCurveData.risk}
                           </span>
                         </motion.div>
@@ -965,10 +879,10 @@ export default function LaunchPage() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-center gap-3">
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${antisniperEnabled ? "bg-mf-success/15 border border-mf-success/40" : "bg-mf-obsidian/60 border border-mf-line-gold"}`}>
-                              <Shield size={18} className={antisniperEnabled ? "text-mf-success" : "text-mf-dim"} />
+                              <Shield size={18} className={antisniperEnabled ? "text-mf-success" : "text-gray-300"} />
                             </div>
                             <div>
-                              <p className="font-mono text-[0.62rem] tracking-widest uppercase text-mf-dim mb-0.5">L·02 — Anti-Sniper Launch Shield</p>
+                              <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-0.5">L·02 — Anti-Sniper Launch Shield</p>
                               <p className="font-display text-base text-white">60-Second Protection Mode</p>
                             </div>
                           </div>
@@ -1004,7 +918,7 @@ export default function LaunchPage() {
                                 <div key={label} className="bg-mf-success/5 border border-mf-success/20 rounded-xl p-3 flex flex-col gap-1">
                                   <div className="flex items-center gap-1.5">
                                     <Icon size={10} className="text-mf-success" />
-                                    <span className="font-mono text-[0.55rem] tracking-widest uppercase text-mf-dim">{label}</span>
+                                    <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{label}</span>
                                   </div>
                                   <span className="font-display text-sm text-mf-success">{value}</span>
                                 </div>
@@ -1014,7 +928,7 @@ export default function LaunchPage() {
                         </AnimatePresence>
 
                         {!antisniperEnabled && (
-                          <p className="mt-3 font-mono text-[0.58rem] text-mf-danger/70 tracking-wider">
+                          <p className="mt-3 font-mono text-xs text-mf-danger/70 tracking-wider">
                             ⚠ Bots and snipers can front-run your launch without this shield.
                           </p>
                         )}
@@ -1022,7 +936,7 @@ export default function LaunchPage() {
 
                       {/* ── Liquidity Distribution ── */}
                       <div>
-                        <p className="font-mono text-[0.6rem] tracking-widest uppercase text-mf-dim mb-3">
+                        <p className="font-mono text-sm tracking-widest uppercase text-gray-300 mb-3">
                           Liquidity Distribution
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1041,14 +955,14 @@ export default function LaunchPage() {
                               >
                                 <div className="flex items-center gap-2 mb-2">
                                   <Icon size={14} style={{ color: opt.color }} />
-                                  <span className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">{opt.label}</span>
+                                  <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{opt.label}</span>
                                 </div>
                                 <p className="font-display text-sm text-white">{opt.desc}</p>
                                 {selectedLiquidity === opt.id && (
                                   <motion.p
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="font-mono text-[0.58rem] text-mf-dim mt-2 leading-relaxed"
+                                    className="font-mono text-xs text-gray-300 mt-2 leading-relaxed"
                                   >
                                     {opt.detail}
                                   </motion.p>
@@ -1074,7 +988,7 @@ export default function LaunchPage() {
                         {/* Token card */}
                         <div className="rounded-2xl border border-mf-gold/30 bg-mf-gold/5 p-5 relative overflow-hidden">
                           <div className="absolute -top-8 -right-8 w-32 h-32 bg-mf-gold/10 blur-2xl rounded-full" />
-                          <p className="font-mono text-[0.55rem] tracking-widest uppercase text-mf-gold-deep mb-3">Token Identity</p>
+                          <p className="font-mono text-xs tracking-widest uppercase text-mf-gold-deep mb-3">Token Identity</p>
                           <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-mf-gold/30 to-mf-violet/20 flex items-center justify-center font-display text-2xl text-gold shadow-[0_0_14px_rgba(232,184,75,0.2)]">
                               {formData.name[0] || "?"}
@@ -1085,13 +999,13 @@ export default function LaunchPage() {
                             </div>
                           </div>
                           {formData.description && (
-                            <p className="font-body text-xs text-mf-dim leading-relaxed line-clamp-2">{formData.description}</p>
+                            <p className="font-body text-xs text-gray-300 leading-relaxed line-clamp-2">{formData.description}</p>
                           )}
                         </div>
 
                         {/* Mechanics summary */}
                         <div className="rounded-2xl border border-mf-line-gold bg-mf-obsidian/40 p-5 space-y-3">
-                          <p className="font-mono text-[0.55rem] tracking-widest uppercase text-mf-dim mb-3">Mechanics Summary</p>
+                          <p className="font-mono text-xs tracking-widest uppercase text-gray-300 mb-3">Mechanics Summary</p>
                           {[
                             { label: "Curve", value: selectedCurveData.name, color: selectedCurveData.color },
                             { label: "Liquidity", value: selectedLiquidityData.desc, color: "#e8b84b" },
@@ -1099,7 +1013,7 @@ export default function LaunchPage() {
                             { label: "Network", value: process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Solana Mainnet' : 'Solana Devnet', color: "#a855f7" },
                           ].map(({ label, value, color }) => (
                             <div key={label} className="flex justify-between items-center py-2 border-b border-mf-line-gold/20 last:border-0">
-                              <span className="font-mono text-[0.58rem] tracking-widest uppercase text-mf-dim">{label}</span>
+                              <span className="font-mono text-xs tracking-widest uppercase text-gray-300">{label}</span>
                               <span className="font-mono text-[0.65rem] tracking-wider" style={{ color }}>{value}</span>
                             </div>
                           ))}
@@ -1121,7 +1035,7 @@ export default function LaunchPage() {
                         </div>
                         <div className="text-center">
                           <p className="font-display text-lg text-white mb-1">Contract ready to deploy</p>
-                          <p className="font-mono text-[0.58rem] text-mf-dim tracking-widest uppercase">
+                          <p className="font-mono text-xs text-gray-300 tracking-widest uppercase">
                             Estimated cost: ~0.02 SOL · Solana {process.env.NEXT_PUBLIC_NETWORK === 'mainnet-beta' ? 'Mainnet' : 'Devnet'}
                           </p>
                         </div>
@@ -1139,8 +1053,8 @@ export default function LaunchPage() {
                       if (step === 0) setMode("selection");
                       else setStep(step - 1);
                     }}
-                    className="font-mono text-[0.62rem] tracking-widest uppercase rounded-full px-2 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/50 transition-colors"
-                    style={{ color: "#6b6987" }}
+                    className="font-mono text-sm tracking-widest uppercase rounded-full px-2 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-mf-gold/50 transition-colors"
+                    style={{ color: "#9ca3af" }}
                     onMouseEnter={e => (e.currentTarget.style.color = "#e8b84b")}
                     onMouseLeave={e => (e.currentTarget.style.color = "#6b6987")}
                   >
