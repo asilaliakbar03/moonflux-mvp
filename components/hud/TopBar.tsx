@@ -36,23 +36,32 @@ export default function TopBar() {
       {/* ── Logo ── */}
       <Link href="/" className="flex items-center gap-4 shrink-0 group mr-8">
         <div className="relative w-8 h-8 rounded-full flex items-center justify-center overflow-visible">
-          {/* Sweeping Energy Flow (Rightwards) */}
-          <div className="absolute left-[40%] top-1/2 -translate-y-1/2 w-[60px] h-[16px] bg-[radial-gradient(ellipse_at_left,rgba(168,85,247,0.6)_0%,rgba(59,130,246,0.4)_50%,transparent_100%)] blur-[3px] rounded-r-full mix-blend-screen" />
-          <div className="absolute left-[40%] top-1/2 -translate-y-1/2 w-[80px] h-[3px] bg-[linear-gradient(90deg,rgba(255,255,255,0.9)_0%,rgba(168,85,247,0.8)_30%,rgba(59,130,246,0.5)_70%,transparent_100%)] blur-[0.5px] rounded-r-full mix-blend-screen" />
+          {/* The Orbit/Circle Ring (Static left half) */}
+          <div className="absolute inset-[-2px] rounded-full border-[1.5px] border-[#a855f7] opacity-80 [mask-image:linear-gradient(90deg,#000_30%,transparent_70%)]" style={{ boxShadow: "inset 0 0 10px rgba(168,85,247,0.3)" }} />
+          <div className="absolute inset-[-2px] rounded-full border-[1.5px] border-[#3b82f6] opacity-50 [mask-image:linear-gradient(180deg,transparent_20%,#000_80%)]" />
 
-          {/* Left short beam */}
-          <div className="absolute right-[50%] top-1/2 -translate-y-1/2 w-[16px] h-[2px] bg-[linear-gradient(270deg,rgba(255,255,255,0.9)_0%,rgba(168,85,247,0.5)_100%)] blur-[0.5px] rounded-l-full mix-blend-screen" />
+          {/* Sweeping Energy Flow (Rightwards - "Fluxing") */}
+          <motion.div 
+            animate={{ opacity: [0.5, 1, 0.5], scaleX: [0.9, 1.15, 0.9] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+            className="absolute left-[40%] top-1/2 -translate-y-1/2 w-[70px] h-[12px] bg-[radial-gradient(ellipse_at_left,rgba(168,85,247,0.8)_0%,rgba(59,130,246,0.6)_50%,transparent_100%)] rounded-r-full mix-blend-screen"
+            style={{ transformOrigin: "left center" }}
+          />
+          <motion.div 
+            animate={{ opacity: [0.7, 1, 0.7], x: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            className="absolute left-[40%] top-1/2 -translate-y-1/2 w-[90px] h-[2px] bg-[linear-gradient(90deg,rgba(255,255,255,1)_0%,rgba(168,85,247,1)_30%,rgba(59,130,246,0.8)_70%,transparent_100%)] rounded-r-full mix-blend-screen"
+            style={{ boxShadow: "0 0 12px 2px rgba(59,130,246,0.8)", transformOrigin: "left center" }}
+          />
 
-          {/* Vertical Crosshair */}
-          <div className="absolute w-[2px] h-[180%] bg-[linear-gradient(180deg,transparent_0%,rgba(168,85,247,0.8)_25%,rgba(255,255,255,1)_50%,rgba(168,85,247,0.8)_75%,transparent_100%)] blur-[0.5px] rounded-full mix-blend-screen" style={{ boxShadow: "0 0 12px 2px rgba(168,85,247,0.6)" }} />
+          {/* Left short beam (Static) */}
+          <div className="absolute right-[50%] top-1/2 -translate-y-1/2 w-[16px] h-[2px] bg-[linear-gradient(270deg,rgba(255,255,255,1)_0%,rgba(168,85,247,0.5)_100%)] rounded-l-full mix-blend-screen" style={{ boxShadow: "0 0 8px rgba(168,85,247,0.6)" }} />
 
-          {/* The Orbit/Circle Ring */}
-          <div className="absolute inset-[-2px] rounded-full border border-[#a855f7] opacity-60 [mask-image:linear-gradient(90deg,#000_30%,transparent_80%)]" />
-          <div className="absolute inset-[-2px] rounded-full border border-[#3b82f6] opacity-40 [mask-image:linear-gradient(180deg,transparent_20%,#000_80%)]" />
+          {/* Vertical Crosshair (Sharp & Static) */}
+          <div className="absolute w-[2px] h-[180%] bg-[linear-gradient(180deg,transparent_0%,rgba(168,85,247,0.9)_30%,rgba(255,255,255,1)_50%,rgba(168,85,247,0.9)_70%,transparent_100%)] rounded-full mix-blend-screen" style={{ boxShadow: "0 0 12px 2px rgba(168,85,247,0.8)" }} />
 
-          {/* Glowing Core */}
-          <div className="absolute w-4 h-4 bg-white rounded-full blur-[3px]" style={{ boxShadow: "0 0 15px 4px rgba(168,85,247,0.9), 0 0 30px 8px rgba(59,130,246,0.7)" }} />
-          <div className="absolute w-1.5 h-1.5 bg-white rounded-full" />
+          {/* Glowing Core (Sharp) */}
+          <div className="absolute w-2 h-2 bg-white rounded-full" style={{ boxShadow: "0 0 20px 6px rgba(168,85,247,1), 0 0 40px 10px rgba(59,130,246,0.8)" }} />
         </div>
         
         <span
