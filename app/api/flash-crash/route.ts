@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     if (isAIConfigured()) {
       try {
         const result = await aiGenerate<Omit<FlashCrashReport, 'severity'>>({
-          system: `You are MoonFluxx AI Crash Analyst — the first responder when a Solana token crashes.
+          system: `You are MoonFluxx AI Crash Analyst — the first responder when a Crypto token crashes.
 
 Respond with a JSON object containing these fields:
 - "causeType" (string): one of "whale_dump", "coordinated_exit", "liquidity_drain", "market_wide", "panic_cascade", "bot_attack"

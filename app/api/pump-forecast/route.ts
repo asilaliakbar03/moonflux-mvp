@@ -51,7 +51,7 @@ const MOCK: PumpForecastResponse = {
     { id: 'rwa',        name: 'RWA',        emoji: '🏦', confidence: 41, momentumScore: 33, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'Fading',    color: '#ef4444', volumeChange24h:  -28, mentionVelocity: 18,  keyDrivers: ['ONDO', 'BUIDL'],            aiInsight: 'RWA narrative losing meme market share to dog meta — institutional buyers absent this week.' },
     { id: 'depin',      name: 'DePIN',      emoji: '📡', confidence: 55, momentumScore: 61, trend: 'Awakening',  timeframe: 'Next 3d',  tag: 'Watch',     color: '#14b8a6', volumeChange24h:  +89, mentionVelocity: 52,  keyDrivers: ['HNT', 'IOTX', 'WIFI'],      aiInsight: 'DePIN showing unusual early accumulation — possible next narrative rotation target.' },
     { id: 'socialfi',   name: 'SocialFi',   emoji: '💬', confidence: 47, momentumScore: 44, trend: 'Stable',     timeframe: 'Next 7d',  tag: 'Watch',     color: '#6366f1', volumeChange24h:  +15, mentionVelocity: 31,  keyDrivers: ['SOCIAL', 'BFREN'],          aiInsight: 'SocialFi tokens in accumulation phase — watch for a Friends.tech-style catalyst to ignite.' },
-    { id: 'l2s',        name: 'L2 Tokens',  emoji: '⚡', confidence: 38, momentumScore: 29, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'High Risk', color: '#94a3b8', volumeChange24h:  -41, mentionVelocity: 22,  keyDrivers: ['ARB', 'OP'],                aiInsight: 'L2 tokens losing ground to Solana-native assets — funds rotating on-chain.' },
+    { id: 'l2s',        name: 'L2 Tokens',  emoji: '⚡', confidence: 38, momentumScore: 29, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'High Risk', color: '#94a3b8', volumeChange24h:  -41, mentionVelocity: 22,  keyDrivers: ['ARB', 'OP'],                aiInsight: 'L2 tokens losing ground to Multi-Chain-native assets — funds rotating on-chain.' },
   ],
   marketSentiment: {
     regime:            'Euphoria',
@@ -74,7 +74,7 @@ export async function GET() {
   if (isAIConfigured()) {
     try {
       const result = await aiGenerate<Omit<PumpForecastResponse, 'generatedAt'>>({
-        system: `You are MoonFluxx AI Pump Forecaster — an expert Solana narrative analyst. Generate a real-time market pulse report.
+        system: `You are MoonFluxx AI Pump Forecaster — an expert Crypto narrative analyst. Generate a real-time market pulse report.
 
 Respond with a JSON object containing these fields:
 - "narratives" (array of exactly 8 objects): Each narrative object contains:
@@ -101,7 +101,7 @@ Respond with a JSON object containing these fields:
 - "breakoutAlert" (object or null): the single narrative showing the most unusual velocity spike, or null if none stand out
   - "narrativeId" (string)
   - "reason" (string): 1-2 sentences explaining why this narrative is spiking unusually`,
-        prompt: `Analyze these 8 narratives for the current Solana meta:
+        prompt: `Analyze these 8 narratives for the current Crypto meta:
 1. dog_meta — Dog Meta (BARK, BONK derivatives, LDOGE)
 2. ai_agents — AI Agents (autonomous on-chain AI tokens)
 3. meme_season — Meme Season (broad meme market health)
@@ -109,7 +109,7 @@ Respond with a JSON object containing these fields:
 5. rwa — RWA (Real World Assets tokenization)
 6. depin — DePIN (Decentralized Physical Infrastructure)
 7. socialfi — SocialFi (Friend.tech, social graph tokens)
-8. l2s — L2 Tokens (Ethereum L2s vs Solana competition)
+8. l2s — L2 Tokens (Ethereum L2s vs Multi-Chain competition)
 
 For each narrative:
 - confidence: how confident is this prediction (50-95 range realistic)

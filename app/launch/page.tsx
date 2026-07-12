@@ -232,7 +232,7 @@ export default function LaunchPage() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold font-display text-white mb-3">Launch Your Token</h1>
-            <p className="text-[#94A3B8] text-lg">Two ways to bring your token to life on Solana.</p>
+            <p className="text-[#94A3B8] text-lg">Two ways to bring your token to life across chains.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -351,7 +351,7 @@ export default function LaunchPage() {
               <div className="flex flex-col gap-6">
                 <div className="text-center mb-2">
                   <h2 className="text-2xl font-bold text-white">Ready to Deploy</h2>
-                  <p className="text-[#94A3B8]">Review your token details before launching on Solana.</p>
+                  <p className="text-[#94A3B8]">Review your token details before launching multi-chain.</p>
                 </div>
                 
                 <div className="bg-[#080B12] rounded-xl p-6 border border-[rgba(99,102,241,0.15)] flex flex-col gap-4">
@@ -380,7 +380,7 @@ export default function LaunchPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-[#94A3B8]">Network</span>
-                    <span className="text-white">Solana Mainnet</span>
+                    <span className="text-white">Multi-Chain Deployment</span>
                   </div>
                 </div>
                 
@@ -393,7 +393,7 @@ export default function LaunchPage() {
                   {isDeploying ? "Deploying Token..." : !anchorWallet ? "Connect Wallet to Deploy" : "Launch Token"}
                 </button>
                 
-                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens on Solana cannot be deleted after launch.</p>
+                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens deployed on-chain cannot be deleted after launch.</p>
               </div>
             )}
           </div>
@@ -517,7 +517,7 @@ export default function LaunchPage() {
               <div className="flex flex-col gap-6">
                 <div className="text-center mb-2">
                   <h2 className="text-2xl font-bold text-white">Ready to Deploy</h2>
-                  <p className="text-[#94A3B8]">Review your token details before launching on Solana.</p>
+                  <p className="text-[#94A3B8]">Review your token details before launching multi-chain.</p>
                 </div>
                 
                 <div className="bg-[#080B12] rounded-xl p-6 border border-[rgba(99,102,241,0.15)] flex flex-col gap-4">
@@ -546,7 +546,7 @@ export default function LaunchPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-[#94A3B8]">Network</span>
-                    <span className="text-white">Solana Mainnet</span>
+                    <span className="text-white">Multi-Chain Deployment</span>
                   </div>
                 </div>
                 
@@ -562,7 +562,7 @@ export default function LaunchPage() {
                   </button>
                 </div>
                 
-                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens on Solana cannot be deleted after launch.</p>
+                <p className="text-xs text-center text-[#475569]">By launching, you agree to our Terms. Tokens deployed on-chain cannot be deleted after launch.</p>
               </div>
             )}
           </div>

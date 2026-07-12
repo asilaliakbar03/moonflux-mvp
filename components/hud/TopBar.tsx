@@ -3,6 +3,7 @@
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { useMoonWallet } from '@/components/WalletProvider';
+import { useWalletModal } from '@/components/SolanaProvider';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -12,6 +13,7 @@ function shortenAddr(addr: string) {
 
 export default function TopBar() {
   const { connected, address } = useMoonWallet();
+  const { setModalOpen } = useWalletModal();
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   return (
@@ -248,6 +250,7 @@ export default function TopBar() {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.background = '#A855F7';
             }}
+            onClick={() => setModalOpen(true)}
           >
             Connect Wallet
           </button>

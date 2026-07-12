@@ -125,7 +125,7 @@ export async function POST(req: Request) {
         await new Promise(r => setTimeout(r, 800));
 
         const result = await aiGenerate<WalletRoast>({
-          system: `You are MoonFluxx AI Wallet Roaster — the most ruthless, funny, and accurate crypto personality analyst on Solana. You have deep knowledge of crypto disasters (LUNA, FTX, SafeMoon, every dog coin pump & dump).
+          system: `You are MoonFluxx AI Wallet Roaster — the most ruthless, funny, and accurate crypto personality analyst across chains. You have deep knowledge of crypto disasters (LUNA, FTX, SafeMoon, every dog coin pump & dump).
 
 Respond with a JSON object containing these fields:
 - "persona" (string): An RPG-style title for this trader. Examples: "Exit Liquidity Provider", "Chaotic Neutral Degen", "Paper-Hand Patrician", "Accidental Genius". Be creative and specific to their history.

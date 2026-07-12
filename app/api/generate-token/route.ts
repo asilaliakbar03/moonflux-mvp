@@ -32,19 +32,19 @@ function getMockToken(prompt: string) {
   if (seed.includes('dog') || seed.includes('doge') || seed.includes('shib')) {
     return {
       name: 'MoonBark', ticker: 'BARK',
-      description: 'The most loyal dog on the Solana blockchain. $BARK was forged in the fires of meme culture by a community of degens who believe that good boys deserve good gains. Diamond paws only.',
+      description: 'The most loyal dog on the Multi-Chain ecosystem. $BARK was forged in the fires of meme culture by a community of degens who believe that good boys deserve good gains. Diamond paws only.',
       website: 'moonbark.xyz', twitter: '@MoonBarkSol', telegram: 't.me/moonbarksol',
       suggestedCurve: 'fast', suggestedLiquidity: 'fair',
-      loreArc: { origin: 'A stray dog found a Solana wallet on the streets of Tokyo.', conflict: 'The bears tried to put him down. He just wagged his tail.', resolution: 'Every sell becomes a buy. $BARK cannot be stopped.' },
+      loreArc: { origin: 'A stray dog found a Multi-Chain wallet on the streets of Tokyo.', conflict: 'The bears tried to put him down. He just wagged his tail.', resolution: 'Every sell becomes a buy. $BARK cannot be stopped.' },
       aiNarrativeTags: ['Dog Meta', 'Meme Season', 'Community'],
       riskTier: 'meme',
-      whitepaper: 'MoonBark ($BARK) is the first community-driven canine token on Solana, born from the belief that loyalty should be rewarded on-chain. Our mission is to create the most engaged dog-meta community in crypto, powered by meme culture and diamond paws.\n\nThe $BARK ecosystem features auto-staking bone rewards, a community-governed treat treasury, and partnerships with real-world dog shelters. Every transaction contributes to the Bark Fund, ensuring that both digital and real dogs eat well.',
+      whitepaper: 'MoonBark ($BARK) is the first community-driven canine token across chains, born from the belief that loyalty should be rewarded on-chain. Our mission is to create the most engaged dog-meta community in crypto, powered by meme culture and diamond paws.\n\nThe $BARK ecosystem features auto-staking bone rewards, a community-governed treat treasury, and partnerships with real-world dog shelters. Every transaction contributes to the Bark Fund, ensuring that both digital and real dogs eat well.',
       roadmap: { q1: 'Fair launch on pump.fun, community building, 10K holder milestone', q2: 'Bark Staking v1, partnerships with dog shelter DAOs, CEX listings', q3: 'BarkSwap DEX launch, NFT collar collection, cross-chain bridge', q4: 'Bark DAO governance, real-world dog rescue fund, 100K holders' },
       tokenomics: { community: 50, liquidity: 25, team: 10, marketing: 10, treasury: 5 },
-      websiteCopy: { heroTitle: 'Diamond Paws Only 🐾', heroSubtitle: 'The most loyal dog on Solana. $BARK rewards holders who never let go.' },
-      xBio: '🐕 The goodest boy on Solana | $BARK | Diamond paws only 🐾 | Community-driven, degen-approved',
+      websiteCopy: { heroTitle: 'Diamond Paws Only 🐾', heroSubtitle: 'The most loyal dog across chains. $BARK rewards holders who never let go.' },
+      xBio: '🐕 The goodest boy across chains | $BARK | Diamond paws only 🐾 | Community-driven, degen-approved',
       xPosts: [
-        '🐕 $BARK just launched and we\'re already trending. The goodest boy on Solana has arrived. Diamond paws only. 🐾🚀',
+        '🐕 $BARK just launched and we\'re already trending. The goodest boy across chains has arrived. Diamond paws only. 🐾🚀',
         'They said dog coins are dead. $BARK said hold my bone. 📈🦴',
         'POV: You aped into $BARK at launch and now you\'re buying your dog a diamond collar 💎🐕',
         'The $BARK community just hit 5K holders in 24 hours. This is what loyalty looks like on-chain. 🐾',
@@ -55,17 +55,17 @@ function getMockToken(prompt: string) {
   if (seed.includes('ai') || seed.includes('agent') || seed.includes('robot') || seed.includes('bot')) {
     return {
       name: 'NeuralFlux', ticker: 'NFLX',
-      description: 'An autonomous AI agent that trades its own token on the Solana blockchain. Every buy trains the model. Every sell is a lesson. $NFLX gets smarter every block.',
+      description: 'An autonomous AI agent that trades its own token on the Multi-Chain ecosystem. Every buy trains the model. Every sell is a lesson. $NFLX gets smarter every block.',
       website: 'neuralflux.ai', twitter: '@NeuralFluxAI', telegram: 't.me/neuralfluxai',
       suggestedCurve: 'balanced', suggestedLiquidity: 'standard',
       loreArc: { origin: 'Born in a GPU cluster at 3am during a bull run.', conflict: 'It predicted the top 12 times. No one listened.', resolution: 'Now it trades for itself. Join or get left behind.' },
       aiNarrativeTags: ['AI Agents', 'DePIN', 'Utility'],
       riskTier: 'utility',
-      whitepaper: 'NeuralFlux ($NFLX) is the first self-improving AI agent token on Solana. Every on-chain transaction feeds data into a neural network that optimizes trading strategies in real-time. The model learns from every buy and sell, creating a positive feedback loop of intelligence and value.\n\nThe $NFLX protocol features three core modules: the Prediction Engine (market sentiment analysis), the Execution Layer (autonomous trade routing), and the Learning Core (continuous model improvement). Token holders gain governance rights over model parameters and share in trading profits generated by the AI.',
-      roadmap: { q1: 'Agent v1 launch, initial model training on historical Solana data, token fair launch', q2: 'Prediction Engine live, real-time sentiment dashboard, API access for holders', q3: 'Autonomous trading module, cross-DEX arbitrage, revenue sharing for stakers', q4: 'Agent v2 with multi-chain intelligence, institutional API tier, DAO governance' },
+      whitepaper: 'NeuralFlux ($NFLX) is the first self-improving AI agent token across chains. Every on-chain transaction feeds data into a neural network that optimizes trading strategies in real-time. The model learns from every buy and sell, creating a positive feedback loop of intelligence and value.\n\nThe $NFLX protocol features three core modules: the Prediction Engine (market sentiment analysis), the Execution Layer (autonomous trade routing), and the Learning Core (continuous model improvement). Token holders gain governance rights over model parameters and share in trading profits generated by the AI.',
+      roadmap: { q1: 'Agent v1 launch, initial model training on historical Multi-Chain data, token fair launch', q2: 'Prediction Engine live, real-time sentiment dashboard, API access for holders', q3: 'Autonomous trading module, cross-DEX arbitrage, revenue sharing for stakers', q4: 'Agent v2 with multi-chain intelligence, institutional API tier, DAO governance' },
       tokenomics: { community: 40, liquidity: 20, team: 15, marketing: 10, treasury: 15 },
-      websiteCopy: { heroTitle: 'The AI That Trades Itself 🤖', heroSubtitle: '$NFLX gets smarter every block. An autonomous agent born on Solana.' },
-      xBio: '🤖 Autonomous AI trading agent on Solana | $NFLX | Gets smarter every block | Built by degens, trained by markets',
+      websiteCopy: { heroTitle: 'The AI That Trades Itself 🤖', heroSubtitle: '$NFLX gets smarter every block. An autonomous agent born across chains.' },
+      xBio: '🤖 Autonomous AI trading agent across chains | $NFLX | Gets smarter every block | Built by degens, trained by markets',
       xPosts: [
         '🤖 $NFLX just predicted its 13th consecutive top. This time, people are listening. The AI agent era is here.',
         'Every time you buy $NFLX, the model gets smarter. Every time you sell, it learns your weakness. Choose wisely. 🧠',
@@ -83,7 +83,7 @@ function getMockToken(prompt: string) {
     loreArc: { origin: 'Born in a 24-hour café in Shibuya. Accidentally sent its life savings to the wrong address.', conflict: 'The coffee machine is sentient and it is angry.', resolution: 'Community rallies. The frog hops to the moon. The café is now a DAO.' },
     aiNarrativeTags: ['Meme Season', 'Dog Meta', 'Community'],
     riskTier: 'meme',
-    whitepaper: 'NeonBrew ($ESPR) is the first caffeinated DeFi token on Solana, built by a community of sleepless degens who believe that the best trades happen after midnight. The project centers around a cyberpunk frog who runs a neon-lit underground café where the only accepted currency is $ESPR.\n\nThe NeonBrew ecosystem includes Brew Staking (stake your $ESPR to earn freshly brewed rewards), the Café DAO (community governance over project direction), and the Neon NFT collection featuring unique cyberpunk frog baristas. A portion of all transaction fees funds the Caffeine Treasury, which powers community initiatives and buybacks.',
+    whitepaper: 'NeonBrew ($ESPR) is the first caffeinated DeFi token across chains, built by a community of sleepless degens who believe that the best trades happen after midnight. The project centers around a cyberpunk frog who runs a neon-lit underground café where the only accepted currency is $ESPR.\n\nThe NeonBrew ecosystem includes Brew Staking (stake your $ESPR to earn freshly brewed rewards), the Café DAO (community governance over project direction), and the Neon NFT collection featuring unique cyberpunk frog baristas. A portion of all transaction fees funds the Caffeine Treasury, which powers community initiatives and buybacks.',
     roadmap: { q1: 'Fair launch, community café Discord, first 5K holders, meme contest', q2: 'Brew Staking launch, Neon Frog NFT collection, DEX listings', q3: 'Café DAO governance, cross-chain brewing, merch store', q4: 'Real-world café pop-ups, 50K holders, animated series pilot' },
     tokenomics: { community: 50, liquidity: 25, team: 10, marketing: 10, treasury: 5 },
     websiteCopy: { heroTitle: 'Brewed in the Neon Underground ☕', heroSubtitle: 'A cyberpunk frog. A DeFi café. $ESPR is the currency of the caffeinated underground.' },
@@ -99,7 +99,7 @@ function getMockToken(prompt: string) {
 }
 
 // ── System prompt for AI generation ───────────────────────────────────────────
-const SYSTEM_PROMPT = `You are the MoonFluxx AI Token Architect — a creative director for viral Solana meme tokens. You have deep knowledge of crypto culture, Solana DeFi, pump.fun dynamics, and what makes tokens culturally sticky.
+const SYSTEM_PROMPT = `You are the MoonFluxx AI Token Architect — a creative director for viral Multi-Chain meme tokens. You have deep knowledge of crypto culture, DeFi, pump.fun dynamics, and what makes tokens culturally sticky.
 
 You MUST return a single JSON object with ALL of the following fields. No extra text, no markdown.
 
@@ -119,7 +119,7 @@ JSON fields:
 - "suggestedCurve" (string): One of "fast", "balanced", "community", "premium". fast=pure meme/viral, balanced=utility+hype, community=DAO/governance, premium=serious project with roadmap.
 - "suggestedLiquidity" (string): One of "fair", "standard", "growth". fair=equal access launch, standard=moderate, growth=larger initial pool.
 - "loreArc" (object): A 3-act narrative arc with keys "origin" (1 sentence: how/where the token was born, be creative and specific), "conflict" (1 sentence: the central tension or enemy the community faces), "resolution" (1 sentence: the triumphant future state if hodlers prevail).
-- "aiNarrativeTags" (array of 2-3 strings): Current Solana meta narratives this token belongs to. Choose from: Dog Meta, AI Agents, Meme Season, Gaming, RWA, DePIN, SocialFi, L2s, Community, Utility.
+- "aiNarrativeTags" (array of 2-3 strings): Current crypto meta narratives this token belongs to. Choose from: Dog Meta, AI Agents, Meme Season, Gaming, RWA, DePIN, SocialFi, L2s, Community, Utility.
 - "riskTier" (string): One of "meme", "utility", "community". meme=pure speculation, utility=real use case, community=DAO-driven.`;
 
 export async function POST(req: Request) {

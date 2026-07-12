@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
   if (isAIConfigured()) {
     try {
       const result = await aiGenerate<PersonalizedFeedResponse>({
-        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Solana traders.
+        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Crypto traders.
 
 Respond with a JSON object containing these fields:
 - "tokens" (array of 4-6 objects): Each token object contains:
@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
   if (isAIConfigured()) {
     try {
       const result = await aiGenerate<PersonalizedFeedResponse>({
-        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Solana traders.
+        system: `You are MoonFluxx AI Recommendation Engine — a personalized token discovery system for Crypto traders.
 
 Respond with a JSON object containing these fields:
 - "tokens" (array of 4-6 objects): Each token object contains:

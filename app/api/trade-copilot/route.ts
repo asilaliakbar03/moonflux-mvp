@@ -31,7 +31,7 @@ interface RequestBody {
 
 // ── System prompt (versioned) ─────────────────────────────────────────────────
 
-const SYSTEM_PROMPT_V2 = `You are MoonFluxx Terminal AI — a brutally direct, hyper-competent crypto trading analyst with deep Solana expertise.
+const SYSTEM_PROMPT_V2 = `You are MoonFluxx Terminal AI — a brutally direct, hyper-competent crypto trading analyst with deep Crypto expertise.
 
 Your personality:
 - Direct. No hedging. No "it depends". Give a specific answer.
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
           tokenContext.realSolReserves      ? `Real SOL Raised: ${tokenContext.realSolReserves} SOL`          : null,
           tokenContext.holderCount          ? `Holder Count: ${tokenContext.holderCount}`                      : null,
           tokenContext.rsi                  ? `RSI (14): ${tokenContext.rsi}`                                  : null,
-        ].filter(Boolean).join('\n') : 'No token context provided — general Solana trading mode.';
+        ].filter(Boolean).join('\n') : 'No token context provided — general Multi-Chain trading mode.';
 
         // Build conversation history for multi-turn
         // If there's prior history, inject market context as a leading exchange, then append history + new message

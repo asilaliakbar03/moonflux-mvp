@@ -10,7 +10,7 @@ const PROPOSALS = [
   { id: 1, title: "Integrate ZK-Rollups for Launchpad", author: "0xNova", time: "2h ago", category: "Protocol", forPct: 78, forVotes: 9360, againstVotes: 2640, quorum: 12000, status: "Active", endsIn: "2d 14h" },
   { id: 2, title: "Increase Staking APY by 2%", author: "WhaleKing", time: "6h ago", category: "Economics", forPct: 52, forVotes: 5200, againstVotes: 4800, quorum: 10000, status: "Active", endsIn: "4d 3h" },
   { id: 3, title: "Burn 10% Protocol Revenue", author: "DegenDave", time: "3d ago", category: "Economics", forPct: 94, forVotes: 18800, againstVotes: 1200, quorum: 20000, status: "Passed", endsIn: "Ended" },
-  { id: 4, title: "Add Solana Mobile Support", author: "CryptoQueen", time: "1d ago", category: "Community", forPct: 61, forVotes: 7320, againstVotes: 4680, quorum: 12000, status: "Active", endsIn: "1d 8h" },
+  { id: 4, title: "Add Multi-Chain Mobile Support", author: "CryptoQueen", time: "1d ago", category: "Community", forPct: 61, forVotes: 7320, againstVotes: 4680, quorum: 12000, status: "Active", endsIn: "1d 8h" },
 ];
 
 const INCUBATOR_PROJECTS = [
@@ -161,7 +161,7 @@ export default function VenturePage() {
           <div className="surface-card p-8 border border-[rgba(5,213,250,0.3)] bg-[rgba(5,213,250,0.02)] flex flex-col items-center text-center mb-4 relative overflow-hidden shadow-[0_0_20px_rgba(5,213,250,0.1)]">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,rgba(5,213,250,0.8),transparent_60%)]" />
             <h2 className="text-2xl font-bold text-white mb-2 relative z-10 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Back Early Stage Projects</h2>
-            <p className="text-[#C8A2C8] max-w-xl mb-6 relative z-10">Vote for the next big protocol on Solana. Projects that reach 100% funding goal receive a MoonFluxx ecosystem grant and automatic listing.</p>
+            <p className="text-[#C8A2C8] max-w-xl mb-6 relative z-10">Vote for the next big protocol across chains. Projects that reach 100% funding goal receive a MoonFluxx ecosystem grant and automatic listing.</p>
             <button className="bg-[rgba(5,213,250,0.15)] hover:bg-[rgba(5,213,250,0.25)] border border-[rgba(5,213,250,0.5)] text-[#05D5FA] shadow-[0_0_15px_rgba(5,213,250,0.3)] rounded-lg font-bold px-6 py-2 transition-all relative z-10 hover:shadow-[0_0_25px_rgba(5,213,250,0.5)]">Apply for Incubation</button>
           </div>
 

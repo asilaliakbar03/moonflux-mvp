@@ -27,7 +27,7 @@ async function fetchTokenPrice(mintAddress: string): Promise<number | null> {
     if (!res.ok) return null;
     const data = await res.json();
     const pairs = (data.pairs ?? []).filter(
-      (p: { chainId: string }) => p.chainId === 'solana'
+      (p: { chainId: string }) => p.chainId === 'multi-chain'
     );
     if (pairs.length === 0) return null;
     const best = pairs.sort(

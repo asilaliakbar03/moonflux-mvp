@@ -143,7 +143,7 @@ export async function POST(req: Request) {
           temperature: 0.2,
           maxTokens: 800,
           cacheTtlMs: 3600000, // 1 hour per token
-          system: `You are MoonFluxx AI Risk Engine — an institutional-grade Solana token risk scanner.
+          system: `You are MoonFluxx AI Risk Engine — an institutional-grade Crypto token risk scanner.
 
 Return a JSON object with EXACTLY these fields:
 
