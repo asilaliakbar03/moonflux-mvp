@@ -7,8 +7,8 @@ import { ToastProvider } from "@/components/ToastProvider";
 import { SolanaProvider } from "@/components/SolanaProvider";
 
 export const metadata: Metadata = {
-  title: "MoonFluxx — Launch, Trade & Discover Tokens on Solana",
-  description: "The easiest way to launch, discover, and trade memecoins on Solana. AI-powered. Community-first.",
+  title: "MoonFluxx — Launch, Trade & Discover Tokens",
+  description: "The easiest way to launch, discover, and trade memecoins across multiple chains. AI-powered. Community-first.",
 };
 
 export default function RootLayout({

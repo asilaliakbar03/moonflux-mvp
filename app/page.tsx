@@ -35,7 +35,7 @@ export default function HomePage() {
         <div className="flex-1 flex flex-col gap-6">
           <div className="inline-flex items-center gap-2 bg-[#120721] border border-[rgba(255,42,109,0.3)] rounded-full px-4 py-1.5 w-fit shadow-[0_0_15px_rgba(255,42,109,0.15)]">
             <span className="w-2 h-2 rounded-full bg-[#FF2A6D] animate-pulse shadow-[0_0_10px_#FF2A6D]" />
-            <span className="text-xs font-bold text-[#F8F0FF] uppercase tracking-wider">The memecoin launchpad on Solana</span>
+            <span className="text-xs font-bold text-[#F8F0FF] uppercase tracking-wider">The Multi-Chain Memecoin Launchpad</span>
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight">
@@ -61,7 +61,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 text-xs sm:text-sm text-[#8B6A8B] font-mono font-bold">
             <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> No coding required</div>
             <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> AI-powered</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> Solana-native</div>
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> Multi-chain</div>
           </div>
         </div>
         
