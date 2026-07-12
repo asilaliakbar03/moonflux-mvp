@@ -248,7 +248,6 @@ export default function TopBar() {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.background = '#A855F7';
             }}
-            onClick={() => setModalOpen(true)}
           >
             Connect Wallet
           </button>
