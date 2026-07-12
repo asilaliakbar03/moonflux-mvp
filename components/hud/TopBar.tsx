@@ -52,7 +52,7 @@ export default function TopBar() {
           ●
         </span>
         <span
-          className="hidden sm:inline"
+          className="inline"
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 700,
@@ -138,7 +138,7 @@ export default function TopBar() {
                 onBlur={() => setSearchExpanded(false)}
                 style={{
                   height: 36,
-                  width: 180,
+                  width: 130,
                   background: '#161B27',
                   border: '1px solid rgba(99,102,241,0.30)',
                   borderRadius: 8,
