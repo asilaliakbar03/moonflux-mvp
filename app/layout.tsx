@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import FluidBackground from "@/components/hud/FluidBackground";
 import Sidebar from "@/components/hud/Sidebar";
@@ -44,12 +44,7 @@ export default function RootLayout({
 
             {/* Main content */}
             <main
-              className="relative z-10"
-              style={{
-                paddingTop: "64px",
-                paddingLeft: "72px",
-                minHeight: "100vh",
-              }}
+              className="relative z-10 pt-[64px] md:pl-[72px] min-h-screen"
             >
               <div className="px-4 md:px-6 lg:px-8 py-6 max-w-[1400px] mx-auto">
                 {children}

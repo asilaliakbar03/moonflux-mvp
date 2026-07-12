@@ -141,54 +141,81 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden"
-      style={{
-        width: expanded ? 220 : 72,
-        backgroundColor: '#0B0414',
-        borderRight: '1px solid rgba(255,42,109,0.15)',
-        transition: 'width 300ms cubic-bezier(0.16,1,0.3,1)',
-      }}
-    >
-      {/* ── Main nav ── */}
-      <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-6 overflow-hidden">
-        {MAIN_ITEMS.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            isActive={pathname === item.href}
-            expanded={expanded}
-          />
-        ))}
-      </nav>
+    <>
+      <aside
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden"
+        style={{
+          width: expanded ? 220 : 72,
+          backgroundColor: '#0B0414',
+          borderRight: '1px solid rgba(255,42,109,0.15)',
+          transition: 'width 300ms cubic-bezier(0.16,1,0.3,1)',
+        }}
+      >
+        {/* ── Main nav ── */}
+        <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-6 overflow-hidden">
+          {MAIN_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={pathname === item.href}
+              expanded={expanded}
+            />
+          ))}
+        </nav>
 
-      {/* ── Divider ── */}
-      <div
-        className="mx-3 my-1"
-        style={{ borderTop: '1px solid rgba(255,42,109,0.15)' }}
-      />
-
-      {/* ── Bottom section ── */}
-      <div className="flex flex-col gap-0.5 px-2 pb-4">
-
-        {/* Thin divider above profile/settings */}
+        {/* ── Divider ── */}
         <div
-          className="mx-1 mb-1"
+          className="mx-3 my-1"
           style={{ borderTop: '1px solid rgba(255,42,109,0.15)' }}
         />
 
-        {/* Profile & Settings */}
-        {BOTTOM_ITEMS.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            isActive={pathname === item.href}
-            expanded={expanded}
+        {/* ── Bottom section ── */}
+        <div className="flex flex-col gap-0.5 px-2 pb-4">
+          <div
+            className="mx-1 mb-1"
+            style={{ borderTop: '1px solid rgba(255,42,109,0.15)' }}
           />
-        ))}
-      </div>
-    </aside>
+          {BOTTOM_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={pathname === item.href}
+              expanded={expanded}
+            />
+          ))}
+        </div>
+      </aside>
+
+      {/* ── Mobile Bottom Nav ── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[rgba(11,4,20,0.95)] backdrop-blur-md border-t border-[rgba(255,42,109,0.15)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
+        {[
+          MAIN_ITEMS[0], // Dashboard
+          MAIN_ITEMS[1], // Explore
+          MAIN_ITEMS[2], // Feed
+          MAIN_ITEMS[3], // Launch
+          BOTTOM_ITEMS[0], // Profile
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+          return (
+            <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center w-full h-full gap-1">
+              <Icon 
+                size={22} 
+                strokeWidth={isActive ? 2.5 : 2} 
+                className={isActive ? "text-[#FF2A6D]" : "text-[#475569]"} 
+              />
+              <span 
+                className="text-[10px] font-medium" 
+                style={{ color: isActive ? "#F1F5F9" : "#475569" }}
+              >
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

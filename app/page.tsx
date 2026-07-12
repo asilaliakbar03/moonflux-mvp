@@ -38,7 +38,7 @@ export default function HomePage() {
             <span className="text-xs font-bold text-[#F8F0FF] uppercase tracking-wider">The memecoin launchpad on Solana</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight">
             Discover & Launch <br/>
             Tokens That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2A6D] to-[#05D5FA] drop-shadow-[0_0_10px_rgba(255,42,109,0.3)]">Move</span>
           </h1>
@@ -58,7 +58,7 @@ export default function HomePage() {
             </Link>
           </div>
           
-          <div className="flex items-center gap-6 mt-4 text-sm text-[#8B6A8B] font-mono font-bold">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 text-xs sm:text-sm text-[#8B6A8B] font-mono font-bold">
             <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> No coding required</div>
             <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> AI-powered</div>
             <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> Solana-native</div>
