@@ -226,8 +226,8 @@ export default function TopBar() {
               justifyContent: 'center',
               height: 36,
               padding: '0 16px',
-              background: '#6366F1',
-              boxShadow: '0 4px 15px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+              background: '#A855F7',
+              boxShadow: '0 4px 15px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 8,
               cursor: 'pointer',
@@ -239,14 +239,14 @@ export default function TopBar() {
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.2)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.2)';
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.background = '#4F46E5';
+              e.currentTarget.style.background = '#9333EA';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.1)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.1)';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = '#6366F1';
+              e.currentTarget.style.background = '#A855F7';
             }}
             onClick={() => setModalOpen(true)}
           >
