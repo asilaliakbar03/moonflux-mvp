@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Compass,
@@ -12,6 +12,8 @@ import {
   UserCircle,
   Settings,
   Film,
+  Menu,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -123,6 +125,7 @@ function NavLink({
 export default function Sidebar() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
@@ -189,18 +192,28 @@ export default function Sidebar() {
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[rgba(11,4,20,0.95)] backdrop-blur-md border-t border-[rgba(255,42,109,0.15)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[rgba(11,4,20,0.95)] backdrop-blur-md border-t border-[rgba(255,42,109,0.15)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
         {[
           MAIN_ITEMS[0], // Dashboard
           MAIN_ITEMS[1], // Explore
           MAIN_ITEMS[2], // Feed
           MAIN_ITEMS[3], // Launch
-          BOTTOM_ITEMS[0], // Profile
+          { icon: Menu, label: 'More', href: '#more' } // More
         ].map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+          
+          if (item.href === '#more') {
+            return (
+              <button key="more" onClick={() => setShowMobileMenu(true)} className="flex flex-col items-center justify-center w-full h-full gap-1">
+                <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#FF2A6D]" : "text-[#475569]"} />
+                <span className="text-[10px] font-medium" style={{ color: showMobileMenu ? "#F1F5F9" : "#475569" }}>More</span>
+              </button>
+            );
+          }
+
           return (
-            <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center w-full h-full gap-1">
+            <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1">
               <Icon 
                 size={22} 
                 strokeWidth={isActive ? 2.5 : 2} 
@@ -216,6 +229,61 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      <AnimatePresence>
+        {showMobileMenu && (
+          <motion.div 
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="md:hidden fixed inset-0 z-[90] bg-[#0B0414] overflow-y-auto pb-24 pt-6 px-6 flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-8 mt-2">
+              <h2 className="text-3xl font-bold font-display text-white">Menu</h2>
+              <button onClick={() => setShowMobileMenu(false)} className="p-2 bg-[rgba(255,255,255,0.05)] rounded-full text-[#F1F5F9] hover:text-[#FF2A6D] hover:bg-[rgba(255,42,109,0.1)] transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-8">
+              <div>
+                <h3 className="text-[10px] font-mono font-bold text-[#FF2A6D] tracking-widest uppercase mb-3 px-2">Main</h3>
+                <div className="flex flex-col gap-1">
+                  {MAIN_ITEMS.map(item => (
+                    <Link 
+                      key={item.href} 
+                      href={item.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 ${pathname === item.href ? 'bg-[rgba(255,42,109,0.15)] text-white border border-[rgba(255,42,109,0.3)] shadow-[0_0_15px_rgba(255,42,109,0.15)]' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                    >
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#FF2A6D]" : "text-[#475569]"} />
+                      <span className="font-bold text-base">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-[10px] font-mono font-bold text-[#05D5FA] tracking-widest uppercase mb-3 px-2">Account</h3>
+                <div className="flex flex-col gap-1">
+                  {BOTTOM_ITEMS.map(item => (
+                    <Link 
+                      key={item.href} 
+                      href={item.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 ${pathname === item.href ? 'bg-[rgba(5,213,250,0.15)] text-white border border-[rgba(5,213,250,0.3)] shadow-[0_0_15px_rgba(5,213,250,0.15)]' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                    >
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#05D5FA]" : "text-[#475569]"} />
+                      <span className="font-bold text-base">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
