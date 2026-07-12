@@ -34,7 +34,7 @@ export default function TopBar() {
       }}
     >
       {/* ── Logo ── */}
-      <Link href="/" className="flex items-center gap-4 shrink-0 group mr-8">
+      <Link href="/" className="flex items-center gap-3 shrink-0 group mr-2 sm:mr-8">
         <div className="relative w-8 h-8 rounded-full flex items-center justify-center overflow-visible">
           {/* The Orbit/Circle Ring (Static left half) */}
           <div className="absolute inset-[-2px] rounded-full border-[1.5px] border-[#a855f7] opacity-80 [mask-image:linear-gradient(90deg,#000_30%,transparent_70%)]" style={{ boxShadow: "inset 0 0 10px rgba(168,85,247,0.3)" }} />
@@ -168,17 +168,18 @@ export default function TopBar() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 36,
-                height: 36,
-                background: '#161B27',
-                border: '1px solid rgba(99,102,241,0.15)',
-                borderRadius: 8,
+                width: 38,
+                height: 38,
+                background: 'rgba(255,42,109,0.05)',
+                border: '1px solid rgba(255,42,109,0.2)',
+                borderRadius: '50%',
                 cursor: 'pointer',
-                color: '#475569',
+                color: '#05D5FA',
+                transition: 'all 0.2s ease',
               }}
               aria-label="Search"
             >
-              <Search size={15} />
+              <Search size={16} />
             </button>
           )}
         </div>
@@ -225,8 +226,9 @@ export default function TopBar() {
               justifyContent: 'center',
               height: 36,
               padding: '0 16px',
-              background: '#6366F1',
-              border: 'none',
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.8) 0%, rgba(59,130,246,0.8) 100%)',
+              boxShadow: '0 4px 15px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 8,
               cursor: 'pointer',
               color: '#fff',
@@ -234,14 +236,17 @@ export default function TopBar() {
               fontWeight: 600,
               letterSpacing: '0.01em',
               whiteSpace: 'nowrap',
-              transition: 'background 0.15s ease',
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#4F46E5';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.3)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#6366F1';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
+            onClick={() => setModalOpen(true)}
           >
             Connect Wallet
           </button>

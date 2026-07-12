@@ -43,25 +43,25 @@ export default function HomePage() {
             Tokens That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2A6D] to-[#05D5FA] drop-shadow-[0_0_10px_rgba(255,42,109,0.3)]">Move</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-[#C8A2C8] max-w-xl leading-relaxed">
+          <p className="text-lg md:text-xl text-[#C8A2C8] max-w-xl leading-relaxed mt-4 mb-8">
             Find the next 100x before it pumps. Launch your own token in minutes with AI assistance.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
-            <Link href="/explore" className="w-full sm:w-auto px-8 py-3.5 btn-primary font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Link href="/explore" className="w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all" style={{ background: "linear-gradient(135deg, #05D5FA 0%, #3b82f6 100%)", color: "#fff", boxShadow: "0 0 20px rgba(5,213,250,0.4)" }}>
               <Search className="w-5 h-5" />
               Explore Tokens
             </Link>
-            <Link href="/launch" className="w-full sm:w-auto px-8 py-3.5 btn-ghost font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <Link href="/launch" className="w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all hover:bg-[rgba(255,42,109,0.1)]" style={{ border: "1px solid rgba(255,42,109,0.5)", color: "#FF2A6D", boxShadow: "inset 0 0 15px rgba(255,42,109,0.1)" }}>
               <Rocket className="w-5 h-5" />
               Launch a Token
             </Link>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4 text-xs sm:text-sm text-[#8B6A8B] font-mono font-bold">
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> No coding required</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> AI-powered</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#39FF14]" /> Multi-chain</div>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-6 text-xs sm:text-sm text-[#8B6A8B] font-mono font-bold">
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#05D5FA]" /> No coding required</div>
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#05D5FA]" /> AI-powered</div>
+            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#05D5FA]" /> Multi-chain</div>
           </div>
         </div>
         
