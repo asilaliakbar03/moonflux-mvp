@@ -123,7 +123,7 @@ export default function ArenaPage() {
                     <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => setConfirming('a')} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors w-full max-w-[200px] hover:bg-[rgba(16,185,129,0.1)] hover:text-[#10B981] hover:border-[#10B981]">
+                  <button onClick={() => setConfirming('a')} className="px-6 py-3 rounded-xl font-bold border-2 border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.1)] text-[#10B981] hover:bg-[#10B981] hover:text-white transition-all w-full max-w-[200px] shadow-[0_0_15px_rgba(16,185,129,0.1)]">
                     Vote {BATTLE.tokenA.name}
                   </button>
                 )
@@ -159,7 +159,7 @@ export default function ArenaPage() {
                     <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => setConfirming('b')} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors w-full max-w-[200px] hover:bg-[rgba(244,63,94,0.1)] hover:text-[#F43F5E] hover:border-[#F43F5E]">
+                  <button onClick={() => setConfirming('b')} className="px-6 py-3 rounded-xl font-bold border-2 border-[rgba(244,63,94,0.3)] bg-[rgba(244,63,94,0.1)] text-[#F43F5E] hover:bg-[#F43F5E] hover:text-white transition-all w-full max-w-[200px] shadow-[0_0_15px_rgba(244,63,94,0.1)]">
                     Vote {BATTLE.tokenB.name}
                   </button>
                 )
