@@ -14,6 +14,7 @@ import {
   LineChart, Line, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
+import { supabase } from '@/lib/supabase';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const TOTAL_SUPPLY = 1_000_000_000;
@@ -144,14 +145,32 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const [slippage, setSlippage] = useState<number | 'custom'>(1);
   const [isExecuting, setIsExecuting] = useState(false);
 
+  const [dbToken, setDbToken] = useState<any>(null);
+
   // Derivations
-  const tokenName = `Project ${mintAddress.slice(0, 4)}`;
-  const ticker = `$PRJ${mintAddress.slice(0, 2).toUpperCase()}`;
+  const tokenName = dbToken ? dbToken.name : `Project ${mintAddress.slice(0, 4)}`;
+  const ticker = dbToken ? `$${dbToken.ticker}` : `$PRJ${mintAddress.slice(0, 2).toUpperCase()}`;
   const basePrice = priceFromReserves(curveData.virtualSolReserves, curveData.virtualTokenReserves, solUsd);
   const isComplete = curveData.complete;
   const progress = Math.min(100, (curveData.realSolReserves / GRAD_SOL) * 100);
   
   useEffect(() => {
+    async function fetchDbToken() {
+      try {
+        const { data } = await supabase
+          .from('tokens')
+          .select('*')
+          .eq('mint_address', mintAddress)
+          .single();
+        if (data) {
+          setDbToken(data);
+        }
+      } catch (err) {
+        console.warn("Could not fetch token from DB:", err);
+      }
+    }
+    fetchDbToken();
+
     setTrades(genInitialTrades(mintAddress));
     setChartData(genChartData(mintAddress, 40, basePrice));
     

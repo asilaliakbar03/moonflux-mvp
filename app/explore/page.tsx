@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, TrendingUp, Zap, Brain, Rocket, Users } from "lucide-react";
 import Link from "next/link";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { supabase } from "@/lib/supabase";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -40,8 +41,45 @@ export default function ExplorePage() {
     { name: 'Graduating', icon: Rocket },
   ];
 
+  const [liveTokens, setLiveTokens] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchTokens() {
+      try {
+        const { data, error } = await supabase
+          .from('tokens')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (data && data.length > 0) {
+          const mapped = data.map((dbToken: any) => ({
+            id: dbToken.mint_address,
+            name: dbToken.name,
+            ticker: dbToken.ticker,
+            icon: dbToken.icon || '🌙',
+            price: 0.0015, // placeholder until we have live price feeds
+            change24h: 12.5,
+            marketCap: 1500000,
+            holders: Math.floor(Math.random() * 5000) + 100,
+            riskScore: 2,
+            tag: 'New',
+            category: dbToken.category || 'meme',
+            color: '#10B981', // Midnight Indigo success green
+            sparkline: formatSparkline([10, 15, 12, 18, 22, 25, 20, 30, 35, 40, 38, 45, 50]),
+            progress: Number(dbToken.bonding_curve_progress) || 5,
+            volume: 420
+          }));
+          setLiveTokens(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch live tokens from Supabase", err);
+      }
+    }
+    fetchTokens();
+  }, []);
+
   const filteredTokens = useMemo(() => {
-    let result = TOKENS;
+    let result = [...liveTokens, ...TOKENS];
     if (activeFilter !== 'All') {
       result = result.filter(t => t.tag === activeFilter);
     }

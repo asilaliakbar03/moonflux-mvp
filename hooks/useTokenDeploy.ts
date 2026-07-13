@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMoonWallet } from '@/components/WalletProvider';
+import { supabase } from '@/lib/supabase';
 
 export interface TokenDeployFormData {
   name: string;
@@ -124,6 +125,20 @@ export function useTokenDeploy() {
         { signature, blockhash, lastValidBlockHeight },
         "confirmed"
       );
+
+      // Insert token into Supabase
+      try {
+        await supabase.from('tokens').insert({
+          mint_address: mint.publicKey.toBase58(),
+          name: formData.name,
+          ticker: formData.ticker,
+          description: formData.description,
+          metadata_uri: metadataUri,
+          bonding_curve_progress: 0,
+        } as any);
+      } catch (dbErr) {
+        console.error("Failed to insert token into Supabase:", dbErr);
+      }
 
       router.push(`/token/${mint.publicKey.toBase58()}`);
     } catch (err) {
