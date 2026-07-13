@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Sparkles, Settings, ChevronRight, Check, Loader2, Upload, AlertCircle, Rocket } from "lucide-react";
+import { Sparkles, Settings, ChevronRight, ChevronDown, Check, Loader2, Upload, AlertCircle, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMoonWallet } from "@/components/WalletProvider";
 
