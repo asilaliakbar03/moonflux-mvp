@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown, CheckCircle2, ShieldAlert } from "lucide-react";
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useTokenDeploy, TokenDeployFormData } from "@/hooks/useTokenDeploy";
@@ -20,7 +20,7 @@ export default function LaunchPage() {
   const [currentStep, setCurrentStep] = useState<Step>(1);
   
   const [aiPrompt, setAiPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingStep, setGeneratingStep] = useState(0);
 
   const [formData, setFormData] = useState<TokenDeployFormData>({
     name: "",
@@ -50,7 +50,12 @@ export default function LaunchPage() {
   };
 
   const simulateAIGeneration = async () => {
-    setIsGenerating(true);
+    setGeneratingStep(1); // "Analyzing prompt..."
+    
+    // Simulate sequencing
+    setTimeout(() => setGeneratingStep(2), 1500); // "Forging tokenomics..."
+    setTimeout(() => setGeneratingStep(3), 3000); // "Finalizing contract..."
+    
     try {
       const res = await fetch("/api/generate-token", {
         method: "POST",
@@ -71,7 +76,7 @@ export default function LaunchPage() {
         throw new Error("API error");
       }
     } catch(e) {
-      // Upgraded Smart AI Mocks
+      await new Promise(r => setTimeout(r, 4500)); // wait for animations if fallback
       const prefixes = ["Neon", "Cyber", "Quantum", "Aero", "Luna", "Astro", "Nova", "Plasma"];
       const suffixes = ["Doge", "Inu", "Flux", "Sync", "Pulse", "Node", "Byte", "Chain"];
       
@@ -92,7 +97,7 @@ export default function LaunchPage() {
       });
       setSelectedCurve(Math.random() > 0.5 ? "fast" : "balanced");
     } finally {
-      setIsGenerating(false);
+      setGeneratingStep(0);
       setCurrentStep(2);
     }
   };
@@ -143,6 +148,8 @@ export default function LaunchPage() {
     { id: 'stable', name: 'Stable', desc: 'Slow and steady for long-term.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0' },
     { id: 'aggressive', name: 'Aggressive', desc: 'Max degenerate mode.', risk: 'Very High', color: '#8B5CF6', svg: 'M0,25 L10,20 L20,10 L30,2 L40,0' }
   ];
+
+  const devSolCost = ((devAllocation / 100) * 85).toFixed(2); // Mock: max 85 SOL for pool
 
   return (
     <div className="max-w-3xl mx-auto w-full pt-8 pb-16">
@@ -210,18 +217,23 @@ export default function LaunchPage() {
                   <textarea 
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
+                    disabled={generatingStep > 0}
                     placeholder="Describe your token in a few words. E.g. 'A meme token for dog lovers with auto-burn and community rewards'"
-                    className="w-full max-w-xl h-32 bg-[#080B12] border border-[rgba(99,102,241,0.2)] hover:border-[rgba(99,102,241,0.4)] rounded-xl p-4 text-white placeholder:text-[#475569] focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-all resize-none mb-2"
+                    className="w-full max-w-xl h-32 bg-[#080B12] border border-[rgba(99,102,241,0.2)] hover:border-[rgba(99,102,241,0.4)] rounded-xl p-4 text-white placeholder:text-[#475569] focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-all resize-none mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <div className="text-xs text-[#475569] mb-8">{aiPrompt.length} / 280 chars</div>
                   
                   <button 
                     onClick={simulateAIGeneration}
-                    disabled={aiPrompt.length < 10 || isGenerating}
-                    className="btn-primary flex items-center gap-2 px-8 py-3 w-full max-w-xs justify-center disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all"
+                    disabled={aiPrompt.length < 10 || generatingStep > 0}
+                    className="btn-primary flex items-center gap-2 px-8 py-3 w-full max-w-xs justify-center disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all overflow-hidden relative"
                   >
-                    {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                    {isGenerating ? "Generating Magic..." : "Generate Token"}
+                    {generatingStep > 0 && <div className="absolute inset-0 bg-white/10 animate-pulse" />}
+                    {generatingStep > 0 ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                    {generatingStep === 0 && "Generate Token"}
+                    {generatingStep === 1 && "Analyzing prompt..."}
+                    {generatingStep === 2 && "Forging tokenomics..."}
+                    {generatingStep === 3 && "Finalizing contract..."}
                   </button>
                   <p className="text-xs text-[#475569] mt-4 max-w-sm">AI will generate: name, ticker, description, and recommended curve settings</p>
                 </motion.div>
@@ -234,8 +246,15 @@ export default function LaunchPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Name {mode==='custom' && '*'}</label>
-                      <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] transition-colors" />
+                      <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5 flex justify-between items-center">
+                        <span>Name {mode==='custom' && '*'}</span>
+                        {formData.name.length > 0 ? (
+                          <span className="text-[#10B981] flex items-center gap-1 text-xs drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"><CheckCircle2 className="w-3.5 h-3.5" /></span>
+                        ) : (
+                          <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> Required</span>
+                        )}
+                      </label>
+                      <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className={`w-full bg-[#080B12] border rounded-lg p-3 text-white focus:outline-none transition-colors ${formData.name.length > 0 ? 'border-[rgba(16,185,129,0.5)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]' : 'border-[rgba(99,102,241,0.2)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1]'}`} />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5 flex justify-between items-center">
@@ -243,7 +262,7 @@ export default function LaunchPage() {
                         {formData.ticker.length > 0 && (
                           isTickerValid 
                             ? <span className="text-[#10B981] flex items-center gap-1 text-xs drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"><CheckCircle2 className="w-3.5 h-3.5" /> Valid</span>
-                            : <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> Invalid</span>
+                            : <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> 2-10 chars</span>
                         )}
                       </label>
                       <div className="relative">
@@ -255,7 +274,7 @@ export default function LaunchPage() {
                   
                   <div>
                     <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Description {mode==='custom' && '*'}</label>
-                    <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] resize-none transition-colors" />
+                    <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className={`w-full h-24 bg-[#080B12] border rounded-lg p-3 text-white focus:outline-none resize-none transition-colors ${formData.description.length > 0 ? 'border-[rgba(16,185,129,0.5)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]' : 'border-[rgba(99,102,241,0.2)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1]'}`} />
                   </div>
 
                   {/* AI Mode: Show Curve Selection directly in this step */}
@@ -342,10 +361,20 @@ export default function LaunchPage() {
                                 <BondingCurveChart curveType={curve.id} color={curve.color} />
                               </div>
                             ) : (
-                              <div className="w-full flex justify-between items-end">
+                              <div className="w-full flex justify-between items-end group">
                                 <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: curve.color }}>{curve.risk}</span>
-                                <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-60">
-                                  <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-60 group-hover:opacity-100 transition-opacity">
+                                  <motion.path 
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: 1 }}
+                                    transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: "linear" }}
+                                    d={curve.svg} 
+                                    fill="none" 
+                                    stroke={curve.color} 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                  />
                                 </svg>
                               </div>
                             )}
@@ -368,7 +397,7 @@ export default function LaunchPage() {
                     
                     <AnimatePresence mode="wait">
                       {isAdvancedMode ? (
-                        <motion.div key="advanced" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="p-6 rounded-xl border border-[#8B5CF6] bg-[rgba(139,92,246,0.05)] shadow-[0_0_20px_rgba(139,92,246,0.1)]">
+                        <motion.div key="advanced" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="p-6 rounded-xl border border-[#8B5CF6] bg-[rgba(139,92,246,0.05)] shadow-[0_0_20px_rgba(139,92,246,0.1)] overflow-hidden">
                           <div className="flex justify-between items-center mb-6">
                             <div>
                               <div className="font-bold text-white text-lg">{devAllocation}% Dev Allocation</div>
@@ -388,12 +417,17 @@ export default function LaunchPage() {
                               step="1"
                               value={devAllocation} 
                               onChange={(e) => setDevAllocation(Number(e.target.value))}
-                              className="w-full h-2 bg-[#080B12] rounded-lg appearance-none cursor-pointer accent-[#8B5CF6] border border-[rgba(255,255,255,0.1)]"
+                              className="w-full h-2 bg-[#080B12] rounded-lg appearance-none cursor-pointer accent-[#8B5CF6] border border-[rgba(255,255,255,0.1)] shadow-inner"
                             />
-                            <div className="flex justify-between text-xs text-[#64748B] mt-2 font-mono">
-                              <span>0%</span>
-                              <span>25%</span>
-                              <span>50%</span>
+                            <div className="absolute top-[28px] pointer-events-none" style={{ left: `calc(${devAllocation * 2}% - 14px)` }}>
+                               <motion.div layout className="bg-[#8B5CF6] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-[0_0_10px_rgba(139,92,246,0.5)]">
+                                 {devSolCost} SOL
+                               </motion.div>
+                            </div>
+                            <div className="flex justify-between text-xs text-[#64748B] mt-6 font-mono">
+                              <span>0% (0 SOL)</span>
+                              <span>25% (~21 SOL)</span>
+                              <span>50% (~42 SOL)</span>
                             </div>
                           </div>
                         </motion.div>
@@ -458,24 +492,33 @@ export default function LaunchPage() {
                       <span className="text-[#94A3B8]">Bonding Curve</span>
                       <span className="text-[#10B981] capitalize font-bold drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">{selectedCurve} Curve</span>
                     </div>
-                    <div className="flex justify-between items-center relative z-10">
-                      <span className="text-[#94A3B8]">Liquidity Split</span>
-                      <span className="text-white">
-                        {isAdvancedMode ? (
-                          <span className="flex gap-2 text-sm"><span className="text-[#8B5CF6]">{devAllocation}% Dev</span> / <span className="text-[#10B981]">{100 - devAllocation}% Pool</span></span>
-                        ) : (
-                          <span className="capitalize">{selectedLiquidity.replace('_', ' ')}</span>
-                        )}
-                      </span>
-                    </div>
                     
                     <div className="h-px bg-[rgba(255,255,255,0.05)] my-2 relative z-10" />
                     
-                    <div className="flex justify-between items-center relative z-10">
-                      <span className="text-[#94A3B8]">Estimated Cost</span>
-                      <span className="font-mono font-bold text-[#F59E0B]">~0.02 SOL</span>
+                    {/* Transaction Breakdown Receipt */}
+                    <div className="bg-[#0D1117] rounded-lg p-4 border border-[rgba(255,255,255,0.05)] relative z-10 space-y-3">
+                       <div className="flex justify-between items-center text-sm">
+                         <span className="text-[#94A3B8]">Dev Allocation ({devAllocation}%)</span>
+                         <span className="font-mono text-white">{devSolCost} SOL</span>
+                       </div>
+                       <div className="flex justify-between items-center text-sm">
+                         <span className="text-[#94A3B8]">Network Fee</span>
+                         <span className="font-mono text-white">0.002 SOL</span>
+                       </div>
+                       <div className="flex justify-between items-center text-sm">
+                         <span className="text-[#94A3B8]">Platform Fee</span>
+                         <span className="font-mono text-[#10B981]">Free</span>
+                       </div>
+                       <div className="h-px bg-[rgba(255,255,255,0.1)] w-full" />
+                       <div className="flex justify-between items-center font-bold">
+                         <span className="text-white">Total Cost</span>
+                         <span className="font-mono text-[#F59E0B] drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]">
+                           ~{(Number(devSolCost) + 0.002).toFixed(3)} SOL
+                         </span>
+                       </div>
                     </div>
-                    <div className="flex justify-between items-center relative z-10">
+
+                    <div className="flex justify-between items-center relative z-10 mt-2">
                       <span className="text-[#94A3B8]">Network</span>
                       <span className="text-white font-semibold">Multi-Chain Deployment</span>
                     </div>
