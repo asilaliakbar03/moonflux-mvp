@@ -323,14 +323,42 @@ export default function LaunchPage() {
                   <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] resize-none" />
                 </div>
                 
-                <div className="flex gap-4 p-4 rounded-xl bg-[rgba(16,185,129,0.05)] border border-[rgba(16,185,129,0.1)]">
-                  <div className="flex-1">
-                    <div className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-1">Recommended Curve</div>
-                    <div className="font-medium text-[#10B981] capitalize">{selectedCurve} Curve</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-[rgba(99,102,241,0.05)] border border-[rgba(99,102,241,0.1)]">
+                  <div className="flex flex-col">
+                    <label className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-2 flex items-center justify-between">
+                      Curve Type 
+                      <span className="text-[#6366F1] text-[10px] px-1.5 py-0.5 bg-[rgba(99,102,241,0.1)] rounded font-bold uppercase tracking-widest">AI Rec</span>
+                    </label>
+                    <div className="relative">
+                      <select 
+                        value={selectedCurve} 
+                        onChange={(e) => setSelectedCurve(e.target.value)}
+                        className="w-full appearance-none bg-[#080B12] border border-[rgba(99,102,241,0.2)] hover:border-[rgba(99,102,241,0.5)] rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-all cursor-pointer"
+                      >
+                        <option value="balanced">Balanced Curve (Standard)</option>
+                        <option value="aggressive">Aggressive Curve (Degen)</option>
+                        <option value="stable">Stable Curve (Utility)</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-1">Recommended Liquidity</div>
-                    <div className="font-medium text-[#10B981]">Fair Launch (100% pool)</div>
+                  
+                  <div className="flex flex-col">
+                    <label className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold mb-2 flex items-center justify-between">
+                      Initial Liquidity
+                      <span className="text-[#6366F1] text-[10px] px-1.5 py-0.5 bg-[rgba(99,102,241,0.1)] rounded font-bold uppercase tracking-widest">AI Rec</span>
+                    </label>
+                    <div className="relative">
+                      <select 
+                        defaultValue="fair"
+                        className="w-full appearance-none bg-[#080B12] border border-[rgba(99,102,241,0.2)] hover:border-[rgba(99,102,241,0.5)] rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-all cursor-pointer"
+                      >
+                        <option value="fair">Fair Launch (100% pool)</option>
+                        <option value="team_10">Dev Retains 10%</option>
+                        <option value="team_20">Dev Retains 20%</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+                    </div>
                   </div>
                 </div>
                 
