@@ -54,7 +54,7 @@ export default function LeaderboardPage() {
     <div className="max-w-5xl mx-auto w-full pt-8 pb-16">
       
       {/* ── HEADER ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 text-center md:text-left">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16 text-center md:text-left">
         <div>
           <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
             <Trophy className="w-8 h-8 text-[#FFD700]" />
@@ -63,7 +63,7 @@ export default function LeaderboardPage() {
           <p className="text-[#C8A2C8]">The highest ranked traders on MoonFluxx. Updated in real-time.</p>
         </div>
         
-        <div className="flex p-1 bg-[#120721] border border-[rgba(5,213,250,0.2)] rounded-xl overflow-x-auto max-w-full shadow-[0_0_15px_rgba(5,213,250,0.1)]">
+        <div className="flex p-1.5 bg-[rgba(18,7,33,0.6)] backdrop-blur-md border border-[rgba(5,213,250,0.2)] rounded-2xl overflow-x-auto max-w-full shadow-[0_0_20px_rgba(5,213,250,0.1)]">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon;
             const active = activeCat === cat.id;
@@ -71,10 +71,10 @@ export default function LeaderboardPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCat(cat.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg whitespace-nowrap font-medium text-sm transition-all ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl whitespace-nowrap font-medium text-sm transition-all duration-300 ${
                   active 
-                    ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' 
-                    : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                    ? 'bg-gradient-to-r from-[rgba(5,213,250,0.2)] to-[rgba(5,213,250,0.05)] text-[#05D5FA] shadow-[0_0_15px_rgba(5,213,250,0.2)] border border-[rgba(5,213,250,0.3)]' 
+                    : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)] border border-transparent'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -86,35 +86,54 @@ export default function LeaderboardPage() {
       </motion.div>
 
       {/* ── PODIUM ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col md:flex-row justify-center items-end gap-4 md:gap-8 mb-12">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col md:flex-row justify-center items-end gap-4 md:gap-6 mb-16 px-4">
         {podium.map((trader, i) => {
           const isFirst = i === 1; // 2nd, 1st, 3rd mapping
           const rankNum = isFirst ? 1 : i === 0 ? 2 : 3;
           const colors = {
-            1: { border: '#FFD700', bg: 'rgba(255,215,0,0.15)', text: '#FFEA00' },
-            2: { border: '#C8A2C8', bg: 'rgba(200,162,200,0.15)', text: '#F8F0FF' },
-            3: { border: '#FF5C97', bg: 'rgba(255,92,151,0.15)', text: '#FF2A6D' }
+            1: { border: '#FFD700', bg: 'rgba(255,215,0,0.2)', text: '#FFEA00' },
+            2: { border: '#05D5FA', bg: 'rgba(5,213,250,0.2)', text: '#E0FFFF' },
+            3: { border: '#FF2A6D', bg: 'rgba(255,42,109,0.2)', text: '#FFB3C6' }
           }[rankNum];
 
           return (
-            <div key={trader.name} className={`flex flex-col items-center ${isFirst ? 'order-1 md:order-2 md:-mt-8' : 'order-2 md:order-1'} ${i===2 ? 'md:order-3' : ''}`}>
-              <div 
-                className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 flex items-center justify-center text-2xl font-bold bg-[#0B0414] shadow-xl mb-4 relative z-10"
-                style={{ borderColor: colors.border, color: colors.text, boxShadow: `0 0 20px ${colors.bg}` }}
-              >
-                #{rankNum}
-                {isFirst && <Crown className="absolute -top-6 text-[#FFD700] w-8 h-8 drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />}
-              </div>
+            <div key={trader.name} className={`flex flex-col items-center relative transition-transform duration-500 hover:-translate-y-4 ${isFirst ? 'order-1 md:order-2 z-20' : 'order-2 md:order-1 z-10'} ${i===2 ? 'md:order-3' : ''}`}>
               
               <div 
-                className={`w-40 md:w-48 surface-glass flex flex-col items-center justify-end rounded-t-2xl border-b-0 relative overflow-hidden`}
-                style={{ height: isFirst ? '200px' : '160px', borderColor: colors.border }}
+                className={`w-full min-w-[160px] md:min-w-[200px] flex flex-col items-center justify-between rounded-t-3xl border-t-2 border-x border-b-0 relative overflow-hidden pt-8 pb-6 px-4`}
+                style={{ 
+                  height: isFirst ? '280px' : '220px', 
+                  borderColor: colors.border,
+                  background: `linear-gradient(to bottom, ${colors.bg}, rgba(8,11,18,0.95))`
+                }}
               >
-                <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(to top, transparent, ${colors.border})` }} />
-                <div className="text-center p-4 w-full bg-[#120721] rounded-t-xl h-full border-t border-x border-[rgba(255,255,255,0.1)] relative z-10 flex flex-col items-center justify-center gap-1">
-                  <div className="font-bold text-white text-lg truncate drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{trader.name}</div>
-                  <div className="text-[#05D5FA] font-mono text-sm">{trader.xp.toLocaleString()} XP</div>
-                  <div className="text-[#39FF14] font-bold">{trader.pnl}</div>
+                {/* Top Glow Ray */}
+                <div className="absolute top-0 inset-x-0 h-40 opacity-40 mix-blend-screen" style={{ background: `radial-gradient(circle at top, ${colors.border}, transparent 70%)` }} />
+                
+                {/* Avatar */}
+                <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center text-3xl font-display font-bold bg-[#080B12] relative z-10 shadow-2xl"
+                     style={{ borderColor: colors.border, color: colors.text, boxShadow: `0 0 20px ${colors.bg}` }}>
+                  {trader.name.charAt(0)}
+                  {isFirst && <Crown className="absolute -top-7 text-[#FFD700] w-8 h-8 drop-shadow-[0_0_12px_rgba(255,215,0,1)]" />}
+                  <div className="absolute -bottom-3 bg-[#080B12] border rounded-full px-3 py-0.5 text-xs font-bold font-mono shadow-lg"
+                       style={{ borderColor: colors.border, color: colors.text }}>
+                    #{rankNum}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col items-center relative z-10 w-full mt-auto">
+                  <div className="font-bold text-white text-lg md:text-xl truncate w-full text-center drop-shadow-md mb-1">{trader.name}</div>
+                  <div className="text-[#05D5FA] font-mono text-xs md:text-sm mb-3 opacity-90">{trader.xp.toLocaleString()} XP</div>
+                  <div className="font-bold font-mono tracking-tight bg-[#080B12] px-4 py-1.5 rounded-xl border"
+                       style={{ borderColor: colors.border, color: colors.text, boxShadow: `0 0 10px ${colors.bg}` }}>
+                    {trader.pnl}
+                  </div>
+                </div>
+
+                {/* Large Background Number */}
+                <div className="absolute -bottom-6 -right-2 text-[120px] font-black font-display opacity-[0.07] select-none pointer-events-none leading-none" style={{ color: colors.text }}>
+                  {rankNum}
                 </div>
               </div>
             </div>

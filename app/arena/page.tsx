@@ -119,11 +119,11 @@ export default function ArenaPage() {
               {!voted ? (
                 confirming === 'a' ? (
                   <div className="flex gap-2 w-full max-w-[200px]">
-                    <button onClick={() => handleVote('a')} className="btn-primary flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
-                    <button onClick={() => setConfirming(null)} className="btn-ghost flex-1">Cancel</button>
+                    <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
+                    <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => handleVote('a')} className="btn-ghost w-full max-w-[200px] hover:bg-[rgba(16,185,129,0.1)] hover:text-[#10B981] hover:border-[#10B981]">
+                  <button onClick={() => setConfirming('a')} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors w-full max-w-[200px] hover:bg-[rgba(16,185,129,0.1)] hover:text-[#10B981] hover:border-[#10B981]">
                     Vote {BATTLE.tokenA.name}
                   </button>
                 )
@@ -155,11 +155,11 @@ export default function ArenaPage() {
               {!voted ? (
                 confirming === 'b' ? (
                   <div className="flex gap-2 w-full max-w-[200px]">
-                    <button onClick={() => handleVote('b')} className="btn-primary flex-1 bg-[#F43F5E] hover:bg-[#E11D48]">Confirm</button>
-                    <button onClick={() => setConfirming(null)} className="btn-ghost flex-1">Cancel</button>
+                    <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#F43F5E] hover:bg-[#E11D48]">Confirm</button>
+                    <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => handleVote('b')} className="btn-ghost w-full max-w-[200px] hover:bg-[rgba(244,63,94,0.1)] hover:text-[#F43F5E] hover:border-[#F43F5E]">
+                  <button onClick={() => setConfirming('b')} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors w-full max-w-[200px] hover:bg-[rgba(244,63,94,0.1)] hover:text-[#F43F5E] hover:border-[#F43F5E]">
                     Vote {BATTLE.tokenB.name}
                   </button>
                 )
