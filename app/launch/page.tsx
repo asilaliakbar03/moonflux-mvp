@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown, CheckCircle2, ShieldAlert } from "lucide-react";
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useTokenDeploy, TokenDeployFormData } from "@/hooks/useTokenDeploy";
+import BondingCurveChart from "@/components/BondingCurveChart";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -30,8 +31,19 @@ export default function LaunchPage() {
     telegram: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [selectedCurve, setSelectedCurve] = useState("balanced");
+  
+  // Curve Settings
+  const [selectedCurve, setSelectedCurve] = useState<"fast" | "balanced" | "stable" | "aggressive">("balanced");
+  
+  // Liquidity Settings
   const [selectedLiquidity, setSelectedLiquidity] = useState("fair");
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const [devAllocation, setDevAllocation] = useState(10); // Default 10% in advanced mode
+
+  // Validation
+  const isTickerValid = useMemo(() => {
+    return formData.ticker.length >= 2 && formData.ticker.length <= 10 && /^[A-Z0-9]+$/.test(formData.ticker);
+  }, [formData.ticker]);
 
   const handleDeploy = () => {
     deployToken(formData, imageFile);
@@ -59,16 +71,26 @@ export default function LaunchPage() {
         throw new Error("API error");
       }
     } catch(e) {
+      // Upgraded Smart AI Mocks
+      const prefixes = ["Neon", "Cyber", "Quantum", "Aero", "Luna", "Astro", "Nova", "Plasma"];
+      const suffixes = ["Doge", "Inu", "Flux", "Sync", "Pulse", "Node", "Byte", "Chain"];
+      
+      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+      
       const words = aiPrompt.split(' ');
-      const mockName = words.length >= 2 ? `${words[0]} ${words[1]}` : 'Lunar Pup';
-      const mockTicker = (words.length >= 2 ? `${words[0].substring(0,2)}${words[1].substring(0,3)}` : 'LPUP').toUpperCase();
+      const userWord = words.find(w => w.length > 3) || "Meme";
+      
+      const mockName = `${randomPrefix} ${userWord.charAt(0).toUpperCase() + userWord.slice(1)}`;
+      const mockTicker = `${randomPrefix.substring(0,2)}${userWord.substring(0,2)}`.toUpperCase();
       
       setFormData({
         ...formData,
         name: mockName,
-        ticker: `$${mockTicker}`,
-        description: `A community-driven token inspired by: ${aiPrompt}. Born on MoonFluxx.`,
+        ticker: mockTicker,
+        description: `Forged in the digital ether. Inspired by: ${aiPrompt}. This token harnesses the power of the MoonFluxx protocol to deliver blazing fast community growth.`,
       });
+      setSelectedCurve(Math.random() > 0.5 ? "fast" : "balanced");
     } finally {
       setIsGenerating(false);
       setCurrentStep(2);
@@ -105,7 +127,17 @@ export default function LaunchPage() {
     setAiPrompt("");
   };
 
-  const CURVES = [
+  type CurveOption = {
+    id: "fast" | "balanced" | "stable" | "aggressive";
+    name: string;
+    desc: string;
+    risk: string;
+    color: string;
+    svg: string;
+    recommended?: boolean;
+  };
+
+  const CURVES: CurveOption[] = [
     { id: 'fast', name: 'Fast Launch', desc: 'High velocity. Great for memes.', risk: 'High', color: '#F43F5E', svg: 'M0,25 L10,22 L20,15 L30,5 L40,0' },
     { id: 'balanced', name: 'Balanced', desc: 'Steady growth for early believers.', risk: 'Medium', color: '#F59E0B', recommended: true, svg: 'M0,25 L10,22 L20,18 L30,12 L40,0' },
     { id: 'stable', name: 'Stable', desc: 'Slow and steady for long-term.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0' },
@@ -195,7 +227,7 @@ export default function LaunchPage() {
                 </motion.div>
               )}
 
-              {/* CUSTOM STEP 1: Details OR AI STEP 2: Review (They share similar UI, but let's separate for clarity) */}
+              {/* CUSTOM STEP 1: Details OR AI STEP 2: Review */}
               {((mode === 'custom' && currentStep === 1) || (mode === 'ai' && currentStep === 2)) && (
                 <motion.div key="details-step" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col gap-6 relative z-10">
                   <h2 className="text-2xl font-bold text-white mb-2">{mode === 'ai' ? "Review AI's Creation" : "Token Details"}</h2>
@@ -206,14 +238,24 @@ export default function LaunchPage() {
                       <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] transition-colors" />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Ticker {mode==='custom' && '*'}</label>
-                      <input type="text" value={formData.ticker} onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} maxLength={10} className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] font-mono transition-colors" />
+                      <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5 flex justify-between items-center">
+                        <span>Ticker {mode==='custom' && '*'}</span>
+                        {formData.ticker.length > 0 && (
+                          isTickerValid 
+                            ? <span className="text-[#10B981] flex items-center gap-1 text-xs drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"><CheckCircle2 className="w-3.5 h-3.5" /> Valid</span>
+                            : <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> Invalid</span>
+                        )}
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569] font-mono">$</span>
+                        <input type="text" value={formData.ticker} onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} maxLength={10} className={`w-full bg-[#080B12] border rounded-lg p-3 pl-8 text-white focus:outline-none font-mono transition-colors ${formData.ticker.length > 0 ? (isTickerValid ? 'border-[rgba(16,185,129,0.5)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]' : 'border-[rgba(244,63,94,0.5)] focus:border-[#F43F5E] focus:ring-1 focus:ring-[#F43F5E]') : 'border-[rgba(99,102,241,0.2)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1]'}`} />
+                      </div>
                     </div>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-semibold text-[#94A3B8] mb-1.5">Description {mode==='custom' && '*'}</label>
-                    <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] resize-none transition-colors" />
+                    <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full h-24 bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] resize-none transition-colors" />
                   </div>
 
                   {/* AI Mode: Show Curve Selection directly in this step */}
@@ -228,15 +270,20 @@ export default function LaunchPage() {
                           <div 
                             key={curve.id} 
                             onClick={() => setSelectedCurve(curve.id)}
-                            className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.08)] shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.08)] shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
                           >
                             <h3 className="font-bold text-white mb-1">{curve.name} Curve</h3>
-                            <p className="text-xs text-[#94A3B8] mb-3">{curve.desc}</p>
-                            <div className="flex justify-between items-end">
-                              <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: curve.color }}>{curve.risk} Risk</span>
-                              <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-80 drop-shadow-md">
-                                <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
+                            <p className="text-xs text-[#94A3B8] mb-2">{curve.desc}</p>
+                            <div className="flex-1 min-h-[100px]">
+                              {selectedCurve === curve.id ? (
+                                <BondingCurveChart curveType={curve.id} color={curve.color} />
+                              ) : (
+                                <div className="w-full h-full flex items-end justify-end pb-2 opacity-50">
+                                  <svg viewBox="0 0 40 25" className="w-[60px] h-[35px] drop-shadow-md">
+                                    <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -254,12 +301,12 @@ export default function LaunchPage() {
                     {mode === 'ai' ? (
                       <>
                         <button onClick={() => setCurrentStep(1)} className="btn-ghost flex-1 py-3 hover:bg-[rgba(255,255,255,0.05)]">Back</button>
-                        <button onClick={() => setCurrentStep(3)} className="btn-primary flex-1 py-3 shadow-[0_0_15px_rgba(99,102,241,0.2)]">Continue to Deploy</button>
+                        <button onClick={() => setCurrentStep(3)} disabled={!isTickerValid} className="btn-primary flex-1 py-3 shadow-[0_0_15px_rgba(99,102,241,0.2)] disabled:opacity-50">Continue to Deploy</button>
                       </>
                     ) : (
                       <button 
                         onClick={() => setCurrentStep(2)}
-                        disabled={!formData.name || !formData.ticker || !formData.description}
+                        disabled={!formData.name || !formData.ticker || !formData.description || !isTickerValid}
                         className="btn-primary w-full py-3 shadow-[0_0_15px_rgba(99,102,241,0.2)] disabled:opacity-50 disabled:shadow-none"
                       >
                         Continue to Settings
@@ -281,19 +328,27 @@ export default function LaunchPage() {
                         <div 
                           key={curve.id} 
                           onClick={() => setSelectedCurve(curve.id)}
-                          className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.08)] shadow-[0_0_15px_rgba(99,102,241,0.15)] scale-[1.02]' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
+                          className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.08)] shadow-[0_0_15px_rgba(99,102,241,0.15)] scale-[1.02] col-span-1 lg:col-span-2 row-span-2' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
                         >
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="font-bold text-white">{curve.name}</h3>
-                            {curve.recommended && <span className="text-[10px] bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-2 py-0.5 rounded uppercase font-bold border border-[rgba(99,102,241,0.3)]">Rec</span>}
+                            {curve.recommended && selectedCurve !== curve.id && <span className="text-[10px] bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-2 py-0.5 rounded uppercase font-bold border border-[rgba(99,102,241,0.3)]">Rec</span>}
                           </div>
-                          <p className="text-xs text-[#94A3B8] mb-4 min-h-[32px]">{curve.desc}</p>
+                          <p className={`text-[#94A3B8] ${selectedCurve === curve.id ? 'text-sm mb-4' : 'text-xs mb-2'}`}>{curve.desc}</p>
                           
-                          <div className="flex justify-between items-end">
-                            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: curve.color }}>{curve.risk} Risk</span>
-                            <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-80 drop-shadow-md">
-                              <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                          <div className="flex-1 w-full min-h-[60px] flex items-end">
+                            {selectedCurve === curve.id ? (
+                              <div className="w-full h-[150px]">
+                                <BondingCurveChart curveType={curve.id} color={curve.color} />
+                              </div>
+                            ) : (
+                              <div className="w-full flex justify-between items-end">
+                                <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: curve.color }}>{curve.risk}</span>
+                                <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-60">
+                                  <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -301,30 +356,76 @@ export default function LaunchPage() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-[#94A3B8] mb-3">Liquidity Split</label>
-                    <div className="flex flex-col gap-3">
-                      {[
-                        { id: 'fair', label: 'Fair Launch', desc: '100% to liquidity pool. Maximum community trust.', rec: true },
-                        { id: 'standard', label: 'Standard', desc: '70% pool / 30% dev allocation for operations.', rec: false }
-                      ].map(opt => (
-                        <div 
-                          key={opt.id}
-                          onClick={() => setSelectedLiquidity(opt.id)}
-                          className={`p-4 rounded-xl border flex items-center gap-4 cursor-pointer transition-all duration-300 ${selectedLiquidity === opt.id ? 'border-[#10B981] bg-[rgba(16,185,129,0.05)] shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
-                        >
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedLiquidity === opt.id ? 'border-[#10B981]' : 'border-[#475569]'}`}>
-                            {selectedLiquidity === opt.id && <motion.div layoutId="liq-dot" className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-bold text-white flex items-center gap-2">
-                              {opt.label}
-                              {opt.rec && <span className="text-[10px] bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded uppercase font-bold border border-[rgba(16,185,129,0.3)]">Recommended</span>}
-                            </div>
-                            <div className="text-sm text-[#94A3B8]">{opt.desc}</div>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex justify-between items-center mb-3">
+                      <label className="block text-sm font-semibold text-[#94A3B8]">Liquidity Split</label>
+                      <button 
+                        onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                        className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${isAdvancedMode ? 'bg-[rgba(139,92,246,0.1)] border-[#8B5CF6] text-[#8B5CF6] shadow-[0_0_10px_rgba(139,92,246,0.3)]' : 'bg-transparent border-[rgba(255,255,255,0.1)] text-[#94A3B8] hover:text-white'}`}
+                      >
+                        {isAdvancedMode ? 'Advanced Mode: ON' : 'Advanced Mode'}
+                      </button>
                     </div>
+                    
+                    <AnimatePresence mode="wait">
+                      {isAdvancedMode ? (
+                        <motion.div key="advanced" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="p-6 rounded-xl border border-[#8B5CF6] bg-[rgba(139,92,246,0.05)] shadow-[0_0_20px_rgba(139,92,246,0.1)]">
+                          <div className="flex justify-between items-center mb-6">
+                            <div>
+                              <div className="font-bold text-white text-lg">{devAllocation}% Dev Allocation</div>
+                              <div className="text-sm text-[#94A3B8]">Tokens reserved for the creator</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-[#10B981] text-lg">{100 - devAllocation}% Pool</div>
+                              <div className="text-sm text-[#94A3B8]">Added to initial liquidity</div>
+                            </div>
+                          </div>
+                          
+                          <div className="relative pt-4 pb-2">
+                            <input 
+                              type="range" 
+                              min="0" 
+                              max="50" 
+                              step="1"
+                              value={devAllocation} 
+                              onChange={(e) => setDevAllocation(Number(e.target.value))}
+                              className="w-full h-2 bg-[#080B12] rounded-lg appearance-none cursor-pointer accent-[#8B5CF6] border border-[rgba(255,255,255,0.1)]"
+                            />
+                            <div className="flex justify-between text-xs text-[#64748B] mt-2 font-mono">
+                              <span>0%</span>
+                              <span>25%</span>
+                              <span>50%</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div key="simple" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col gap-3">
+                          {[
+                            { id: 'fair', label: 'Fair Launch', desc: '100% to liquidity pool. Maximum community trust.', rec: true },
+                            { id: 'standard', label: 'Standard', desc: '70% pool / 30% dev allocation for operations.', rec: false }
+                          ].map(opt => (
+                            <div 
+                              key={opt.id}
+                              onClick={() => {
+                                setSelectedLiquidity(opt.id);
+                                setDevAllocation(opt.id === 'fair' ? 0 : 30);
+                              }}
+                              className={`p-4 rounded-xl border flex items-center gap-4 cursor-pointer transition-all duration-300 ${selectedLiquidity === opt.id ? 'border-[#10B981] bg-[rgba(16,185,129,0.05)] shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-[rgba(255,255,255,0.05)] bg-[#080B12] hover:border-[rgba(99,102,241,0.3)] hover:bg-[rgba(255,255,255,0.02)]'}`}
+                            >
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedLiquidity === opt.id ? 'border-[#10B981]' : 'border-[#475569]'}`}>
+                                {selectedLiquidity === opt.id && <motion.div layoutId="liq-dot" className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />}
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-bold text-white flex items-center gap-2">
+                                  {opt.label}
+                                  {opt.rec && <span className="text-[10px] bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded uppercase font-bold border border-[rgba(16,185,129,0.3)]">Recommended</span>}
+                                </div>
+                                <div className="text-sm text-[#94A3B8]">{opt.desc}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                   
                   <div className="flex gap-4 mt-2">
@@ -347,7 +448,7 @@ export default function LaunchPage() {
                     
                     <div className="flex justify-between items-center relative z-10">
                       <span className="text-[#94A3B8]">Token</span>
-                      <span className="font-bold text-white text-lg">{formData.name} <span className="text-[#6366F1] font-mono ml-1">{formData.ticker}</span></span>
+                      <span className="font-bold text-white text-lg">{formData.name} <span className="text-[#6366F1] font-mono ml-1">${formData.ticker}</span></span>
                     </div>
                     <div className="flex justify-between items-start relative z-10">
                       <span className="text-[#94A3B8] whitespace-nowrap mr-8">Description</span>
@@ -355,11 +456,17 @@ export default function LaunchPage() {
                     </div>
                     <div className="flex justify-between items-center relative z-10">
                       <span className="text-[#94A3B8]">Bonding Curve</span>
-                      <span className="text-[#10B981] capitalize font-bold">{selectedCurve} Curve</span>
+                      <span className="text-[#10B981] capitalize font-bold drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">{selectedCurve} Curve</span>
                     </div>
                     <div className="flex justify-between items-center relative z-10">
-                      <span className="text-[#94A3B8]">Liquidity Mode</span>
-                      <span className="text-white capitalize">{selectedLiquidity.replace('_', ' ')}</span>
+                      <span className="text-[#94A3B8]">Liquidity Split</span>
+                      <span className="text-white">
+                        {isAdvancedMode ? (
+                          <span className="flex gap-2 text-sm"><span className="text-[#8B5CF6]">{devAllocation}% Dev</span> / <span className="text-[#10B981]">{100 - devAllocation}% Pool</span></span>
+                        ) : (
+                          <span className="capitalize">{selectedLiquidity.replace('_', ' ')}</span>
+                        )}
+                      </span>
                     </div>
                     
                     <div className="h-px bg-[rgba(255,255,255,0.05)] my-2 relative z-10" />
