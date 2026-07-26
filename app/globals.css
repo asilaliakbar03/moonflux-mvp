@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   MoonFluxx — "Neon Cyberpunk" Design System
+   MoonFluxx — "Fluxx Identity" Midnight Indigo Design System
    Tailwind CSS v4 · globals.css
    ══════════════════════════════════════════════════════════════ */
 
@@ -11,49 +11,50 @@
 
 @theme {
 
-  /* ── SURFACES ── */
-  --color-surface-base:  #0B0414;
-  --color-surface-1:     #120721;
-  --color-surface-2:     #1C0B33;
-  --color-surface-3:     #250E45;
-  --color-surface-4:     #2F1257;
-  --color-surface-hover: #3A166B;
+  /* ── SURFACES (Midnight Indigo Hierarchy) ── */
+  --color-surface-base:     #080B12;
+  --color-surface-1:        #0D1117;
+  --color-surface-2:        #131924;
+  --color-surface-3:        #1A2232;
+  --color-surface-4:        #252D3D;
+  --color-surface-hover:    #2A3347;
+  --color-surface-elevated: #131924;
 
   /* ── TEXT ── */
-  --color-text-primary:   #F8F0FF;
-  --color-text-secondary: #C8A2C8;
-  --color-text-muted:     #8B6A8B;
-  --color-text-faint:     #5C405C;
+  --color-text-primary:   #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted:     #475569;
+  --color-text-faint:     #334155;
 
-  /* ── BRAND CYBERPUNK ── */
-  --color-indigo-50:  #FFF0F5;
-  --color-indigo-100: #FFD6E8;
-  --color-indigo-200: #FFADCD;
-  --color-indigo-300: #FF85B2;
-  --color-indigo-400: #FF5C97;
-  --color-indigo-500: #FF2A6D;
-  --color-indigo-600: #E61E5B;
-  --color-indigo-700: #CC1249;
-  --color-indigo-800: #B30637;
-  --color-indigo-900: #990025;
+  /* ── BRAND INDIGO ── */
+  --color-indigo-50:  #EEF2FF;
+  --color-indigo-100: #E0E7FF;
+  --color-indigo-200: #C7D2FE;
+  --color-indigo-300: #A5B4FC;
+  --color-indigo-400: #818CF8;
+  --color-indigo-500: #6366F1;
+  --color-indigo-600: #4F46E5;
+  --color-indigo-700: #4338CA;
+  --color-indigo-800: #3730A3;
+  --color-indigo-900: #312E81;
 
   /* ── SEMANTIC ── */
-  --color-success:       #39FF14;
-  --color-success-light: #6EFF4F;
-  --color-success-muted: rgba(57, 255, 20, 0.12);
-  --color-danger:        #FF2A6D;
-  --color-danger-light:  #FF5C97;
-  --color-danger-muted:  rgba(255, 42, 109, 0.12);
-  --color-warning:       #FFEA00;
-  --color-warning-muted: rgba(255, 234, 0, 0.12);
-  --color-cyan:          #05D5FA;
-  --color-cyan-muted:    rgba(5, 213, 250, 0.12);
+  --color-success:       #10B981;
+  --color-success-light: #34D399;
+  --color-success-muted: rgba(16, 185, 129, 0.12);
+  --color-danger:        #F43F5E;
+  --color-danger-light:  #FB7185;
+  --color-danger-muted:  rgba(244, 63, 94, 0.12);
+  --color-warning:       #F59E0B;
+  --color-warning-muted: rgba(245, 158, 11, 0.12);
+  --color-cyan:          #06B6D4;
+  --color-cyan-muted:    rgba(6, 182, 212, 0.12);
 
   /* ── BORDERS ── */
-  --color-border-default: rgba(255, 42, 109, 0.15);
-  --color-border-subtle:  rgba(255, 42, 109, 0.25);
-  --color-border-strong:  rgba(255, 42, 109, 0.45);
-  --color-border-focus:   rgba(255, 42, 109, 0.70);
+  --color-border-default: rgba(99, 102, 241, 0.10);
+  --color-border-subtle:  rgba(99, 102, 241, 0.18);
+  --color-border-strong:  rgba(99, 102, 241, 0.35);
+  --color-border-focus:   rgba(99, 102, 241, 0.60);
 
   /* ── LEGACY TOKENS (preserved for existing page references) ── */
   --color-mf-bg-primary:  #0B0414;
@@ -138,8 +139,8 @@ html {
 }
 
 html, body {
-  background-color: var(--color-bg-base, #0C0A14);
-  color: var(--color-fg-primary, #F0ECE5);
+  background-color: #080B12;
+  color: #F1F5F9;
   font-family: var(--font-body);
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
@@ -163,17 +164,17 @@ html, body {
 
 
 ::selection {
-  background: rgba(124, 58, 237, 0.4);
+  background: rgba(99, 102, 241, 0.4);
   color: #fff;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--color-mf-violet), var(--color-mf-dimmer));
-  border-radius: 3px;
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 9999px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-mf-hot); }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.6); }
 
 /* ═══════════ KEYFRAMES ═══════════ */
 @keyframes mf-shimmer {
@@ -184,8 +185,21 @@ html, body {
   to { --mf-angle: 360deg; }
 }
 @keyframes mf-pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.25); }
-  50% { box-shadow: 0 0 44px rgba(168, 85, 247, 0.55); }
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.25); }
+  50% { box-shadow: 0 0 44px rgba(99, 102, 241, 0.55); }
+}
+@keyframes fluxx-shimmer-text {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes fluxx-beam {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100vw); opacity: 0; }
+}
+@keyframes fluxx-live-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
 @keyframes mf-float {
   0%, 100% { transform: translateY(0); }
@@ -556,9 +570,77 @@ html, body {
 
 /* visible keyboard focus */
 :focus-visible {
-  outline: 1.5px solid var(--color-mf-hot);
+  outline: 2px solid rgba(99, 102, 241, 0.5);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ── FLUXX IDENTITY UTILITIES ── */
+
+/* Cosmic shimmer headline text */
+.text-fluxx-shimmer {
+  background: linear-gradient(105deg, #C7D2FE 0%, #ffffff 25%, #818CF8 50%, #ffffff 75%, #A5B4FC 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fluxx-shimmer-text 6s ease-in-out infinite;
+}
+
+/* Fluxx card — the universal interactive card */
+.fluxx-card {
+  background: rgba(13, 17, 23, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fluxx-card:hover {
+  border-color: rgba(99, 102, 241, 0.30);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Fluxx glass — elevated modal/floating surface */
+.fluxx-glass {
+  background: rgba(26, 34, 50, 0.90);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+}
+
+/* Live signal dot */
+.fluxx-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #6366F1;
+  animation: fluxx-live-dot 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+}
+
+/* Reactive light leak — place as absolute child */
+.fluxx-light-leak {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* TopBar animated beam */
+.fluxx-beam {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #6366F1, #818CF8, transparent);
+  animation: fluxx-beam 4s ease-in-out infinite;
+  border-radius: 9999px;
 }
 
 @media (prefers-reduced-motion: reduce) {

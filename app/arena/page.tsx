@@ -87,107 +87,113 @@ export default function ArenaPage() {
           <h1 className="text-4xl font-bold font-display text-white mb-2">Token Arena</h1>
           <p className="text-[#94A3B8]">Daily battle. Two tokens. One winner. You decide.</p>
         </div>
-        <div className="bg-[#161B27] border border-[rgba(99,102,241,0.15)] rounded-xl px-6 py-3 flex flex-col items-center">
+        <div className="bg-[#0D1117] border border-[rgba(99,102,241,0.2)] rounded-xl px-6 py-3 flex flex-col items-center shadow-[0_0_15px_rgba(99,102,241,0.1)]">
           <span className="text-[#94A3B8] text-xs uppercase tracking-wider font-semibold mb-1">Resets in</span>
-          <span className="text-2xl font-mono font-bold text-white tracking-widest">{countdown}</span>
+          <span className="text-2xl font-mono font-bold text-white tracking-widest" style={{ textShadow: '0 0 10px rgba(99,102,241,0.5)' }}>{countdown}</span>
         </div>
       </motion.div>
 
       {/* ── TODAY'S BATTLE ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <div className="flex justify-center mb-4">
-          <span className="bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase">
+        <div className="flex justify-center mb-4 relative z-10">
+          <span className="bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.3)] text-[#818CF8] px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-[0_0_10px_rgba(99,102,241,0.2)]">
             Today's Battle
           </span>
         </div>
 
-        <div className="surface-panel p-6 md:p-10 relative mb-8">
+        <div className="relative mb-8">
+          {/* Dynamic Ambient Lighting */}
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none opacity-[0.12] bg-[#10B981] fluxx-light-leak" />
+          <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none opacity-[0.12] bg-[#F43F5E] fluxx-light-leak" />
           
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-4 relative z-10">
+          <div className="fluxx-card p-6 md:p-10 relative z-10 bg-[#080B12]/80 backdrop-blur-xl border border-[rgba(99,102,241,0.15)] rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
             
-            {/* Token A */}
-            <div className="flex-1 flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4" style={{ backgroundColor: `${BATTLE.tokenA.color}20`, border: `2px solid ${BATTLE.tokenA.color}40` }}>
-                {BATTLE.tokenA.icon}
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenA.name}</h2>
-              <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenA.ticker}</span>
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-4 relative z-10">
               
-              <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenA.color }}>{BATTLE.tokenA.pct}%</div>
-              <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenA.votes.toLocaleString()} votes</div>
-              
-              {!voted ? (
-                confirming === 'a' ? (
-                  <div className="flex gap-2 w-full max-w-[200px]">
-                    <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
-                    <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+              {/* Token A */}
+              <div className="flex-1 flex flex-col items-center text-center p-6 rounded-2xl border border-[rgba(16,185,129,0.3)] transition-all hover:border-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-[#0D1117]/50 w-full">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 shadow-[0_0_15px_rgba(16,185,129,0.2)]" style={{ backgroundColor: `${BATTLE.tokenA.color}20`, border: `2px solid ${BATTLE.tokenA.color}40` }}>
+                  {BATTLE.tokenA.icon}
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenA.name}</h2>
+                <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenA.ticker}</span>
+                
+                <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenA.color, textShadow: '0 0 10px rgba(16,185,129,0.4)' }}>{BATTLE.tokenA.pct}%</div>
+                <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenA.votes.toLocaleString()} votes</div>
+                
+                {!voted ? (
+                  confirming === 'a' ? (
+                    <div className="flex gap-2 w-full max-w-[200px]">
+                      <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
+                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirming('a')} className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-[#10B981] to-[#059669] text-white active:scale-95 transition-transform w-full max-w-[200px] shadow-[0_4px_15px_rgba(16,185,129,0.4)]">
+                      Vote {BATTLE.tokenA.name}
+                    </button>
+                  )
+                ) : voted === 'a' ? (
+                  <div className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                    ✓ You voted For
                   </div>
                 ) : (
-                  <button onClick={() => setConfirming('a')} className="px-6 py-3 rounded-xl font-bold border-2 border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.1)] text-[#10B981] hover:bg-[#10B981] hover:text-white transition-all w-full max-w-[200px] shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                    Vote {BATTLE.tokenA.name}
-                  </button>
-                )
-              ) : voted === 'a' ? (
-                <div className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
-                  ✓ You voted For
-                </div>
-              ) : (
-                <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
-              )}
-            </div>
-
-            {/* VS Badge */}
-            <div className="w-16 h-16 rounded-full bg-[#080B12] border-2 border-[rgba(99,102,241,0.2)] flex items-center justify-center shrink-0 z-20 md:my-0 my-4 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
-              <span className="font-bold text-[#818CF8] italic text-xl">VS</span>
-            </div>
-
-            {/* Token B */}
-            <div className="flex-1 flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4" style={{ backgroundColor: `${BATTLE.tokenB.color}20`, border: `2px solid ${BATTLE.tokenB.color}40` }}>
-                {BATTLE.tokenB.icon}
+                  <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
+                )}
               </div>
-              <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenB.name}</h2>
-              <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenB.ticker}</span>
-              
-              <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenB.color }}>{BATTLE.tokenB.pct}%</div>
-              <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenB.votes.toLocaleString()} votes</div>
-              
-              {!voted ? (
-                confirming === 'b' ? (
-                  <div className="flex gap-2 w-full max-w-[200px]">
-                    <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#F43F5E] hover:bg-[#E11D48]">Confirm</button>
-                    <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+
+              {/* VS Badge */}
+              <div className="w-16 h-16 rounded-full bg-[#080B12] border-flow flex items-center justify-center shrink-0 z-20 md:my-0 my-4 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+                <span className="font-bold font-display text-white text-xl">VS</span>
+              </div>
+
+              {/* Token B */}
+              <div className="flex-1 flex flex-col items-center text-center p-6 rounded-2xl border border-[rgba(244,63,94,0.3)] transition-all hover:border-[#F43F5E] hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] bg-[#0D1117]/50 w-full">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 shadow-[0_0_15px_rgba(244,63,94,0.2)]" style={{ backgroundColor: `${BATTLE.tokenB.color}20`, border: `2px solid ${BATTLE.tokenB.color}40` }}>
+                  {BATTLE.tokenB.icon}
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenB.name}</h2>
+                <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenB.ticker}</span>
+                
+                <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenB.color, textShadow: '0 0 10px rgba(244,63,94,0.4)' }}>{BATTLE.tokenB.pct}%</div>
+                <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenB.votes.toLocaleString()} votes</div>
+                
+                {!voted ? (
+                  confirming === 'b' ? (
+                    <div className="flex gap-2 w-full max-w-[200px]">
+                      <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#F43F5E] hover:bg-[#E11D48]">Confirm</button>
+                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirming('b')} className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-[#F43F5E] to-[#E11D48] text-white active:scale-95 transition-transform w-full max-w-[200px] shadow-[0_4px_15px_rgba(244,63,94,0.4)]">
+                      Vote {BATTLE.tokenB.name}
+                    </button>
+                  )
+                ) : voted === 'b' ? (
+                  <div className="bg-[rgba(244,63,94,0.15)] text-[#F43F5E] px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+                    ✓ You voted For
                   </div>
                 ) : (
-                  <button onClick={() => setConfirming('b')} className="px-6 py-3 rounded-xl font-bold border-2 border-[rgba(244,63,94,0.3)] bg-[rgba(244,63,94,0.1)] text-[#F43F5E] hover:bg-[#F43F5E] hover:text-white transition-all w-full max-w-[200px] shadow-[0_0_15px_rgba(244,63,94,0.1)]">
-                    Vote {BATTLE.tokenB.name}
-                  </button>
-                )
-              ) : voted === 'b' ? (
-                <div className="bg-[rgba(244,63,94,0.15)] text-[#F43F5E] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
-                  ✓ You voted For
-                </div>
-              ) : (
-                <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
-              )}
+                  <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
+                )}
+              </div>
+
             </div>
 
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-10 max-w-2xl mx-auto">
-            <div className="flex justify-center text-xs font-mono text-[#94A3B8] mb-2">
-              {BATTLE.tokenA.pct}% vs {BATTLE.tokenB.pct}%
-            </div>
-            <div className="h-3 w-full bg-[#080B12] rounded-full overflow-hidden flex border border-[rgba(255,255,255,0.05)]">
-              <motion.div 
-                initial={{ width: 0 }} animate={{ width: `${BATTLE.tokenA.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                className="h-full bg-[#10B981]" 
-              />
-              <motion.div 
-                initial={{ width: '100%' }} animate={{ width: `${BATTLE.tokenB.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                className="h-full bg-[#F43F5E]" 
-              />
+            {/* Progress Bar */}
+            <div className="mt-10 max-w-2xl mx-auto relative z-10">
+              <div className="flex justify-center text-xs font-mono text-[#94A3B8] mb-2">
+                {BATTLE.tokenA.pct}% vs {BATTLE.tokenB.pct}%
+              </div>
+              <div className="h-4 w-full bg-[#080B12] rounded-full overflow-hidden flex border border-[rgba(255,255,255,0.05)] shadow-inner">
+                <motion.div 
+                  initial={{ width: 0 }} animate={{ width: `${BATTLE.tokenA.pct}%` }} transition={{ duration: 1, ease: EASE }}
+                  className="h-full bg-[#10B981] shadow-[0_0_10px_rgba(16,185,129,0.8)]" 
+                />
+                <motion.div 
+                  initial={{ width: '100%' }} animate={{ width: `${BATTLE.tokenB.pct}%` }} transition={{ duration: 1, ease: EASE }}
+                  className="h-full bg-[#F43F5E] shadow-[0_0_10px_rgba(244,63,94,0.8)]" 
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -197,7 +203,7 @@ export default function ArenaPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
         <button 
           onClick={() => setAnalysisOpen(!analysisOpen)}
-          className="w-full flex justify-between items-center bg-[#0D1117] border border-[rgba(99,102,241,0.15)] rounded-xl p-5 hover:bg-[rgba(99,102,241,0.05)] transition-colors"
+          className="w-full flex justify-between items-center bg-[#0D1117] border border-[rgba(99,102,241,0.3)] fluxx-card rounded-xl p-5 hover:bg-[rgba(99,102,241,0.1)] transition-colors shadow-[0_0_15px_rgba(99,102,241,0.1)]"
         >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
@@ -236,7 +242,7 @@ export default function ArenaPage() {
                   <button 
                     onClick={regenerateAnalysis}
                     disabled={analysisLoading}
-                    className="flex items-center gap-2 text-sm text-[#818CF8] hover:text-white transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[#818CF8] border border-[rgba(99,102,241,0.3)] hover:bg-[rgba(99,102,241,0.1)] hover:text-white active:scale-95 transition-all disabled:opacity-50"
                   >
                     <RefreshCw className={`w-4 h-4 ${analysisLoading ? 'animate-spin' : ''}`} />
                     {analysisLoading ? "Regenerating..." : "Regenerate Analysis"}
@@ -251,9 +257,9 @@ export default function ArenaPage() {
       {/* ── PAST BATTLES ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-        <div className="bg-[#0D1117] border border-[rgba(99,102,241,0.1)] rounded-xl overflow-hidden">
+        <div className="fluxx-card bg-[#0D1117] border border-[rgba(99,102,241,0.15)] rounded-xl overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.05)]">
           {PAST_BATTLES.map((b, i) => (
-            <div key={i} className={`flex items-center justify-between p-4 ${i !== PAST_BATTLES.length - 1 ? 'border-b border-[rgba(99,102,241,0.1)]' : ''} hover:bg-[rgba(99,102,241,0.03)] transition-colors`}>
+            <div key={i} className={`flex items-center justify-between p-4 ${i !== PAST_BATTLES.length - 1 ? 'border-b border-[rgba(99,102,241,0.1)]' : ''} odd:bg-[rgba(99,102,241,0.03)] hover:bg-[rgba(99,102,241,0.06)] transition-colors`}>
               <div className="text-[#475569] text-sm w-16">{b.date}</div>
               <div className="flex-1 flex items-center gap-3">
                 <span className="text-xl">{b.icon}</span>
