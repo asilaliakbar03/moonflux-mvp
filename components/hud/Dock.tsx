@@ -66,15 +66,15 @@ function DockItem({
         <motion.div
           whileHover={{ scale: 1.18, y: -5 }}
           whileTap={{ scale: 0.92 }}
-          className={`group relative p-3 rounded-full transition-colors ${
-            isActive ? "text-gold" : "text-mf-gold-deep hover:text-mf-champagne"
+          className={`group relative p-3 rounded-full transition-colors fluxx-hover-shimmer ${
+            isActive ? "text-[#F1F5F9]" : "text-[#94A3B8] hover:text-[#F1F5F9]"
           }`}
         >
           {isActive && (
             <motion.div
               layoutId="dock-active-bg"
               transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              className="absolute inset-0 rounded-full bg-gradient-to-br from-mf-gold/30 to-mf-gold-hi/15 border border-mf-gold/40 shadow-[0_0_18px_rgba(232,184,75,0.4)]"
+              className="absolute inset-0 rounded-full bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.30)] shadow-[0_0_12px_rgba(99,102,241,0.4)] fluxx-breathe"
             />
           )}
 
@@ -83,12 +83,12 @@ function DockItem({
           {isActive && (
             <motion.div
               layoutId="dock-active-dot"
-              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-mf-gold shadow-[0_0_8px_rgba(232,184,75,1)]"
+              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#6366F1] shadow-[0_0_8px_rgba(99,102,241,1)] fluxx-breathe"
             />
           )}
 
           {/* tooltip — desktop only */}
-          <div className="absolute -top-11 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-mf-obsidian/95 backdrop-blur-md border border-mf-line-gold rounded-md text-[0.58rem] font-mono tracking-[0.25em] uppercase text-gold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all whitespace-nowrap pointer-events-none">
+          <div className="absolute -top-11 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-[#050510] backdrop-blur-md border border-[rgba(99,102,241,0.18)] rounded-md text-[0.58rem] font-mono tracking-[0.25em] uppercase text-[#F1F5F9] opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all whitespace-nowrap pointer-events-none">
             {item.label}
           </div>
         </motion.div>
@@ -101,32 +101,32 @@ function DockItem({
 function MobileTab({ item, isActive }: { item: NavItem; isActive: boolean }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 relative">
+    <Link href={item.href} className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 relative fluxx-hover-shimmer">
       {isActive && (
         <motion.div
           layoutId="mobile-active-bg"
-          className="absolute inset-x-1 inset-y-0.5 rounded-xl"
-          style={{ background: "rgba(232,184,75,0.1)", border: "1px solid rgba(232,184,75,0.25)" }}
+          className="absolute inset-x-1 inset-y-0.5 rounded-xl fluxx-breathe"
+          style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.25)" }}
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
         />
       )}
       <Icon
         size={20}
         strokeWidth={isActive ? 2.5 : 1.8}
-        style={{ color: isActive ? "#e8b84b" : "#6b6987" }}
+        style={{ color: isActive ? "#6366F1" : "#94A3B8" }}
         className="relative z-10"
       />
       <span
         className="font-mono text-[0.45rem] tracking-widest uppercase relative z-10 transition-colors"
-        style={{ color: isActive ? "#e8b84b" : "#35334a" }}
+        style={{ color: isActive ? "#F1F5F9" : "#475569" }}
       >
         {item.label}
       </span>
       {isActive && (
         <motion.div
           layoutId="mobile-active-dot"
-          className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-          style={{ background: "#e8b84b", boxShadow: "0 0 8px rgba(232,184,75,0.9)" }}
+          className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full fluxx-breathe"
+          style={{ background: "#6366F1", boxShadow: "0 0 8px rgba(99,102,241,0.9)" }}
         />
       )}
     </Link>
@@ -156,15 +156,15 @@ export default function Dock() {
             <div
               className="relative rounded-full px-4 py-2.5 flex items-center gap-1.5 backdrop-blur-2xl"
               style={{
-                background: "rgba(12, 10, 7, 0.72)",
-                border: "1px solid rgba(232, 184, 75, 0.35)",
-                boxShadow: "0 20px 60px -20px rgba(232,184,75,0.35)",
+                background: "rgba(0,0,0,0.70)",
+                border: "1px solid rgba(99,102,241,0.15)",
+                boxShadow: "0 20px 60px -20px rgba(99,102,241,0.25)",
               }}
             >
-              <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-mf-gold/50 to-transparent" />
+              <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[rgba(99,102,241,0.5)] to-transparent" />
               {ITEMS.map((item, idx) =>
                 "type" in item && item.type === "divider" ? (
-                  <div key={`div-${idx}`} className="w-[1px] h-7 bg-mf-line mx-1.5" />
+                  <div key={`div-${idx}`} className="w-[1px] h-7 bg-[rgba(255,255,255,0.1)] mx-1.5" />
                 ) : (
                   <DockItem
                     key={(item as { href: string }).href}
@@ -185,15 +185,15 @@ export default function Dock() {
         transition={{ type: "spring", stiffness: 300, damping: 24, delay: 0.15 }}
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch safe-b"
         style={{
-          background: "rgba(8,6,3,0.97)",
-          borderTop: "1px solid rgba(232,184,75,0.2)",
+          background: "rgba(0,0,0,0.70)",
+          borderTop: "1px solid rgba(99,102,241,0.1)",
           boxShadow: "0 -12px 40px -12px rgba(0,0,0,0.8)",
-          backdropFilter: "blur(20px)",
+          backdropFilter: "blur(24px)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
         {/* Gold top hairline */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-mf-gold/40 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(99,102,241,0.4)] to-transparent" />
         {MOBILE_ITEMS.map(item => (
           <MobileTab key={item.href} item={item} isActive={pathname === item.href} />
         ))}

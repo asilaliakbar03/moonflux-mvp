@@ -1,11 +1,39 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Rocket, Search, ArrowRight, CheckCircle2, Zap, AtSign, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useMoonWallet } from "@/components/WalletProvider";
+import AnimatedCounter from '@/components/AnimatedCounter';
+import MagneticButton from '@/components/MagneticButton';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+function TiltLink({ children, href, className }: { children: React.ReactNode, href: string, className: string }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setTilt({ x: -(y / 20), y: x / 20 });
+  };
+  
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
+  
+  return (
+    <Link 
+      href={href}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default function HomePage() {
   const { address } = useMoonWallet();
@@ -23,25 +51,28 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col gap-12 pb-16 relative overflow-hidden">
+    <div className="flex flex-col gap-12 pb-16 relative overflow-hidden bg-[#000000]">
       
       {/* ── HERO SECTION ── */}
       <motion.section 
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
         transition={{ duration: 0.6, ease: EASE }}
         className="flex flex-col md:flex-row items-center gap-12 pt-8 relative z-10"
       >
-        <div className="fluxx-light-leak absolute" style={{width:'600px', height:'600px', background:'#6366F1', top:'-200px', right:'-200px'}} />
+        <div className="fluxx-nebula fluxx-light-leak absolute" style={{width:'600px', height:'600px', background:'#6366F1', top:'-200px', right:'-200px'}} />
+        <div className="fluxx-nebula fluxx-light-leak absolute" style={{width:'500px', height:'500px', background:'#A78BFA', top:'-100px', right:'0px', opacity: 0.6}} />
+        
         <div className="flex-1 flex flex-col gap-6 relative z-10">
-          <div className="inline-flex items-center gap-2 bg-[#0D1117] border border-[rgba(99,102,241,0.3)] rounded-full px-4 py-1.5 w-fit shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+          <div className="inline-flex items-center gap-2 bg-[rgba(5,5,16,0.80)] backdrop-blur-xl border border-[rgba(99,102,241,0.3)] rounded-full px-4 py-1.5 w-fit shadow-[0_0_15px_rgba(99,102,241,0.15)]">
             <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-pulse shadow-[0_0_10px_#6366F1]" />
             <span className="text-xs font-bold text-[#F1F5F9] uppercase tracking-wider">The Multi-Chain Memecoin Launchpad</span>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-display leading-[1.1] tracking-tight display-safe">
             Discover & Launch <br/>
-            Tokens That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#818CF8] to-[#A5B4FC] text-fluxx-shimmer drop-shadow-[0_0_10px_rgba(99,102,241,0.3)]">Move</span>
+            Tokens That <span className="fluxx-text-flow text-transparent bg-clip-text bg-gradient-to-r from-[#818CF8] to-[#A5B4FC] text-fluxx-shimmer drop-shadow-[0_0_40px_rgba(99,102,241,0.3)]">Move</span>
           </h1>
           
           <p className="text-lg md:text-xl text-[#94A3B8] max-w-xl leading-relaxed mt-4 mb-8">
@@ -49,11 +80,13 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link href="/explore" className="w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-[#fff] shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-              <Search className="w-5 h-5" />
-              Explore Tokens
-            </Link>
-            <Link href="/launch" className="w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all hover:bg-[rgba(99,102,241,0.1)] text-[#6366F1]" style={{ border: "1px solid rgba(99,102,241,0.5)", boxShadow: "inset 0 0 15px rgba(99,102,241,0.1)" }}>
+            <MagneticButton as="div" strength={0.3}>
+              <Link href="/explore" className="fluxx-breathe fluxx-interactive active:scale-[0.98] w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-[#fff] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)]">
+                <Search className="w-5 h-5" />
+                Explore Tokens
+              </Link>
+            </MagneticButton>
+            <Link href="/launch" className="fluxx-interactive active:scale-[0.98] w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all hover:bg-[rgba(99,102,241,0.1)] text-[#6366F1] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)]" style={{ border: "1px solid rgba(99,102,241,0.5)", boxShadow: "inset 0 0 15px rgba(99,102,241,0.1)" }}>
               <Rocket className="w-5 h-5" />
               Launch a Token
             </Link>
@@ -70,9 +103,9 @@ export default function HomePage() {
           <motion.div 
             animate={{ y: [-10, 10, -10], rotateX: [2, -2, 2], rotateY: [-2, 2, -2] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="fluxx-card p-6 w-full max-w-[320px] shadow-[0_0_40px_rgba(99,102,241,0.15)] relative overflow-hidden bg-[#0D1117] border border-[rgba(99,102,241,0.3)] rounded-2xl"
+            className="fluxx-card p-6 w-full max-w-[320px] shadow-[0_0_40px_rgba(99,102,241,0.15)] relative overflow-hidden bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#6366F1] opacity-20 blur-[60px]" />
+            <div className="fluxx-nebula absolute top-0 right-0 w-32 h-32 bg-[#6366F1] opacity-20 blur-[60px]" />
             <div className="flex justify-between items-start mb-6 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[rgba(99,102,241,0.2)] flex items-center justify-center text-2xl border border-[rgba(99,102,241,0.4)] shadow-[0_0_15px_rgba(99,102,241,0.3)]">🤖</div>
@@ -88,7 +121,7 @@ export default function HomePage() {
             </div>
             
             <svg viewBox="0 0 100 30" className="w-full h-[60px] overflow-visible relative z-10 filter drop-shadow-[0_2px_6px_rgba(16,185,129,0.4)]">
-              <path d="M0,25 L10,22 L20,24 L30,15 L40,18 L50,8 L60,12 L70,5 L80,2 L90,6 L100,0" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M0,25 L10,22 L20,24 L30,15 L40,18 L50,8 L60,12 L70,5 L80,2 L90,6 L100,0" fill="none" stroke="#818CF8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </motion.div>
         </div>
@@ -97,20 +130,30 @@ export default function HomePage() {
       {/* ── STATS BAR ── */}
       <motion.section 
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 border-y border-[rgba(99,102,241,0.15)] py-8 relative z-10"
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 border-y border-[rgba(99,102,241,0.08)] py-8 relative z-10 bg-[rgba(5,5,16,0.80)] backdrop-blur-xl"
       >
-        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.15)] pb-6 md:pb-0">
-          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">$142M</div>
+        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.08)] pb-6 md:pb-0">
+          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">
+            <span className="font-mono text-[#F1F5F9]">—</span>
+            <span className="text-[#475569] text-xs ml-1">live data</span>
+          </div>
           <div className="text-[#94A3B8] text-sm mt-1 flex items-center gap-1.5"><span className="fluxx-live-dot inline-block w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981] animate-pulse"></span>24H Volume</div>
         </div>
-        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.15)] pb-6 md:pb-0">
-          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">12.4K</div>
+        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.08)] pb-6 md:pb-0">
+          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">
+            <span className="font-mono text-[#F1F5F9]">—</span>
+            <span className="text-[#475569] text-xs ml-1">live data</span>
+          </div>
           <div className="text-[#94A3B8] text-sm mt-1">Active Traders This Month</div>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">847</div>
+          <div className="text-3xl font-display font-bold font-mono text-[#F1F5F9]">
+            <span className="font-mono text-[#F1F5F9]">—</span>
+            <span className="text-[#475569] text-xs ml-1">live data</span>
+          </div>
           <div className="text-[#94A3B8] text-sm mt-1">Tokens Launched Total</div>
         </div>
       </motion.section>
@@ -118,22 +161,23 @@ export default function HomePage() {
       {/* ── TRENDING NOW ── */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: EASE }}
         className="relative z-10"
       >
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-2xl font-bold font-display flex items-center gap-2 text-[#F1F5F9]">
             <TrendingUp className="text-[#F43F5E]" /> Trending Now
           </h2>
-          <Link href="/explore" className="text-[#6366F1] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
+          <Link href="/explore" className="fluxx-interactive text-[#6366F1] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
             View all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {MOCK_TRENDING.map((token, i) => (
-            <Link href={`/token/${token.id}`} key={token.id} className="fluxx-card p-5 group hover:border-[#6366F1] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(99,102,241,0.2)] transition-all flex flex-col h-full relative overflow-hidden bg-[#0D1117] border border-[rgba(99,102,241,0.15)] rounded-2xl">
+            <TiltLink href={`/token/${token.id}`} key={token.id} className={`fluxx-hover-shimmer fluxx-cascade fluxx-cascade-${i + 1} fluxx-interactive fluxx-card p-5 group hover:border-[rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-300 ease-out flex flex-col h-full relative overflow-hidden bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl`}>
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
               
               {/* Top */}
@@ -141,9 +185,13 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_0_15px_rgba(244,63,94,0.2)]" style={{ backgroundColor: `${token.color}20` }}>
                   {token.icon}
                 </div>
-                <div className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${token.change >= 0 ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981] border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E] border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.2)]'}`}>
-                  {token.change > 0 ? '+' : ''}{token.change}%
-                </div>
+                <AnimatedCounter 
+                  value={Math.abs(token.change)} 
+                  prefix={token.change > 0 ? '+' : '-'} 
+                  suffix="%" 
+                  decimals={1} 
+                  className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${token.change >= 0 ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981] border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E] border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.2)]'}`} 
+                />
               </div>
 
               {/* Middle */}
@@ -159,7 +207,7 @@ export default function HomePage() {
               <div className="flex justify-between items-end mb-4 relative z-10">
                 <div>
                   <div className="text-xl font-mono text-[#F1F5F9] font-bold drop-shadow-[0_0_8px_rgba(241,245,249,0.3)]">{token.price}</div>
-                  <div className="text-xs text-[#475569] mt-1 font-mono">MCap ${(token.marketCap / 1000000).toFixed(2)}M</div>
+                  <AnimatedCounter value={token.marketCap / 1000000} prefix="MCap $" suffix="M" decimals={2} className="text-xs text-[#475569] mt-1 font-mono block" />
                 </div>
                 
                 {/* Mini sparkline */}
@@ -167,7 +215,7 @@ export default function HomePage() {
                   <path 
                     d={`M0,${32 - (token.sparkline[0]/140)*32} ${token.sparkline.map((val, idx) => `L${(idx / (token.sparkline.length - 1)) * 80},${32 - (val/140)*32}`).join(' ')}`}
                     fill="none" 
-                    stroke={token.change >= 0 ? '#10B981' : '#F43F5E'} 
+                    stroke="#818CF8" 
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
@@ -181,12 +229,12 @@ export default function HomePage() {
                   <span>Curve Progress</span>
                   <span className="text-[#6366F1]">{token.progress}%</span>
                 </div>
-                <div className="h-1.5 bg-[#080B12] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
+                <div className="h-1.5 bg-[#000000] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
                   <div className="h-full bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.6)]" style={{ width: `${token.progress}%` }} />
                 </div>
               </div>
 
-            </Link>
+            </TiltLink>
           ))}
         </div>
       </motion.section>
@@ -194,22 +242,23 @@ export default function HomePage() {
       {/* ── JUST LAUNCHED ── */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: EASE }}
         className="relative z-10 mt-8"
       >
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-2xl font-bold font-display flex items-center gap-2 text-[#F1F5F9]">
             <Zap className="text-[#F59E0B]" /> Just Launched
           </h2>
-          <Link href="/explore" className="text-[#6366F1] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
+          <Link href="/explore" className="fluxx-interactive text-[#6366F1] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1">
             See all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {MOCK_LAUNCHES.map((token) => (
-            <Link href={`/token/${token.id}`} key={token.id} className="fluxx-card p-5 group hover:border-[#6366F1] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(99,102,241,0.2)] transition-all flex flex-col h-full relative overflow-hidden bg-[#0D1117] border border-[rgba(99,102,241,0.15)] rounded-2xl">
+            <TiltLink href={`/token/${token.id}`} key={token.id} className="fluxx-hover-shimmer fluxx-interactive fluxx-card p-5 group hover:border-[rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-300 ease-out flex flex-col h-full relative overflow-hidden bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
               
               <div className="flex justify-between items-start relative z-10 mb-4">
@@ -235,11 +284,11 @@ export default function HomePage() {
                   <span>Bonding Curve</span>
                   <span className="text-[#6366F1]">{token.progress}%</span>
                 </div>
-                <div className="h-1.5 bg-[#080B12] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
+                <div className="h-1.5 bg-[#000000] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
                   <div className="h-full bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.6)]" style={{ width: `${token.progress}%` }} />
                 </div>
               </div>
-            </Link>
+            </TiltLink>
           ))}
         </div>
       </motion.section>
@@ -247,9 +296,10 @@ export default function HomePage() {
       {/* ── HOW IT WORKS ── */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
-        className="mt-8 bg-[#0D1117] rounded-2xl border border-[rgba(99,102,241,0.15)] p-8 md:p-12 relative z-10"
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="mt-8 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl rounded-2xl border border-[rgba(99,102,241,0.08)] p-8 md:p-12 relative z-10"
       >
         <h2 className="text-2xl font-bold font-display mb-8 text-center text-[#F1F5F9]">How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -278,12 +328,12 @@ export default function HomePage() {
       </motion.section>
       
       {/* ── FOOTER ── */}
-      <footer className="mt-8 pt-8 border-t border-[rgba(99,102,241,0.15)] flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#94A3B8] relative z-10">
+      <footer className="mt-8 p-8 border border-[rgba(99,102,241,0.08)] bg-[rgba(5,5,16,0.80)] backdrop-blur-xl shadow-[0_0_30px_rgba(167,139,250,0.20)] rounded-t-3xl flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#94A3B8] relative z-10">
         <div>MoonFluxx © 2025</div>
         <div className="flex items-center gap-6">
-          <a href="#" className="hover:text-[#F1F5F9] transition-colors flex items-center gap-1.5"><AtSign className="w-4 h-4"/> Twitter</a>
-          <a href="#" className="hover:text-[#F1F5F9] transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4"/> Discord</a>
-          <a href="#" className="hover:text-[#F1F5F9] transition-colors">Docs</a>
+          <a href="#" className="fluxx-interactive hover:text-[#F1F5F9] transition-colors flex items-center gap-1.5"><AtSign className="w-4 h-4"/> Twitter</a>
+          <a href="#" className="fluxx-interactive hover:text-[#F1F5F9] transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4"/> Discord</a>
+          <a href="#" className="fluxx-interactive hover:text-[#F1F5F9] transition-colors">Docs</a>
         </div>
       </footer>
       

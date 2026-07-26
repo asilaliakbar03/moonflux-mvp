@@ -6,6 +6,8 @@ import { Search, TrendingUp, Zap, Brain, Rocket, Users } from "lucide-react";
 import Link from "next/link";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { supabase } from "@/lib/supabase";
+import AnimatedCounter from '@/components/AnimatedCounter';
+import MagneticButton from '@/components/MagneticButton';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -57,17 +59,17 @@ export default function ExplorePage() {
             name: dbToken.name,
             ticker: dbToken.ticker,
             icon: dbToken.icon || '🌙',
-            price: 0.0015, // placeholder until we have live price feeds
-            change24h: 12.5,
-            marketCap: 1500000,
-            holders: Math.floor(Math.random() * 5000) + 100,
+            price: 0, // placeholder until we have live price feeds
+            change24h: 0,
+            marketCap: 0,
+            holders: 0,
             riskScore: 2,
             tag: 'New',
             category: dbToken.category || 'meme',
             color: '#10B981', // Midnight Indigo success green
             sparkline: formatSparkline([10, 15, 12, 18, 22, 25, 20, 30, 35, 40, 38, 45, 50]),
             progress: Number(dbToken.bonding_curve_progress) || 5,
-            volume: 420
+            volume: 0
           }));
           setLiveTokens(mapped);
         }
@@ -102,12 +104,18 @@ export default function ExplorePage() {
   const displayedTokens = filteredTokens.slice(0, showCount);
 
   return (
-    <div className="flex flex-col gap-8 pb-16 pt-4">
+    <div className="flex flex-col gap-8 pb-16 pt-4 w-full max-w-full overflow-x-hidden">
       
       {/* ── HEADER ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 16 }} 
+        whileInView={{ opacity: 1, y: 0 }} 
+        viewport={{ once: true, margin: '-50px' }} 
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
         <div>
-          <h1 className="text-4xl font-bold font-display tracking-tight text-white mb-2">Explore Tokens</h1>
+          <h1 className="text-4xl font-bold font-display tracking-tight text-white mb-2 display-safe">Explore Tokens</h1>
           <p className="text-[#94A3B8]">Discover the next wave. Filter by what moves you.</p>
         </div>
         <div className="relative w-full md:w-auto md:min-w-[320px]">
@@ -117,10 +125,10 @@ export default function ExplorePage() {
             placeholder="Search by name or ticker..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-[#475569] focus:outline-none focus:border-[rgba(99,102,241,0.5)] focus:ring-1 focus:ring-[#6366F1] transition-all"
+            className="w-full bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.15)] rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-[#475569] focus:border-[rgba(99,102,241,0.5)] focus:ring-1 focus:ring-[#6366F1] transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* ── FILTERS ── */}
       <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -130,7 +138,7 @@ export default function ExplorePage() {
             <button
               key={filter.name}
               onClick={() => setActiveFilter(filter.name)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full whitespace-nowrap font-medium text-sm transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full whitespace-nowrap font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
                 isActive 
                   ? 'bg-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]' 
                   : 'bg-[rgba(99,102,241,0.05)] text-[#94A3B8] border border-[rgba(99,102,241,0.15)] hover:bg-[rgba(99,102,241,0.1)] hover:text-white'
@@ -153,7 +161,7 @@ export default function ExplorePage() {
           <select 
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-[#080B12] border border-[rgba(99,102,241,0.2)] rounded-lg py-1.5 px-3 text-sm text-white focus:outline-none focus:border-[#6366F1] cursor-pointer hover:border-[#6366F1] transition-colors"
+            className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.15)] rounded-lg py-1.5 px-3 text-sm text-white focus:border-[#6366F1] cursor-pointer hover:border-[#6366F1] transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
           >
             <option>Price Change</option>
             <option>Market Cap</option>
@@ -163,14 +171,15 @@ export default function ExplorePage() {
       </div>
 
       {/* ── GRID ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedTokens.map((token, i) => (
-          <Link href={`/token/${token.id}`} key={token.id}>
+          <Link href={`/token/${token.id}`} key={token.id} className="focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: i * 0.05, ease: EASE }}
-              className="surface-card p-5 hover:border-[rgba(99,102,241,0.4)] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(99,102,241,0.15)] transition-all cursor-pointer group flex flex-col h-full relative overflow-hidden"
+              className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 hover:border-[rgba(99,102,241,0.4)] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(99,102,241,0.15)] transition-all cursor-pointer group flex flex-col h-full relative overflow-hidden"
             >
               {/* Background Glow */}
               <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)] group-hover:opacity-[0.08] transition-opacity duration-500" />
@@ -197,9 +206,9 @@ export default function ExplorePage() {
               {/* Market Data & Sparkline */}
               <div className="flex justify-between items-end mb-4 relative z-10">
                 <div>
-                  <div className="text-xl font-mono text-white font-bold">${token.price}</div>
-                  <div className="text-xs text-[#64748B] mt-1 font-mono">MCap ${(token.marketCap / 1000000).toFixed(2)}M</div>
-                  <div className="text-xs text-[#64748B] font-mono mt-0.5">Vol ${token.volume}</div>
+                  <div className="text-xl font-mono text-white font-bold">{token.price > 0 ? '$'+token.price : '--'}</div>
+                  <div className="text-xs text-[#64748B] mt-1 font-mono">MCap {token.marketCap > 0 ? '$'+(token.marketCap / 1000000).toFixed(2)+'M' : '--'}</div>
+                  <div className="text-xs text-[#64748B] font-mono mt-0.5">Vol {token.volume > 0 ? '$'+token.volume : '--'}</div>
                 </div>
                 
                 {/* Recharts Mini Sparkline */}
@@ -212,7 +221,7 @@ export default function ExplorePage() {
                         stroke={token.change24h >= 0 ? '#10B981' : '#F43F5E'} 
                         strokeWidth={2} 
                         dot={false}
-                        isAnimationActive={false}
+                        isAnimationActive={true}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -226,7 +235,7 @@ export default function ExplorePage() {
                   <span className="text-[#818CF8] font-bold">{token.progress}%</span>
                 </div>
                 <div className="h-1.5 bg-[rgba(0,0,0,0.3)] rounded-full overflow-hidden border border-[rgba(255,255,255,0.05)]">
-                  <div className="h-full bg-[#6366F1] shadow-[0_0_10px_#6366F1]" style={{ width: `${token.progress}%` }} />
+                  <div className="h-full bg-[#6366F1] shadow-[0_0_10px_#6366F1] transition-all duration-700 ease-out" style={{ width: `${token.progress}%` }} />
                 </div>
               </div>
 

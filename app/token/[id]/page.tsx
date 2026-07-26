@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, use } from 'react';
+import AnimatedCounter from '@/components/AnimatedCounter';
+import MagneticButton from '@/components/MagneticButton';
 import Link from 'next/link';
 import {
   Copy, Check, Activity, BarChart3,
@@ -238,7 +240,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
     <div className="max-w-[1400px] mx-auto w-full pt-4 pb-16 px-4">
       
       {/* ── HEADER CARD ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="surface-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="surface-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-6">
           <div className="w-16 h-16 rounded-full bg-[rgba(99,102,241,0.15)] flex items-center justify-center text-3xl font-bold text-[#818CF8]">
             {mintAddress[0].toUpperCase()}
@@ -281,16 +283,18 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
         <div className="flex flex-col gap-6">
           
           {/* Interactive Recharts Price Chart */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="surface-card p-6 h-[400px] flex flex-col">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="surface-card p-6 h-[400px] flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2 text-[#818CF8] font-bold uppercase tracking-wider text-sm">
                 <BarChart3 className="w-4 h-4" /> Price Chart
               </div>
               <div className="flex gap-2">
                 {['15M', '1H', '4H', '1D'].map(tf => (
-                  <button key={tf} className="px-3 py-1 bg-[#161B27] text-[#94A3B8] hover:text-white rounded text-xs font-bold font-mono transition-colors">
-                    {tf}
-                  </button>
+                  <MagneticButton key={tf}>
+                    <button className="px-3 py-1 bg-[#161B27] text-[#94A3B8] hover:text-white rounded text-xs font-bold font-mono transition-colors">
+                      {tf}
+                    </button>
+                  </MagneticButton>
                 ))}
               </div>
             </div>
@@ -324,7 +328,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           </motion.div>
 
           {/* Trade History */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="surface-card overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="surface-card overflow-hidden">
             <div className="p-4 border-b border-[rgba(99,102,241,0.1)] bg-[#161B27] flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#818CF8]" />
               <h3 className="font-bold text-white text-sm uppercase tracking-wider">Recent Trades</h3>
@@ -367,7 +371,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           </motion.div>
 
           {/* Tokenomics Pie Chart */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="surface-card overflow-hidden p-6 mt-2 mb-8 md:mb-0">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.3 }} className="surface-card overflow-hidden p-6 mt-2 mb-8 md:mb-0">
             <div className="flex items-center gap-2 mb-6">
               <PieChartIcon className="w-4 h-4 text-[#F59E0B]" />
               <h3 className="font-bold text-white text-sm uppercase tracking-wider">Tokenomics Breakdown</h3>
@@ -431,7 +435,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
         <div className="flex flex-col gap-6">
           
           {/* Buy/Sell Panel */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="surface-panel p-5 border border-[rgba(99,102,241,0.2)] shadow-[0_8px_32px_rgba(99,102,241,0.1)]">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="surface-panel p-5 border border-[rgba(99,102,241,0.2)] shadow-[0_8px_32px_rgba(99,102,241,0.1)]">
             
             <div className="flex bg-[#0D1117] p-1 rounded-lg mb-6 border border-[rgba(99,102,241,0.1)]">
               <button 
@@ -484,24 +488,26 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
               </div>
             )}
 
-            <button 
-              onClick={handleExecute}
-              disabled={!connected || isExecuting || amountNum <= 0}
-              className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                !connected || amountNum <= 0 
-                  ? 'bg-[#1E2433] text-[#475569] cursor-not-allowed border border-[#252D3D]' 
-                  : tab === 'buy' 
-                    ? 'bg-[#10B981] hover:bg-[#059669] text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] border border-[#34D399]' 
-                    : 'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[0_0_20px_rgba(244,63,94,0.3)] border border-[#FB7185]'
-              }`}
-            >
-              {!connected ? 'Connect Wallet' : isExecuting ? 'Confirming Transaction...' : `Quick ${tab === 'buy' ? 'Buy' : 'Sell'}`}
-            </button>
+            <MagneticButton as="div" strength={0.3}>
+              <button 
+                onClick={handleExecute}
+                disabled={!connected || isExecuting || amountNum <= 0}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
+                  !connected || amountNum <= 0 
+                    ? 'bg-[#1E2433] text-[#475569] cursor-not-allowed border border-[#252D3D]' 
+                    : tab === 'buy' 
+                      ? 'bg-[#10B981] hover:bg-[#059669] text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] border border-[#34D399]' 
+                      : 'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[0_0_20px_rgba(244,63,94,0.3)] border border-[#FB7185]'
+                }`}
+              >
+                {!connected ? 'Connect Wallet' : isExecuting ? 'Confirming Transaction...' : `Quick ${tab === 'buy' ? 'Buy' : 'Sell'}`}
+              </button>
+            </MagneticButton>
 
           </motion.div>
 
           {/* Bonding Curve Progress */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }} className="surface-card p-5">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.15 }} className="surface-card p-5">
             <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Bonding Curve</h3>
             {isComplete ? (
               <div className="text-center p-4 bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] rounded-lg">
@@ -516,7 +522,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                   <span className="text-lg font-mono font-bold text-[#818CF8]">{progress.toFixed(1)}%</span>
                 </div>
                 <div className="h-2.5 bg-[#0D1117] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)] mb-3 relative">
-                  <div className="absolute inset-0 bg-[#6366F1] shadow-[0_0_15px_#6366F1]" style={{ width: `${progress}%` }} />
+                  <div className="absolute inset-0 bg-[#6366F1] shadow-[0_0_15px_#6366F1] transition-all duration-700 ease-out" style={{ width: `${progress}%` }} />
                 </div>
                 <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
                   <span>{curveData.realSolReserves.toFixed(2)} SOL</span>
@@ -527,7 +533,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           </motion.div>
 
           {/* Token Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="surface-card p-5">
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="surface-card p-5">
             <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Stats & Info</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">

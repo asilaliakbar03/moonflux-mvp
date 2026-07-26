@@ -5,9 +5,9 @@ import { useRef, useMemo } from "react";
 import * as THREE from "three";
 
 /**
- * MoonFluxx liquid shader — same DNA as the landing page hero.
- * Layered simplex noise flowing in the brand palette
- * (void → violet → electric → ice) with soft mouse attraction.
+ * MoonFluxx Galaxy Background — Pitch-black OLED void
+ * with flowing indigo/violet nebula clouds and star particles.
+ * Mouse-reactive: nebula warps gently toward cursor.
  */
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -44,45 +44,48 @@ const fragmentShader = /* glsl */ `
   void main() {
     vec2 asp = vec2(uRes.x / uRes.y, 1.0);
     vec2 p = vUv * asp;
-    float T = uTime * 0.05;
+    float T = uTime * 0.03;
 
     vec2 m = uMouse * asp;
     float md = length(p - m);
-    float mforce = exp(-md * 2.4) * 0.8;
+    float mforce = exp(-md * 2.0) * 0.5;
 
-    float n1 = snoise(p * 1.4 + vec2(T * 0.7, -T * 0.4));
-    float n2 = snoise(p * 2.8 - vec2(T * 0.5, T * 0.8) + n1 * 0.6);
-    float n3 = snoise(p * 0.7 + vec2(-T * 0.3, T * 0.55) + n2 * 0.35 + mforce);
-    float flow = n1 * 0.5 + n2 * 0.3 + n3 * 0.6 + mforce * 1.2;
+    float n1 = snoise(p * 1.2 + vec2(T * 0.5, -T * 0.3));
+    float n2 = snoise(p * 2.4 - vec2(T * 0.4, T * 0.6) + n1 * 0.5);
+    float n3 = snoise(p * 0.6 + vec2(-T * 0.2, T * 0.4) + n2 * 0.3 + mforce);
+    float flow = n1 * 0.4 + n2 * 0.3 + n3 * 0.5 + mforce * 0.8;
 
-    /* tighten the bands into thin liquid veins */
-    float vein = sin(flow * 3.1416 + T * 2.0) * 0.5 + 0.5;
-    float band = smoothstep(0.42, 0.92, vein);
-    float filament = pow(smoothstep(0.72, 0.98, vein), 2.4); /* razor-thin molten highlights */
+    /* soft nebula bands — much subtler than liquid veins */
+    float nebula = sin(flow * 2.0 + T * 1.5) * 0.5 + 0.5;
+    float band = smoothstep(0.35, 0.85, nebula);
+    float bright = pow(smoothstep(0.7, 0.95, nebula), 3.0);
 
-    /* obsidian & liquid gold — warm black void, molten veins, whisper of violet */
-    vec3 voidC    = vec3(0.006, 0.005, 0.004);
-    vec3 goldDeep = vec3(0.28, 0.17, 0.03);
-    vec3 gold     = vec3(0.62, 0.42, 0.10);
-    vec3 champagne= vec3(0.92, 0.80, 0.52);
-    vec3 violet   = vec3(0.14, 0.06, 0.24); /* secondary whisper only */
+    /* Galaxy palette: pitch black void → deep indigo → violet → teal whispers */
+    vec3 voidC   = vec3(0.0, 0.0, 0.0);           /* true OLED black */
+    vec3 deepInk = vec3(0.02, 0.02, 0.08);        /* barely-there blue */
+    vec3 indigo  = vec3(0.15, 0.12, 0.40);         /* #261F66 — nebula core */
+    vec3 violet  = vec3(0.28, 0.20, 0.55);         /* #472E8C — nebula bright */
+    vec3 teal    = vec3(0.05, 0.18, 0.20);          /* cosmic teal accent */
 
     vec3 col = voidC;
-    col = mix(col, violet, smoothstep(0.3, 1.0, n1) * band * 0.16);
-    col = mix(col, goldDeep, band * 0.55);
-    col = mix(col, gold, smoothstep(0.45, 1.0, n2) * band * 0.5);
-    col = mix(col, champagne, filament * 0.85);
-    col += vec3(0.85, 0.66, 0.30) * mforce * 0.45; /* cursor warms into gold */
+    col = mix(col, deepInk, smoothstep(0.2, 0.8, n1) * band * 0.6);
+    col = mix(col, indigo, band * 0.25);
+    col = mix(col, teal, smoothstep(0.5, 1.0, n2) * band * 0.12);
+    col = mix(col, violet, bright * 0.35);
+    col += vec3(0.10, 0.08, 0.25) * mforce * 0.4; /* cursor warps indigo */
 
-    /* vignette — keep edges pure black so UI panels pop */
-    float vg = smoothstep(1.35, 0.25, length(vUv - 0.5) * 1.7);
+    /* heavy vignette — edges are pure black, nebula only in center */
+    float vg = smoothstep(1.5, 0.2, length(vUv - 0.5) * 1.9);
     col *= vg;
+
+    /* keep overall brightness very low — this is a background, not a lightshow */
+    col *= 0.65;
 
     gl_FragColor = vec4(col, 1.0);
   }
 `;
 
-function LiquidPlane() {
+function NebulaPlane() {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
   const mouse = useRef(new THREE.Vector2(0.5, 0.5));
@@ -100,7 +103,7 @@ function LiquidPlane() {
   useFrame((state) => {
     if (!mat.current) return;
     mouse.current.set(state.pointer.x * 0.5 + 0.5, state.pointer.y * 0.5 + 0.5);
-    smooth.current.lerp(mouse.current, 0.035);
+    smooth.current.lerp(mouse.current, 0.025);
     mat.current.uniforms.uTime.value = state.clock.elapsedTime;
     mat.current.uniforms.uMouse.value.copy(smooth.current);
     mat.current.uniforms.uRes.value.set(size.width, size.height);
@@ -120,24 +123,26 @@ function LiquidPlane() {
   );
 }
 
-/** Sparse drifting star-dust on top of the liquid */
-function StarDust({ count = 240 }) {
+/** 3000 drifting star particles across the galaxy void */
+function GalaxyStars({ count = 3000 }) {
   const points = useRef<THREE.Points>(null);
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3);
+  const { positions, sizes } = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const sz = new Float32Array(count);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 12;
-      arr[i * 3 + 2] = -2 - Math.random() * 6;
+      pos[i * 3] = (Math.random() - 0.5) * 30;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 18;
+      pos[i * 3 + 2] = -1 - Math.random() * 10;
+      sz[i] = 0.015 + Math.random() * 0.04;
     }
-    return arr;
+    return { positions: pos, sizes: sz };
   }, [count]);
 
   useFrame((state) => {
     if (!points.current) return;
-    points.current.rotation.z = state.clock.elapsedTime * 0.008;
+    points.current.rotation.z = state.clock.elapsedTime * 0.005;
     const m = points.current.material as THREE.PointsMaterial;
-    m.opacity = 0.35 + Math.sin(state.clock.elapsedTime * 0.6) * 0.12;
+    m.opacity = 0.5 + Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
   });
 
   return (
@@ -145,25 +150,53 @@ function StarDust({ count = 240 }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial size={0.035} color="#f5e6c8" transparent opacity={0.45} sizeAttenuation />
+      <pointsMaterial size={0.03} color="#FAFBFF" transparent opacity={0.55} sizeAttenuation />
+    </points>
+  );
+}
+
+/** Accent stars — fewer, brighter, indigo-tinted */
+function AccentStars({ count = 80 }) {
+  const points = useRef<THREE.Points>(null);
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 25;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      arr[i * 3 + 2] = -0.5 - Math.random() * 5;
+    }
+    return arr;
+  }, [count]);
+
+  useFrame((state) => {
+    if (!points.current) return;
+    points.current.rotation.z = -state.clock.elapsedTime * 0.003;
+    const m = points.current.material as THREE.PointsMaterial;
+    m.opacity = 0.6 + Math.sin(state.clock.elapsedTime * 0.8 + 1.5) * 0.2;
+  });
+
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial size={0.06} color="#818CF8" transparent opacity={0.7} sizeAttenuation />
     </points>
   );
 }
 
 export default function FluidBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] bg-mf-bg-primary">
+    <div className="fixed inset-0 z-[-1]" style={{ background: '#000000' }}>
       <Canvas
         camera={{ fov: 60, position: [0, 0, 5] }}
         gl={{ antialias: false, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
       >
-        <LiquidPlane />
-        <StarDust />
+        <NebulaPlane />
+        <GalaxyStars />
+        <AccentStars />
       </Canvas>
-      {/* gilded star-flare accent, upper right — brand mark echo */}
-      <div className="absolute top-[12%] right-[14%] w-[1px] h-40 opacity-50 pointer-events-none hidden lg:block" style={{ background: "linear-gradient(180deg, transparent, #e8b84b, #fffef6, #e8b84b, transparent)", boxShadow: "0 0 14px 2px rgba(232,184,75,0.7)" }} />
-      <div className="absolute top-[12%] right-[14%] translate-y-20 -translate-x-14 w-28 h-[1px] opacity-50 pointer-events-none hidden lg:block" style={{ background: "linear-gradient(90deg, transparent, #e8b84b, #fffef6, #e8b84b, transparent)", boxShadow: "0 0 14px 2px rgba(232,184,75,0.7)" }} />
     </div>
   );
 }

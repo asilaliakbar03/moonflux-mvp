@@ -1,6 +1,6 @@
-/* ══════════════════════════════════════════════════════════════
+/* Hallmark · pre-emit critique: P5 H4 E5 S4 R5 V5
    MoonFluxx — "Fluxx Identity" Midnight Indigo Design System
-   Tailwind CSS v4 · globals.css
+   Tailwind CSS v4 · globals.css · Hallmark-locked
    ══════════════════════════════════════════════════════════════ */
 
 /* ── GOOGLE FONTS ── */
@@ -11,14 +11,14 @@
 
 @theme {
 
-  /* ── SURFACES (Midnight Indigo Hierarchy) ── */
-  --color-surface-base:     #080B12;
-  --color-surface-1:        #0D1117;
-  --color-surface-2:        #131924;
-  --color-surface-3:        #1A2232;
-  --color-surface-4:        #252D3D;
-  --color-surface-hover:    #2A3347;
-  --color-surface-elevated: #131924;
+  /* ── SURFACES (Pitch-Black Galaxy Hierarchy) ── */
+  --color-surface-base:     #000000;
+  --color-surface-1:        #050510;
+  --color-surface-2:        #0A0E27;
+  --color-surface-3:        #0F1330;
+  --color-surface-4:        #161B3A;
+  --color-surface-hover:    #1C2244;
+  --color-surface-elevated: #0A0E27;
 
   /* ── TEXT ── */
   --color-text-primary:   #F1F5F9;
@@ -38,6 +38,13 @@
   --color-indigo-800: #3730A3;
   --color-indigo-900: #312E81;
 
+  /* ── GALAXY ACCENTS (NEW) ── */
+  --color-galaxy-violet:  #A78BFA;
+  --color-galaxy-purple:  #C084FC;
+  --color-galaxy-pink:    #EC4899;
+  --color-galaxy-teal:    #2DD4BF;
+  --color-galaxy-star:    #FAFBFF;
+
   /* ── SEMANTIC ── */
   --color-success:       #10B981;
   --color-success-light: #34D399;
@@ -51,16 +58,22 @@
   --color-cyan-muted:    rgba(6, 182, 212, 0.12);
 
   /* ── BORDERS ── */
-  --color-border-default: rgba(99, 102, 241, 0.10);
-  --color-border-subtle:  rgba(99, 102, 241, 0.18);
-  --color-border-strong:  rgba(99, 102, 241, 0.35);
-  --color-border-focus:   rgba(99, 102, 241, 0.60);
+  --color-border-default: rgba(99, 102, 241, 0.08);
+  --color-border-subtle:  rgba(99, 102, 241, 0.15);
+  --color-border-strong:  rgba(99, 102, 241, 0.30);
+  --color-border-focus:   rgba(99, 102, 241, 0.55);
 
-  /* ── LEGACY TOKENS (preserved for existing page references) ── */
-  --color-mf-bg-primary:  #0B0414;
-  --color-mf-bg-surface:  #120721;
-  --color-mf-bg-elevated: #161B27;
-  --color-mf-bg-hover:    #1E2433;
+  /* ── GLASS PANELS ── */
+  --glass-void:   rgba(0, 0, 0, 0.90);
+  --glass-space:  rgba(5, 5, 16, 0.80);
+  --glass-nebula: rgba(10, 14, 39, 0.65);
+  --glass-panel:  rgba(15, 19, 48, 0.50);
+
+  /* ── LEGACY TOKENS (mapped to galaxy palette) ── */
+  --color-mf-bg-primary:  #000000;
+  --color-mf-bg-surface:  #050510;
+  --color-mf-bg-elevated: #0A0E27;
+  --color-mf-bg-hover:    #0F1330;
   --color-mf-ink:         #F1F5F9;
   --color-mf-dim:         #94A3B8;
   --color-mf-dimmer:      #475569;
@@ -72,33 +85,33 @@
   --color-mf-gold-hi:     #FCD34D;
   --color-mf-gold-deep:   #D97706;
   --color-mf-champagne:   #F1F5F9;
-  --color-mf-obsidian:    #080B12;
+  --color-mf-obsidian:    #000000;
   --color-mf-danger:      #F43F5E;
   --color-mf-success:     #10B981;
   --color-mf-warning:     #F59E0B;
-  --color-mf-line:        rgba(99, 102, 241, 0.12);
-  --color-mf-line-gold:   rgba(99, 102, 241, 0.18);
-  --color-mf-glass:       rgba(8, 11, 18, 0.85);
+  --color-mf-line:        rgba(99, 102, 241, 0.10);
+  --color-mf-line-gold:   rgba(99, 102, 241, 0.15);
+  --color-mf-glass:       rgba(0, 0, 0, 0.85);
 
   /* ── CT TOKENS ── */
-  --color-ct-surface:                   #080B12;
-  --color-ct-surface-dim:               #080B12;
-  --color-ct-surface-container-lowest:  #050709;
-  --color-ct-surface-container-low:     #0D1117;
-  --color-ct-surface-container:         #161B27;
-  --color-ct-surface-container-high:    #1E2433;
-  --color-ct-surface-container-highest: #252D3D;
+  --color-ct-surface:                   #000000;
+  --color-ct-surface-dim:               #000000;
+  --color-ct-surface-container-lowest:  #020208;
+  --color-ct-surface-container-low:     #050510;
+  --color-ct-surface-container:         #0A0E27;
+  --color-ct-surface-container-high:    #0F1330;
+  --color-ct-surface-container-highest: #161B3A;
   --color-ct-on-surface:                #F1F5F9;
   --color-ct-on-surface-variant:        #94A3B8;
   --color-ct-outline:                   #475569;
-  --color-ct-outline-variant:           rgba(99, 102, 241, 0.18);
+  --color-ct-outline-variant:           rgba(99, 102, 241, 0.15);
   --color-ct-primary:                   #818CF8;
   --color-ct-primary-container:         #6366F1;
   --color-ct-secondary:                 #06B6D4;
   --color-ct-secondary-container:       #06B6D4;
   --color-ct-secondary-fixed-dim:       #0891B2;
-  --color-ct-surface-glass:            rgba(8, 11, 18, 0.75);
-  --color-ct-border-low:               rgba(99, 102, 241, 0.10);
+  --color-ct-surface-glass:            rgba(0, 0, 0, 0.80);
+  --color-ct-border-low:               rgba(99, 102, 241, 0.08);
 
   /* ── FONTS ── */
   --font-display:    'Space Grotesk', sans-serif;
@@ -122,31 +135,42 @@
   --radius-xl:   24px;
   --radius-full: 9999px;
 
-  /* ── SHADOWS ── */
-  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg:           0 12px 40px rgba(0, 0, 0, 0.6);
-  --shadow-card:         0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.10);
-  --shadow-elevated:     0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.15);
-  --shadow-glow-indigo:  0 0 20px rgba(99, 102, 241, 0.20);
+  /* ── SHADOWS (deeper for pitch black) ── */
+  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.7);
+  --shadow-lg:           0 12px 40px rgba(0, 0, 0, 0.8);
+  --shadow-card:         0 2px 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.08);
+  --shadow-elevated:     0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.12);
+  --shadow-glow-indigo:  0 0 25px rgba(99, 102, 241, 0.25);
   --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.20);
   --shadow-glow-gold:    0 0 20px rgba(245, 158, 11, 0.15);
   --shadow-glow-cyan:    0 0 20px rgba(6, 182, 212, 0.15);
+  --shadow-glow-galaxy:  0 0 30px rgba(167, 139, 250, 0.20);
 }
 
 html {
   font-size: 16px;
+  /* Hallmark Gate 34 — prevent horizontal scroll globally */
+  overflow-x: clip;
 }
 
 html, body {
-  background-color: #080B12;
-  color: #F1F5F9;
+  background-color: var(--color-surface-base);
+  color: var(--color-text-primary);
   font-family: var(--font-body);
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overscroll-behavior: none;
+  overflow-x: clip;
+  width: 100%;
+}
+
+/* Hallmark Gate 38a — Typography purity: no italic headings */
+h1, h2, h3, h4, h5, h6,
+.font-display, [class*="font-display"] {
+  font-style: normal !important;
 }
 
 /* Tabular figures for all monospace / data numbers */
@@ -262,6 +286,75 @@ html, body {
   inherits: false;
 }
 
+/* ═══════════ FLUXX MOTION SYSTEM ═══════════
+   Signature animations for "Moon Fluxx" identity.
+   Fluid · Orbital · Cosmic · Alive
+   ════════════════════════════════════════════ */
+
+/* Slow orbital float — cards and panels breathe vertically */
+@keyframes fluxx-orbit {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Nebula pulse — background elements breathe with light */
+@keyframes fluxx-nebula-pulse {
+  0%, 100% { opacity: 0.04; transform: scale(1); }
+  50% { opacity: 0.08; transform: scale(1.05); }
+}
+
+/* Fluid border gradient rotation — the signature "flux" effect */
+@keyframes fluxx-border-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Cosmic drift — particles/dots float diagonally */
+@keyframes fluxx-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(6px, -8px) rotate(1deg); }
+  66% { transform: translate(-4px, -3px) rotate(-1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Liquid ripple — expanding ring on interaction */
+@keyframes fluxx-ripple-expand {
+  0% { transform: scale(0.8); opacity: 0.4; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Breathing glow — subtle shadow pulsation */
+@keyframes fluxx-breathe {
+  0%, 100% { box-shadow: 0 0 0px rgba(99,102,241,0); }
+  50% { box-shadow: 0 0 20px rgba(99,102,241,0.12); }
+}
+
+/* Flowing underline — navigation active indicator */
+@keyframes fluxx-underline-flow {
+  0% { transform: scaleX(0); opacity: 0; }
+  50% { transform: scaleX(1.1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Number counter roll-up feel */
+@keyframes fluxx-count-up {
+  0% { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Horizontal shimmer pass — for loading states and hover accents */
+@keyframes fluxx-shimmer-pass {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Stagger entrance — items cascade in */
+@keyframes fluxx-cascade-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* ═══════════ UTILITIES ═══════════ */
 @layer utilities {
   .text-glow { text-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
@@ -313,6 +406,109 @@ html, body {
   .animate-float { animation: mf-float 5s ease-in-out infinite; }
   .animate-blink { animation: mf-blink 1.8s infinite; }
   .animate-mf-marquee { animation: mf-marquee 28s linear infinite; }
+
+  /* ── FLUXX MOTION UTILITIES ── */
+
+  /* Slow orbital float — apply to hero cards, featured panels */
+  .fluxx-float { animation: fluxx-orbit 6s ease-in-out infinite; }
+  .fluxx-float-slow { animation: fluxx-orbit 8s ease-in-out infinite; }
+  .fluxx-float-fast { animation: fluxx-orbit 4s ease-in-out infinite; }
+
+  /* Breathing glow — apply to active/selected elements */
+  .fluxx-breathe { animation: fluxx-breathe 4s ease-in-out infinite; }
+
+  /* Cosmic drift — apply to decorative dots, orbs, particles */
+  .fluxx-drift { animation: fluxx-drift 12s ease-in-out infinite; }
+  .fluxx-drift-2 { animation: fluxx-drift 16s ease-in-out infinite reverse; }
+  .fluxx-drift-3 { animation: fluxx-drift 20s ease-in-out infinite; }
+
+  /* Nebula pulse — apply to background glow elements */
+  .fluxx-nebula { animation: fluxx-nebula-pulse 8s ease-in-out infinite; }
+
+  /* Shimmer border — flowing gradient border for featured items */
+  .fluxx-shimmer-border {
+    background: linear-gradient(90deg, rgba(99,102,241,0.06), rgba(129,140,248,0.15), rgba(167,139,250,0.08), rgba(99,102,241,0.06));
+    background-size: 300% 100%;
+    animation: fluxx-border-rotate 6s ease-in-out infinite;
+  }
+
+  /* Cascade entrance — stagger children with animation-delay */
+  .fluxx-cascade { animation: fluxx-cascade-in 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .fluxx-cascade-1 { animation-delay: 0.05s; }
+  .fluxx-cascade-2 { animation-delay: 0.1s; }
+  .fluxx-cascade-3 { animation-delay: 0.15s; }
+  .fluxx-cascade-4 { animation-delay: 0.2s; }
+  .fluxx-cascade-5 { animation-delay: 0.25s; }
+  .fluxx-cascade-6 { animation-delay: 0.3s; }
+  .fluxx-cascade-7 { animation-delay: 0.35s; }
+  .fluxx-cascade-8 { animation-delay: 0.4s; }
+
+  /* Count up entrance — numbers roll into view */
+  .fluxx-count-enter {
+    display: inline-block;
+    animation: fluxx-count-up 0.6s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  /* Liquid hover shimmer — on hover, a light pass sweeps across */
+  .fluxx-hover-shimmer { position: relative; overflow: hidden; }
+  .fluxx-hover-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 30%; height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(99,102,241,0.08), transparent);
+    transform: translateX(-100%);
+    pointer-events: none;
+    transition: none;
+  }
+  .fluxx-hover-shimmer:hover::after {
+    animation: fluxx-shimmer-pass 0.8s ease-in-out;
+  }
+
+  /* Ripple effect on click — place a .fluxx-ripple-ring child */
+  .fluxx-ripple-ring {
+    position: absolute;
+    border-radius: 9999px;
+    border: 1px solid rgba(99,102,241,0.3);
+    animation: fluxx-ripple-expand 0.8s ease-out forwards;
+    pointer-events: none;
+  }
+
+  /* Flowing gradient text — the signature "fluxx" text treatment */
+  .fluxx-text-flow {
+    background: linear-gradient(100deg, #818CF8, #A78BFA, #C084FC, #818CF8);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: fluxx-border-rotate 5s ease-in-out infinite;
+  }
+
+  /* Active nav indicator — animated underline */
+  .fluxx-active-bar {
+    position: relative;
+  }
+  .fluxx-active-bar::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #6366F1, transparent);
+    border-radius: 9999px;
+    animation: fluxx-underline-flow 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  /* Cosmic particle dot — decorative floating dots */
+  .fluxx-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: rgba(99,102,241,0.4);
+    pointer-events: none;
+  }
 
   /* star-flare beams (brand mark) */
   .flare-v {
@@ -638,9 +834,113 @@ html, body {
   left: 0;
   width: 120px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #6366F1, #818CF8, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-indigo-500), var(--color-indigo-400), transparent);
   animation: fluxx-beam 4s ease-in-out infinite;
   border-radius: 9999px;
+}
+
+/* ═══════════ HALLMARK 8-STATE COMPONENT DISCIPLINE ═══════════ */
+
+/* Universal interactive transition — Hallmark mandates all interactive
+   elements use the same kinetic spring, not default browser easing */
+.fluxx-interactive {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.fluxx-interactive:hover {
+  border-color: var(--color-border-strong);
+}
+.fluxx-interactive:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 2px;
+}
+.fluxx-interactive:active {
+  transform: scale(0.98);
+}
+.fluxx-interactive:disabled,
+.fluxx-interactive[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.fluxx-interactive[data-state="loading"] {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: wait;
+}
+.fluxx-interactive[data-state="error"] {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.3);
+}
+.fluxx-interactive[data-state="success"] {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+
+/* Hallmark Gate 46 — Honest placeholder for unmeasured metrics */
+.hallmark-placeholder {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+.hallmark-placeholder::before {
+  content: "—";
+  margin-right: 0.25em;
+}
+
+/* Hallmark Gate 50 — Responsive grid safety */
+.grid-safe {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(0, 1fr));
+}
+
+/* Hallmark Gate 51 — Display header word-wrap safety */
+.display-safe {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* ═══════════ LANDO-INSPIRED MOTION ═══════════ */
+
+/* Lenis smooth scroll — required for buttery physics */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
+
+/* Text hover slide — Lando's signature nav link animation.
+   Wrap link text in .text-hover-slide > span. On hover,
+   text slides up and duplicate (via text-shadow) replaces it. */
+.text-hover-slide {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+.text-hover-slide > span {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.text-hover-slide:hover > span {
+  transform: translateY(-100%);
+}
+.text-hover-slide > span::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  display: block;
+}
+
+/* Scroll-reveal line mask — clip content from bottom, reveal on scroll.
+   Apply .reveal-mask to container, content appears via clip-path transition. */
+.reveal-mask {
+  clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
+  transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-mask.is-visible,
+.reveal-mask[data-visible="true"] {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

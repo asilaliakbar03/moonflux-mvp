@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Settings, Shield, Bell, Palette, Globe, Wallet, Key, Trash2, Plus, BellRing, ChevronRight } from "lucide-react";
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useToast } from "@/components/ToastProvider";
+import MagneticButton from '@/components/MagneticButton';
+import AnimatedCounter from '@/components/AnimatedCounter';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -20,7 +22,7 @@ const SECTIONS: Section[] = [
   {
     title: "Wallet & Security", icon: Shield,
     items: [
-      { label: "Connected Wallet", value: "0x71C...9711", type: "value" },
+      { label: "Connected Wallet", value: "0x...", type: "value" },
       { label: "Auto-Approve Transactions", value: false, type: "toggle" },
       { label: "Export Private Key", type: "action", actionLabel: "Export" },
       { label: "Disconnect Wallet", type: "action", actionLabel: "Disconnect" },
@@ -65,50 +67,50 @@ export default function SettingsPage() {
   const [alerts, setAlerts] = useState(INITIAL_ALERTS);
 
   return (
-    <div className="max-w-4xl mx-auto w-full pt-8 pb-16">
+    <div className="max-w-4xl mx-auto w-full pt-8 pb-16 w-full max-w-full overflow-x-hidden">
       
       {/* ── HEADER ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 text-center md:text-left">
         <div>
-          <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+          <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">
             <Settings className="w-8 h-8 text-[#05D5FA]" />
             Settings
           </h1>
           <p className="text-[#C8A2C8]">Manage your account, trading preferences, and alerts.</p>
         </div>
         
-        <div className="flex p-1 bg-[#120721] border border-[rgba(5,213,250,0.2)] rounded-xl shadow-[0_0_15px_rgba(5,213,250,0.1)]">
-          <button
+        <div className="flex p-1 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+          <MagneticButton
             onClick={() => setActiveTab('general')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
               activeTab === 'general'
-                ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' 
-                : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
+                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             General Settings
-          </button>
-          <button
+          </MagneticButton>
+          <MagneticButton
             onClick={() => setActiveTab('alerts')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
               activeTab === 'alerts'
-                ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' 
-                : 'text-[#8B6A8B] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
+                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             Price Alerts
-          </button>
+          </MagneticButton>
         </div>
       </motion.div>
 
       {/* ── GENERAL SETTINGS ── */}
       {activeTab === 'general' && (
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {SECTIONS.map((sec, i) => (
-            <div key={i} className="surface-glass flex flex-col overflow-hidden border border-[rgba(5,213,250,0.2)] hover:border-[rgba(5,213,250,0.4)] hover:shadow-[0_0_15px_rgba(5,213,250,0.15)] transition-all">
-              <div className="p-4 border-b border-[rgba(5,213,250,0.15)] bg-[#120721] flex items-center gap-3">
-                <sec.icon className="w-5 h-5 text-[#05D5FA] drop-shadow-[0_0_5px_rgba(5,213,250,0.3)]" />
-                <h3 className="font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">{sec.title}</h3>
+            <div key={i} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] flex flex-col overflow-hidden rounded-xl hover:border-[rgba(99,102,241,0.25)] transition-all">
+              <div className="p-4 border-b border-[rgba(99,102,241,0.08)] flex items-center gap-3">
+                <sec.icon className="w-5 h-5 text-[#818CF8]" />
+                <h3 className="font-bold text-white">{sec.title}</h3>
               </div>
               
               <div className="flex flex-col p-2">
@@ -117,7 +119,7 @@ export default function SettingsPage() {
                     <span className="text-sm font-medium text-[#C8A2C8]">{item.label}</span>
                     
                     {item.type === 'value' && (
-                      <span className="text-sm text-white font-mono bg-[#0B0414] border border-[rgba(255,255,255,0.1)] px-2 py-1 rounded shadow-inner">{item.value === '0x71C...9711' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}</span>
+                      <span className="text-sm text-white font-mono bg-[#0B0414] border border-[rgba(255,255,255,0.1)] px-2 py-1 rounded shadow-inner">{item.value === '0x...' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}</span>
                     )}
                     
                     {item.type === 'toggle' && (
@@ -133,9 +135,9 @@ export default function SettingsPage() {
                     )}
                     
                     {item.type === 'action' && (
-                      <button className={`px-3 py-1 rounded text-sm font-bold transition-all border ${item.actionLabel === 'Disconnect' ? 'bg-[rgba(255,42,109,0.1)] text-[#FF2A6D] border-[rgba(255,42,109,0.3)] hover:bg-[rgba(255,42,109,0.2)] hover:shadow-[0_0_10px_rgba(255,42,109,0.2)]' : 'bg-[rgba(5,213,250,0.1)] text-[#05D5FA] border-[rgba(5,213,250,0.3)] hover:bg-[rgba(5,213,250,0.2)] hover:shadow-[0_0_10px_rgba(5,213,250,0.2)]'}`}>
+                      <MagneticButton strength={0.2} className={`px-3 py-1 rounded text-sm font-bold transition-all border active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${item.actionLabel === 'Disconnect' ? 'bg-[rgba(239,68,68,0.1)] text-[#EF4444] border-[rgba(239,68,68,0.3)] hover:bg-[rgba(239,68,68,0.2)]' : 'bg-[rgba(99,102,241,0.1)] text-[#818CF8] border-[rgba(99,102,241,0.3)] hover:bg-[rgba(99,102,241,0.2)]'}`}>
                         {item.actionLabel}
-                      </button>
+                      </MagneticButton>
                     )}
                   </div>
                 ))}
@@ -148,18 +150,18 @@ export default function SettingsPage() {
       {/* ── PRICE ALERTS ── */}
       {activeTab === 'alerts' && (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
-          <div className="surface-card p-6 flex flex-col md:flex-row justify-between items-center gap-4 border border-[rgba(5,213,250,0.3)] bg-[rgba(5,213,250,0.02)] shadow-[0_0_15px_rgba(5,213,250,0.05)]">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 hover:border-[rgba(99,102,241,0.2)] transition-all">
             <div>
-              <h3 className="text-xl font-bold text-white mb-1 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Create New Alert</h3>
-              <p className="text-sm text-[#C8A2C8]">Get notified when a token hits your target price.</p>
+              <h3 className="text-xl font-bold text-white mb-1 display-safe">Create New Alert</h3>
+              <p className="text-sm text-[#94A3B8]">Get notified when a token hits your target price.</p>
             </div>
-            <button className="bg-[rgba(5,213,250,0.15)] hover:bg-[rgba(5,213,250,0.25)] border border-[rgba(5,213,250,0.5)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)] rounded-lg font-bold px-4 py-2 transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(5,213,250,0.4)]">
+            <MagneticButton strength={0.25} className="bg-[rgba(99,102,241,0.15)] hover:bg-[rgba(99,102,241,0.25)] border border-[rgba(99,102,241,0.4)] text-[#818CF8] rounded-lg font-bold px-4 py-2 transition-all flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
               <Plus className="w-4 h-4" /> Add Alert
-            </button>
+            </MagneticButton>
           </div>
 
-          <div className="surface-glass overflow-hidden">
-            <div className="p-5 border-b border-[rgba(5,213,250,0.2)] bg-[#120721] flex items-center gap-2">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] overflow-hidden">
+            <div className="p-5 border-b border-[rgba(5,213,250,0.2)] bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] flex items-center gap-2">
               <BellRing className="w-5 h-5 text-[#05D5FA] drop-shadow-[0_0_5px_rgba(5,213,250,0.3)]" />
               <h3 className="text-lg font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">Active Alerts</h3>
             </div>
@@ -175,15 +177,15 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <div className="font-bold text-white group-hover:text-[#05D5FA] transition-colors">${alert.token}</div>
-                        <div className="text-xs text-[#C8A2C8] font-mono">
+                        <div className="text-xs text-[#94A3B8] font-mono">
                           {alert.condition === 'above' ? 'Goes above ' : 'Drops below '}
-                          <span className="font-bold text-[#39FF14] drop-shadow-[0_0_5px_rgba(57,255,20,0.3)]">${alert.price}</span>
+                          <span className="font-bold text-[#10B981]"><AnimatedCounter value={alert.price} prefix="$" decimals={4} /></span>
                         </div>
                       </div>
                     </div>
-                    <button className="p-2 text-[#8B6A8B] hover:text-[#FF2A6D] hover:bg-[rgba(255,42,109,0.1)] rounded transition-colors border border-transparent hover:border-[rgba(255,42,109,0.3)]">
+                    <MagneticButton strength={0.2} className="p-2 text-[#94A3B8] hover:text-[#EF4444] hover:bg-[rgba(239,68,68,0.1)] rounded transition-colors border border-transparent hover:border-[rgba(239,68,68,0.3)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </MagneticButton>
                   </div>
                 ))
               )}

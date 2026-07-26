@@ -57,33 +57,38 @@ function NavLink({
       <motion.div
         whileTap={{ scale: 0.96 }}
         transition={{ type: 'spring', stiffness: 400, damping: 26 }}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors duration-150"
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors duration-150 fluxx-hover-shimmer ${isActive ? 'fluxx-active-bar' : ''}`}
         style={{
-          background: isActive ? 'rgba(255,42,109,0.15)' : 'transparent',
-          borderLeft: isActive ? '2px solid #FF2A6D' : '2px solid transparent',
-          color: isActive ? '#FFF' : '#C8A2C8',
+          background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
+          borderLeft: isActive ? '2px solid #6366F1' : '2px solid transparent',
+          color: isActive ? '#F1F5F9' : '#94A3B8',
         }}
         onMouseEnter={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-            e.currentTarget.style.color = '#94A3B8';
+            e.currentTarget.style.color = '#F1F5F9';
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = '#475569';
+            e.currentTarget.style.color = '#94A3B8';
           }
         }}
       >
         {/* Icon */}
-        <div className="flex items-center justify-center w-8 h-8 shrink-0">
+        <div 
+          className="flex items-center justify-center w-8 h-8 shrink-0 rounded-md transition-shadow duration-300"
+          style={{
+            boxShadow: isActive ? '0 0 12px rgba(99,102,241,0.4)' : 'none'
+          }}
+        >
           <Icon size={20} strokeWidth={isActive ? 2.2 : 1.8} />
         </div>
 
         {/* Label */}
         <span
-          className="whitespace-nowrap font-medium transition-opacity duration-200"
+          className={`whitespace-nowrap font-medium transition-opacity duration-200 ${expanded ? 'text-hover-slide' : ''}`}
           style={{
             fontSize: '13px',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
@@ -91,7 +96,7 @@ function NavLink({
             pointerEvents: expanded ? 'auto' : 'none',
           }}
         >
-          {item.label}
+          <span data-text={item.label}>{item.label}</span>
         </span>
       </motion.div>
 
@@ -107,8 +112,8 @@ function NavLink({
             pointer-events-none z-50
           "
           style={{
-            background: '#0F1221',
-            color: '#CBD5E1',
+            background: '#050510',
+            color: '#F1F5F9',
             border: '1px solid rgba(99,102,241,0.18)',
             boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
@@ -151,8 +156,10 @@ export default function Sidebar() {
         className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden"
         style={{
           width: expanded ? 220 : 72,
-          backgroundColor: '#0B0414',
-          borderRight: '1px solid rgba(255,42,109,0.15)',
+          backgroundColor: 'rgba(0,0,0,0.70)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderRight: '1px solid rgba(99,102,241,0.08)',
           transition: 'width 300ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
@@ -171,14 +178,14 @@ export default function Sidebar() {
         {/* ── Divider ── */}
         <div
           className="mx-3 my-1"
-          style={{ borderTop: '1px solid rgba(255,42,109,0.15)' }}
+          style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}
         />
 
         {/* ── Bottom section ── */}
         <div className="flex flex-col gap-0.5 px-2 pb-4">
           <div
             className="mx-1 mb-1"
-            style={{ borderTop: '1px solid rgba(255,42,109,0.15)' }}
+            style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}
           />
           {BOTTOM_ITEMS.map((item) => (
             <NavLink
@@ -192,7 +199,7 @@ export default function Sidebar() {
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[rgba(11,4,20,0.95)] backdrop-blur-md border-t border-[rgba(255,42,109,0.15)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[rgba(0,0,0,0.70)] backdrop-blur-2xl border-t border-[rgba(99,102,241,0.08)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
         {[
           MAIN_ITEMS[0], // Dashboard
           MAIN_ITEMS[1], // Explore
@@ -206,19 +213,23 @@ export default function Sidebar() {
           if (item.href === '#more') {
             return (
               <button key="more" onClick={() => setShowMobileMenu(true)} className="flex flex-col items-center justify-center w-full h-full gap-1">
-                <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#FF2A6D]" : "text-[#475569]"} />
+                <div className={`flex items-center justify-center p-1 rounded-md transition-shadow duration-300 ${showMobileMenu ? 'shadow-[0_0_12px_rgba(99,102,241,0.4)]' : ''}`}>
+                  <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#6366F1]" : "text-[#475569]"} />
+                </div>
                 <span className="text-[10px] font-medium" style={{ color: showMobileMenu ? "#F1F5F9" : "#475569" }}>More</span>
               </button>
             );
           }
 
           return (
-            <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1">
-              <Icon 
-                size={22} 
-                strokeWidth={isActive ? 2.5 : 2} 
-                className={isActive ? "text-[#FF2A6D]" : "text-[#475569]"} 
-              />
+            <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1 fluxx-hover-shimmer">
+              <div className={`flex items-center justify-center p-1 rounded-md transition-shadow duration-300 ${isActive ? 'shadow-[0_0_12px_rgba(99,102,241,0.4)] fluxx-active-bar' : ''}`}>
+                <Icon 
+                  size={22} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  className={isActive ? "text-[#6366F1]" : "text-[#475569]"} 
+                />
+              </div>
               <span 
                 className="text-[10px] font-medium" 
                 style={{ color: isActive ? "#F1F5F9" : "#475569" }}
@@ -237,27 +248,27 @@ export default function Sidebar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="md:hidden fixed inset-0 z-[90] bg-[#0B0414] overflow-y-auto pb-24 pt-6 px-6 flex flex-col"
+            className="md:hidden fixed inset-0 z-[90] bg-[#000000] overflow-y-auto pb-24 pt-6 px-6 flex flex-col"
           >
             <div className="flex items-center justify-between mb-8 mt-2">
               <h2 className="text-3xl font-bold font-display text-white">Menu</h2>
-              <button onClick={() => setShowMobileMenu(false)} className="p-2 bg-[rgba(255,255,255,0.05)] rounded-full text-[#F1F5F9] hover:text-[#FF2A6D] hover:bg-[rgba(255,42,109,0.1)] transition-colors">
+              <button onClick={() => setShowMobileMenu(false)} className="p-2 bg-[rgba(255,255,255,0.05)] rounded-full text-[#F1F5F9] hover:text-[#6366F1] hover:bg-[rgba(99,102,241,0.1)] transition-colors">
                 <X size={24} />
               </button>
             </div>
             
             <div className="flex flex-col gap-8">
               <div>
-                <h3 className="text-[10px] font-mono font-bold text-[#FF2A6D] tracking-widest uppercase mb-3 px-2">Main</h3>
+                <h3 className="text-[10px] font-mono font-bold text-[#6366F1] tracking-widest uppercase mb-3 px-2">Main</h3>
                 <div className="flex flex-col gap-1">
                   {MAIN_ITEMS.map(item => (
                     <Link 
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 ${pathname === item.href ? 'bg-[rgba(255,42,109,0.15)] text-white border border-[rgba(255,42,109,0.3)] shadow-[0_0_15px_rgba(255,42,109,0.15)]' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? 'bg-[rgba(99,102,241,0.15)] text-white border border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0.15)] fluxx-active-bar' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#FF2A6D]" : "text-[#475569]"} />
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#6366F1]" : "text-[#475569]"} />
                       <span className="font-bold text-base">{item.label}</span>
                     </Link>
                   ))}
@@ -265,16 +276,16 @@ export default function Sidebar() {
               </div>
 
               <div>
-                <h3 className="text-[10px] font-mono font-bold text-[#05D5FA] tracking-widest uppercase mb-3 px-2">Account</h3>
+                <h3 className="text-[10px] font-mono font-bold text-[#A78BFA] tracking-widest uppercase mb-3 px-2">Account</h3>
                 <div className="flex flex-col gap-1">
                   {BOTTOM_ITEMS.map(item => (
                     <Link 
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 ${pathname === item.href ? 'bg-[rgba(5,213,250,0.15)] text-white border border-[rgba(5,213,250,0.3)] shadow-[0_0_15px_rgba(5,213,250,0.15)]' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? 'bg-[rgba(167,139,250,0.15)] text-white border border-[rgba(167,139,250,0.3)] shadow-[0_0_15px_rgba(167,139,250,0.15)] fluxx-active-bar' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#05D5FA]" : "text-[#475569]"} />
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#A78BFA]" : "text-[#475569]"} />
                       <span className="font-bold text-base">{item.label}</span>
                     </Link>
                   ))}

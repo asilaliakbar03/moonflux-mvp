@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { Brain, Bot, SendHorizonal, ArrowUpRight, ArrowDownRight, Settings2, BarChart3, AlertTriangle } from "lucide-react";
+import { Brain, Bot, SendHorizonal, ArrowUpRight, ArrowDownRight, Settings2, AlertTriangle, TrendingUp, Activity, Volume2, Zap } from "lucide-react";
+import MagneticButton from '@/components/MagneticButton';
+import AnimatedCounter from '@/components/AnimatedCounter';
 
 const TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h", "1D"];
 
-// Cheap deterministic-ish simulated price series
+/* ── Simulated live price series ── */
 function useSimSeries(count: number) {
   const [tick, setTick] = useState(0);
   const seedRef = useRef(0.00234);
@@ -33,41 +35,88 @@ function useSimSeries(count: number) {
   }, [count, tick]);
 }
 
+/* ── Crosshair-enabled area chart ── */
 function AreaChart() {
   const W = 800;
   const H = 320;
   const PAD = 8;
   const { pts, min, max, last } = useSimSeries(64);
+  const [hover, setHover] = useState<{x:number,y:number,val:number}|null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const range = max - min || 1;
-  const x = (i: number) => PAD + (i / (pts.length - 1)) * (W - PAD * 2);
-  const y = (val: number) => PAD + (1 - (val - min) / range) * (H - PAD * 2);
+  const xPos = (i: number) => PAD + (i / (pts.length - 1)) * (W - PAD * 2);
+  const yPos = (val: number) => PAD + (1 - (val - min) / range) * (H - PAD * 2);
 
   const linePath = pts
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(p).toFixed(1)}`)
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${xPos(i).toFixed(1)} ${yPos(p).toFixed(1)}`)
     .join(" ");
   const areaPath =
-    `M ${x(0).toFixed(1)} ${(H - PAD).toFixed(1)} ` +
-    pts.map((p, i) => `L ${x(i).toFixed(1)} ${y(p).toFixed(1)}`).join(" ") +
-    ` L ${x(pts.length - 1).toFixed(1)} ${(H - PAD).toFixed(1)} Z`;
+    `M ${xPos(0).toFixed(1)} ${(H - PAD).toFixed(1)} ` +
+    pts.map((p, i) => `L ${xPos(i).toFixed(1)} ${yPos(p).toFixed(1)}`).join(" ") +
+    ` L ${xPos(pts.length - 1).toFixed(1)} ${(H - PAD).toFixed(1)} Z`;
 
-  const lastY = y(last);
-  const lastX = x(pts.length - 1);
+  const lastY = yPos(last);
+  const lastX = xPos(pts.length - 1);
+  const isUp = last > pts[0];
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const mx = ((e.clientX - rect.left) / rect.width) * W;
+    const idx = Math.round(((mx - PAD) / (W - PAD * 2)) * (pts.length - 1));
+    if (idx >= 0 && idx < pts.length) {
+      setHover({ x: xPos(idx), y: yPos(pts[idx]), val: pts[idx] });
+    }
+  }, [pts, W, H]);
+
+  const accentColor = isUp ? "#10B981" : "#EF4444";
+  const gradientId = isUp ? "areaGreen" : "areaRed";
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      className="absolute inset-0 h-full w-full cursor-crosshair"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setHover(null)}
+    >
       <defs>
-        <linearGradient id="mfIndigoArea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#05D5FA" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#05D5FA" stopOpacity="0" />
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={accentColor} stopOpacity="0.20" />
+          <stop offset="100%" stopColor={accentColor} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill="url(#mfIndigoArea)" />
-      <path d={linePath} fill="none" stroke="#05D5FA" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <line x1={0} x2={W} y1={lastY} y2={lastY} stroke="#05D5FA" strokeOpacity="0.35" strokeDasharray="4 6" strokeWidth={1} />
-      <circle cx={lastX} cy={lastY} r={4} fill="#05D5FA">
-        <animate attributeName="opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite" />
+
+      {/* Grid lines */}
+      {[0.25, 0.5, 0.75].map(pct => (
+        <line key={pct} x1={PAD} x2={W-PAD} y1={H * pct} y2={H * pct} stroke="rgba(99,102,241,0.06)" strokeWidth={1} />
+      ))}
+
+      <path d={areaPath} fill={`url(#${gradientId})`} />
+      <path d={linePath} fill="none" stroke={accentColor} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Price level line */}
+      <line x1={0} x2={W} y1={lastY} y2={lastY} stroke={accentColor} strokeOpacity="0.25" strokeDasharray="4 6" strokeWidth={1} />
+
+      {/* Live dot */}
+      <circle cx={lastX} cy={lastY} r={3} fill={accentColor}>
+        <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
       </circle>
+
+      {/* Crosshair */}
+      {hover && (
+        <>
+          <line x1={hover.x} x2={hover.x} y1={0} y2={H} stroke="rgba(148,163,184,0.3)" strokeWidth={1} strokeDasharray="3 3" />
+          <line x1={0} x2={W} y1={hover.y} y2={hover.y} stroke="rgba(148,163,184,0.3)" strokeWidth={1} strokeDasharray="3 3" />
+          <circle cx={hover.x} cy={hover.y} r={4} fill="none" stroke={accentColor} strokeWidth={1.5} />
+          <circle cx={hover.x} cy={hover.y} r={2} fill={accentColor} />
+          <rect x={hover.x - 32} y={hover.y - 20} width={64} height={16} rx={4} fill="rgba(0,0,0,0.85)" stroke="rgba(99,102,241,0.2)" strokeWidth={1} />
+          <text x={hover.x} y={hover.y - 9} textAnchor="middle" fill="#F1F5F9" fontSize={9} fontFamily="monospace">{hover.val.toFixed(6)}</text>
+        </>
+      )}
     </svg>
   );
 }
@@ -82,7 +131,7 @@ export default function TerminalPage() {
   // Chat state
   const [copilotInput, setCopilotInput] = useState("");
   const [copilotMessages, setCopilotMessages] = useState<{role:string, content:string}[]>([
-    { role: "assistant", content: "I'm analyzing $LDOGE. Volume is spiking on the 5m chart. Ready when you are." },
+    { role: "assistant", content: "Analyzing $LDOGE. Volume spiking on the 5m — looks like accumulation phase. What's your play?" },
   ]);
   const [copilotLoading, setCopilotLoading] = useState(false);
   const copilotScrollRef = useRef<HTMLDivElement>(null);
@@ -149,51 +198,51 @@ export default function TerminalPage() {
   const expectedTokens = solAmount > 0 ? (solAmount / MOCK_PRICE) * (1 - parseFloat(slippage) / 100) : 0;
 
   return (
-    <div className="flex flex-col gap-4 pb-16 pt-4 h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex flex-col gap-3 pb-16 pt-2 h-[calc(100vh-64px)] overflow-x-hidden w-full max-w-full">
       
-      {/* ── HEADER ── */}
-      <div className="surface-panel p-4 flex flex-col md:flex-row justify-between items-center gap-4 flex-shrink-0 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_left,rgba(255,42,109,0.8),transparent_50%)]" />
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="w-12 h-12 rounded-xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,42,109,0.2)] flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(255,42,109,0.2)]">
+      {/* ── HEADER BAR ── */}
+      <div className="bg-[rgba(0,0,0,0.6)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[rgba(99,102,241,0.08)] border border-[rgba(99,102,241,0.15)] flex items-center justify-center text-xl">
             🐶
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Luna Doge</h1>
-              <span className="badge-indigo bg-[rgba(5,213,250,0.15)] text-[#05D5FA] border-[#05D5FA]">LDOGE / SOL</span>
+              <h1 className="text-lg font-bold text-white display-safe">Luna Doge</h1>
+              <span className="text-[10px] font-mono text-[#818CF8] bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.15)]">LDOGE / SOL</span>
             </div>
-            <div className="text-sm text-[#C8A2C8] font-mono mt-0.5">mint: 4k3...9px2</div>
+            <div className="text-xs text-[#475569] font-mono mt-0.5">4k3...9px2</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-8 relative z-10">
-          <div className="flex items-center gap-6 text-right">
-            <div>
-              <div className="text-[#8B6A8B] text-xs uppercase mb-0.5 font-semibold">Price</div>
-              <div className="text-[#39FF14] font-mono font-bold text-lg drop-shadow-[0_0_8px_rgba(57,255,20,0.3)]">$0.00234</div>
+        <div className="flex items-center gap-6">
+          <div className="text-right">
+            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">Price</div>
+            <div className="text-[#10B981] font-mono font-bold text-lg"><AnimatedCounter value={0.00234} prefix="$" decimals={5} /></div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">24h</div>
+            <div className="text-[#10B981] font-mono font-bold flex items-center gap-1 justify-end">
+              <ArrowUpRight className="w-3.5 h-3.5" /><AnimatedCounter value={18.4} suffix="%" decimals={1} />
             </div>
-            <div>
-              <div className="text-[#8B6A8B] text-xs uppercase mb-0.5 font-semibold">24h Change</div>
-              <div className="text-[#39FF14] font-mono font-bold">+142.5%</div>
-            </div>
-            <div>
-              <div className="text-[#8B6A8B] text-xs uppercase mb-0.5 font-semibold">Market Cap</div>
-              <div className="text-white font-mono font-bold">$1.87M</div>
-            </div>
-            <div>
-              <div className="text-[#8B6A8B] text-xs uppercase mb-0.5 font-semibold">Volume</div>
-              <div className="text-white font-mono font-bold">$423K</div>
-            </div>
+          </div>
+          <div className="text-right hidden sm:block">
+            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">MCap</div>
+            <div className="text-white font-mono font-bold"><AnimatedCounter value={2.34} prefix="$" suffix="M" decimals={2} /></div>
+          </div>
+          <div className="text-right hidden sm:block">
+            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">Vol</div>
+            <div className="text-white font-mono font-bold"><AnimatedCounter value={840} prefix="$" suffix="K" decimals={0} /></div>
           </div>
         </div>
 
-        <div className="flex bg-[#120721] rounded-lg p-1 border border-[rgba(5,213,250,0.2)] relative z-10">
+        {/* Timeframe selector */}
+        <div className="flex bg-[rgba(0,0,0,0.5)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.08)]">
           {TIMEFRAMES.map(t => (
             <button
               key={t}
               onClick={() => setTf(t)}
-              className={`px-3 py-1.5 rounded-md text-sm font-bold font-mono transition-all ${tf === t ? 'bg-[rgba(5,213,250,0.15)] text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]' : 'text-[#8B6A8B] hover:text-[#C8A2C8]'}`}
+              className={`px-2.5 py-1 rounded-md text-xs font-bold font-mono transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${tf === t ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8] shadow-[0_0_8px_rgba(99,102,241,0.15)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
             >
               {t}
             </button>
@@ -201,124 +250,131 @@ export default function TerminalPage() {
         </div>
       </div>
 
-      {/* ── 2 COLUMN LAYOUT ── */}
-      <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
+      {/* ── MAIN GRID ── */}
+      <div className="flex flex-col lg:flex-row gap-3 flex-1 min-h-0">
         
-        {/* LEFT COLUMN */}
-        <div className="flex-1 flex flex-col gap-4 min-w-0">
+        {/* LEFT COLUMN — Chart + Intel */}
+        <div className="flex-1 flex flex-col gap-3 min-w-0">
           
           {/* Chart */}
-          <div className="surface-card relative flex-1 min-h-[300px] overflow-hidden group border border-[rgba(5,213,250,0.2)]">
-            <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_bottom,rgba(5,213,250,0.8),transparent_70%)]" />
-            <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-              <span className="bg-[#1C0B33] border border-[rgba(5,213,250,0.2)] text-[#05D5FA] text-xs px-2 py-1 rounded font-mono shadow-[0_0_10px_rgba(5,213,250,0.2)]">LDOGE / SOL</span>
-              <span className="bg-[rgba(255,42,109,0.1)] border border-[rgba(255,42,109,0.2)] text-[#FF2A6D] text-xs px-2 py-1 rounded font-mono opacity-0 group-hover:opacity-100 transition-opacity">DEMO DATA</span>
+          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl relative flex-1 min-h-[300px] overflow-hidden">
+            {/* Pair label */}
+            <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+              <span className="bg-[rgba(0,0,0,0.7)] backdrop-blur-sm text-[#94A3B8] text-[10px] px-2 py-1 rounded font-mono border border-[rgba(99,102,241,0.08)]">LDOGE/SOL</span>
+              <span className="text-[10px] text-[#334155] font-mono">15m</span>
             </div>
             <AreaChart />
-            <div className="absolute top-0 right-0 h-full w-[60px] border-l border-[rgba(5,213,250,0.1)] bg-[#120721] bg-opacity-90 flex flex-col justify-between py-8 px-2 text-[10px] text-[#8B6A8B] font-mono z-10 backdrop-blur-sm">
+            {/* Y-axis price scale */}
+            <div className="absolute top-0 right-0 h-full w-[52px] bg-[rgba(0,0,0,0.6)] backdrop-blur-sm flex flex-col justify-between py-8 px-1.5 text-[9px] text-[#475569] font-mono z-10 border-l border-[rgba(99,102,241,0.04)]">
               <span>0.00242</span>
               <span>0.00238</span>
-              <span className="text-[#05D5FA] bg-[rgba(5,213,250,0.15)] px-1 rounded shadow-[0_0_5px_rgba(5,213,250,0.3)]">0.00234</span>
+              <span className="text-[#10B981] bg-[rgba(16,185,129,0.1)] px-1 rounded">--</span>
               <span>0.00230</span>
               <span>0.00226</span>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          {/* Bottom panels — Order Book + AI Intel */}
+          <div className="flex gap-3">
+            
             {/* Order Book */}
-            <div className="surface-card p-4 h-[220px] flex flex-col w-1/3">
+            <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 h-[220px] flex flex-col w-1/3">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-white font-bold text-sm">Order Book</h3>
-                <span className="badge-muted text-[10px]">Demo Data</span>
+                <h3 className="text-white font-bold text-xs uppercase tracking-wider">Order Book</h3>
+                <span className="text-[9px] text-[#334155] font-mono">DEMO</span>
               </div>
               
-              <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide text-xs font-mono">
-                <div className="flex justify-between text-[#8B6A8B] mb-2 px-1">
+              <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide text-[11px] font-mono" data-lenis-prevent>
+                <div className="flex justify-between text-[#475569] mb-2 px-1 text-[9px] uppercase tracking-wider">
                   <span>Price</span>
                   <span>Size</span>
                 </div>
                 
                 {/* Asks */}
-                <div className="flex flex-col gap-1 mb-2">
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(255,42,109,0.15)] z-0 rounded-r" style={{ width: '65%' }} />
-                    <span className="text-[#FF2A6D] relative z-10">0.002841</span>
-                    <span className="text-[#C8A2C8] relative z-10">18,200</span>
-                  </div>
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(255,42,109,0.15)] z-0 rounded-r" style={{ width: '85%' }} />
-                    <span className="text-[#FF2A6D] relative z-10">0.002820</span>
-                    <span className="text-[#C8A2C8] relative z-10">31,500</span>
-                  </div>
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(255,42,109,0.15)] z-0 rounded-r" style={{ width: '45%' }} />
-                    <span className="text-[#FF2A6D] relative z-10">0.002810</span>
-                    <span className="text-[#C8A2C8] relative z-10">12,100</span>
-                  </div>
+                <div className="flex flex-col gap-0.5 mb-1.5">
+                  {[
+                    { price: '0.002841', size: '18,200', depth: 65 },
+                    { price: '0.002820', size: '31,500', depth: 85 },
+                    { price: '0.002810', size: '12,100', depth: 45 },
+                  ].map((ask, i) => (
+                    <div key={i} className="flex justify-between px-1 py-0.5 hover:bg-[rgba(239,68,68,0.06)] rounded relative cursor-pointer transition-colors">
+                      <div className="absolute right-0 top-0 h-full bg-[rgba(239,68,68,0.06)] z-0 rounded-r" style={{ width: `${ask.depth}%` }} />
+                      <span className="text-[#EF4444] relative z-10">{ask.price}</span>
+                      <span className="text-[#475569] relative z-10">{ask.size}</span>
+                    </div>
+                  ))}
                 </div>
                 
-                <div className="text-center py-1.5 bg-[#1C0B33] rounded text-[#05D5FA] my-1 border border-[rgba(5,213,250,0.2)] shadow-[0_0_5px_rgba(5,213,250,0.1)]">
+                {/* Spread */}
+                <div className="text-center py-1 bg-[rgba(99,102,241,0.04)] rounded text-[#818CF8] my-1 text-[10px] border border-[rgba(99,102,241,0.06)]">
                   Spread: 0.000012 (0.43%)
                 </div>
                 
                 {/* Bids */}
-                <div className="flex flex-col gap-1 mt-2">
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(57,255,20,0.15)] z-0 rounded-r" style={{ width: '75%' }} />
-                    <span className="text-[#39FF14] relative z-10">0.002798</span>
-                    <span className="text-[#C8A2C8] relative z-10">24,400</span>
-                  </div>
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(57,255,20,0.15)] z-0 rounded-r" style={{ width: '100%' }} />
-                    <span className="text-[#39FF14] relative z-10">0.002780</span>
-                    <span className="text-[#C8A2C8] relative z-10">41,200</span>
-                  </div>
-                  <div className="flex justify-between px-1 hover:bg-[rgba(255,255,255,0.05)] rounded relative group">
-                    <div className="absolute right-0 top-0 h-full bg-[rgba(57,255,20,0.15)] z-0 rounded-r" style={{ width: '55%' }} />
-                    <span className="text-[#39FF14] relative z-10">0.002760</span>
-                    <span className="text-[#C8A2C8] relative z-10">19,800</span>
-                  </div>
+                <div className="flex flex-col gap-0.5 mt-1.5">
+                  {[
+                    { price: '0.002798', size: '24,400', depth: 75 },
+                    { price: '0.002780', size: '41,200', depth: 100 },
+                    { price: '0.002760', size: '19,800', depth: 55 },
+                  ].map((bid, i) => (
+                    <div key={i} className="flex justify-between px-1 py-0.5 hover:bg-[rgba(16,185,129,0.06)] rounded relative cursor-pointer transition-colors">
+                      <div className="absolute right-0 top-0 h-full bg-[rgba(16,185,129,0.06)] z-0 rounded-r" style={{ width: `${bid.depth}%` }} />
+                      <span className="text-[#10B981] relative z-10">{bid.price}</span>
+                      <span className="text-[#475569] relative z-10">{bid.size}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
             {/* AI Intel Panel */}
-            <div className="surface-glass p-4 flex-1 h-[220px] flex flex-col gap-3 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_bottom_right,rgba(57,255,20,0.6),transparent_60%)]" />
-              <div className="flex items-center gap-2 mb-2 relative z-10">
-                <Brain className="w-5 h-5 text-[#39FF14]" />
-                <h3 className="text-white font-bold text-sm drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">AI Intel Layer</h3>
+            <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex-1 h-[220px] flex flex-col gap-3 relative overflow-hidden fluxx-float-slow">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-6 h-6 rounded-md bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
+                  <Brain className="w-3.5 h-3.5 text-[#818CF8]" />
+                </div>
+                <h3 className="text-white font-bold text-xs uppercase tracking-wider">Intel Layer</h3>
+                <div className="ml-auto flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse fluxx-breathe" />
+                  <span className="text-[9px] text-[#475569] font-mono uppercase">Live</span>
+                </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-3 relative z-10">
+              <div className="grid grid-cols-2 gap-2.5 flex-1">
                 {/* Pump Forecast */}
-                <div className="bg-[#120721] p-3 rounded-lg border border-[rgba(5,213,250,0.2)] shadow-[0_0_10px_rgba(5,213,250,0.1)]">
-                  <div className="text-[10px] text-[#05D5FA] font-mono uppercase mb-1">Pump Forecast</div>
-                  <div className="text-xl font-bold text-white flex items-center gap-2">
-                    {intel?.pump ? intel.pump.probability : "..."}
-                    <ArrowUpRight className="w-4 h-4 text-[#39FF14]" />
+                <div className="bg-[rgba(16,185,129,0.04)] border border-[rgba(16,185,129,0.08)] rounded-lg p-3 flex flex-col justify-between fluxx-hover-shimmer">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <TrendingUp className="w-3 h-3 text-[#10B981]" />
+                    <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Pump Forecast</span>
                   </div>
-                  <div className="text-xs text-[#8B6A8B] mt-1">{intel?.pump ? intel.pump.target : "Loading..."}</div>
+                  <div className="text-xl font-bold text-white font-mono">
+                    {intel?.pump ? intel.pump.probability : "..."}
+                  </div>
+                  <div className="text-[10px] text-[#475569] mt-1">{intel?.pump ? intel.pump.target : "Calculating..."}</div>
                 </div>
 
                 {/* Flash Crash Risk */}
-                <div className="bg-[#120721] p-3 rounded-lg border border-[rgba(255,42,109,0.2)] shadow-[0_0_10px_rgba(255,42,109,0.1)]">
-                  <div className="text-[10px] text-[#FF2A6D] font-mono uppercase mb-1">Crash Risk</div>
-                  <div className="text-xl font-bold text-white flex items-center gap-2">
-                    {intel?.crash ? intel.crash.riskLevel : "..."}
-                    <ArrowDownRight className="w-4 h-4 text-[#FF2A6D]" />
+                <div className="bg-[rgba(239,68,68,0.04)] border border-[rgba(239,68,68,0.08)] rounded-lg p-3 flex flex-col justify-between fluxx-hover-shimmer">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Activity className="w-3 h-3 text-[#EF4444]" />
+                    <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Crash Risk</span>
                   </div>
-                  <div className="text-xs text-[#8B6A8B] mt-1">Volatility active</div>
+                  <div className="text-xl font-bold text-white font-mono">
+                    {intel?.crash ? intel.crash.riskLevel : "..."}
+                  </div>
+                  <div className="text-[10px] text-[#475569] mt-1">Volatility active</div>
                 </div>
               </div>
 
               {/* Narrative Radar */}
-              <div className="bg-[#1C0B33] p-3 rounded-lg border border-[rgba(57,255,20,0.2)] shadow-[0_0_10px_rgba(57,255,20,0.1)] mt-auto relative z-10">
+              <div className="bg-[rgba(99,102,241,0.04)] border border-[rgba(99,102,241,0.06)] rounded-lg p-2.5">
                  <div className="flex justify-between items-center mb-1">
-                   <span className="text-[10px] text-[#39FF14] font-mono uppercase">Narrative Radar</span>
-                   <span className="badge-success text-[8px] bg-[rgba(57,255,20,0.15)] text-[#39FF14]">LIVE</span>
+                   <div className="flex items-center gap-1.5">
+                     <Zap className="w-3 h-3 text-[#818CF8]" />
+                     <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Narrative</span>
+                   </div>
                  </div>
-                 <div className="text-xs text-[#F8F0FF]">
+                 <div className="text-[11px] text-[#94A3B8] leading-relaxed">
                    {intel?.radar ? intel.radar.summary : "Scanning socials..."}
                  </div>
               </div>
@@ -326,111 +382,122 @@ export default function TerminalPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="w-full lg:w-[340px] flex flex-col gap-4 flex-shrink-0 min-h-0">
+        {/* RIGHT COLUMN — Trade + Copilot */}
+        <div className="w-full lg:w-[320px] flex flex-col gap-3 flex-shrink-0 min-h-0">
           
           {/* Trade Panel */}
-          <div className="surface-panel p-5 flex flex-col gap-4 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(0,0,0,0.8),transparent_50%)]" />
-            <div className="flex bg-[#120721] rounded-lg p-1 border border-[rgba(255,42,109,0.2)] relative z-10">
+          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex flex-col gap-3.5">
+            
+            {/* Buy/Sell Toggle */}
+            <div className="flex bg-[rgba(0,0,0,0.5)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.06)]">
               <button 
                 onClick={() => setSide("BUY")}
-                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all ${side === "BUY" ? 'bg-gradient-to-r from-[#39FF14] to-[#25A110] text-[#0B0414] shadow-[0_0_10px_rgba(57,255,20,0.5)]' : 'text-[#8B6A8B] hover:text-white'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
               >BUY</button>
               <button 
                 onClick={() => setSide("SELL")}
-                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all ${side === "SELL" ? 'bg-gradient-to-r from-[#FF2A6D] to-[#B30637] text-white shadow-[0_0_10px_rgba(255,42,109,0.5)]' : 'text-[#8B6A8B] hover:text-white'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "SELL" ? 'bg-[#EF4444] text-white shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
               >SELL</button>
             </div>
 
-            <div className="relative z-10">
+            {/* Amount input */}
+            <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-sm text-[#C8A2C8] font-semibold">Amount (SOL)</label>
-                <span className="text-xs text-[#05D5FA] font-mono shadow-[0_0_5px_rgba(5,213,250,0.2)]">Bal: 12.45 SOL</span>
+                <label className="text-xs text-[#475569] font-semibold uppercase tracking-wider">Amount (SOL)</label>
+                <span className="text-[10px] text-[#475569] font-mono">Bal: -- SOL</span>
               </div>
-              <div className="bg-[#120721] border border-[rgba(255,42,109,0.2)] rounded-lg p-1 flex items-center focus-within:border-[rgba(255,42,109,0.6)] focus-within:shadow-[0_0_10px_rgba(255,42,109,0.2)] transition-all">
+              <div className="bg-[rgba(0,0,0,0.5)] border border-[rgba(99,102,241,0.08)] rounded-lg p-1 flex items-center focus-within:border-[rgba(99,102,241,0.25)] focus-within:shadow-[0_0_12px_rgba(99,102,241,0.08)] transition-all">
                 <input 
                   type="number" 
                   value={amount}
                   onChange={e => setAmount(e.target.value)}
                   placeholder="0.0"
-                  className="w-full bg-transparent p-2 text-white font-mono focus:outline-none"
+                  className="w-full bg-transparent p-2 text-white font-mono text-sm focus-visible:ring-0 focus-visible:outline-none"
                 />
                 <div className="flex gap-1 pr-1">
-                  {['25%','50%','100%'].map(pct => (
-                    <button key={pct} onClick={() => setAmount(pct === '100%' ? '12.45' : pct === '50%' ? '6.22' : '3.11')} className="px-2 py-1 bg-[#1C0B33] text-xs text-[#05D5FA] border border-[rgba(5,213,250,0.2)] rounded hover:bg-[rgba(5,213,250,0.1)] transition-colors font-mono">{pct}</button>
+                  {['25%','50%','MAX'].map(pct => (
+                    <button key={pct} onClick={() => setAmount(pct === 'MAX' ? '12.45' : pct === '50%' ? '6.22' : '3.11')} className="px-2 py-1 bg-[rgba(99,102,241,0.06)] text-[10px] text-[#818CF8] border border-[rgba(99,102,241,0.1)] rounded hover:bg-[rgba(99,102,241,0.12)] transition-colors font-mono font-bold focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">{pct}</button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="bg-[rgba(5,213,250,0.05)] border border-[rgba(5,213,250,0.2)] rounded-lg p-3 text-sm flex justify-between items-center relative z-10">
-              <span className="text-[#C8A2C8]">You receive</span>
-              <span className="text-white font-mono font-bold">~{expectedTokens.toLocaleString(undefined, {maximumFractionDigits: 0})} LDOGE</span>
+            {/* Expected output */}
+            <div className="bg-[rgba(99,102,241,0.04)] border border-[rgba(99,102,241,0.06)] rounded-lg p-3 text-sm flex justify-between items-center">
+              <span className="text-[#475569] text-xs">You receive</span>
+              <span className="text-white font-mono font-bold text-sm">~{expectedTokens.toLocaleString(undefined, {maximumFractionDigits: 0})} LDOGE</span>
             </div>
 
-            <div className="flex justify-between items-center bg-[#120721] border border-[rgba(255,42,109,0.15)] rounded-lg px-3 py-2 relative z-10">
-              <span className="text-sm text-[#8B6A8B] flex items-center gap-1"><Settings2 className="w-3.5 h-3.5"/> Slippage</span>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSlippage("0.5")} className="w-6 h-6 flex items-center justify-center bg-[#1C0B33] text-[#05D5FA] rounded border border-[rgba(5,213,250,0.2)] hover:bg-[rgba(5,213,250,0.1)]">-</button>
-                <span className="text-sm font-mono text-white w-8 text-center">{slippage}%</span>
-                <button onClick={() => setSlippage("2.0")} className="w-6 h-6 flex items-center justify-center bg-[#1C0B33] text-[#05D5FA] rounded border border-[rgba(5,213,250,0.2)] hover:bg-[rgba(5,213,250,0.1)]">+</button>
+            {/* Slippage */}
+            <div className="flex justify-between items-center bg-[rgba(0,0,0,0.3)] border border-[rgba(99,102,241,0.04)] rounded-lg px-3 py-2">
+              <span className="text-xs text-[#475569] flex items-center gap-1"><Settings2 className="w-3 h-3"/> Slippage</span>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setSlippage("0.5")} className="w-5 h-5 flex items-center justify-center bg-[rgba(99,102,241,0.08)] text-[#818CF8] rounded text-xs border border-[rgba(99,102,241,0.1)] hover:bg-[rgba(99,102,241,0.15)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">-</button>
+                <span className="text-xs font-mono text-white w-7 text-center">{slippage}%</span>
+                <button onClick={() => setSlippage("2.0")} className="w-5 h-5 flex items-center justify-center bg-[rgba(99,102,241,0.08)] text-[#818CF8] rounded text-xs border border-[rgba(99,102,241,0.1)] hover:bg-[rgba(99,102,241,0.15)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">+</button>
               </div>
             </div>
 
-            <button className={`relative z-10 w-full py-3 rounded-lg font-bold text-white text-base transition-all shadow-[0_0_15px_rgba(0,0,0,0.3)] ${side === "BUY" ? 'bg-gradient-to-r from-[#39FF14] to-[#25A110] text-[#0B0414] hover:shadow-[0_0_20px_rgba(57,255,20,0.6)]' : 'bg-gradient-to-r from-[#FF2A6D] to-[#B30637] hover:shadow-[0_0_20px_rgba(255,42,109,0.6)]'}`}>
-              {side} LDOGE
-            </button>
-            <div className="text-[10px] text-center text-[#475569] flex items-center justify-center gap-1">
-              <AlertTriangle className="w-3 h-3" /> Trading involves risk. Demo mode active.
+            {/* Execute button */}
+            <MagneticButton as="div" strength={0.25} className="w-full">
+              <button className={`w-full py-3 rounded-lg font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-[#EF4444] text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]'}`}>
+                {side} LDOGE
+              </button>
+            </MagneticButton>
+            <div className="text-[9px] text-center text-[#334155] flex items-center justify-center gap-1 font-mono">
+              <AlertTriangle className="w-2.5 h-2.5" /> Demo mode · Trading involves risk
             </div>
           </div>
 
-          {/* Trade Copilot */}
-          <div className="surface-glass flex flex-col flex-1 min-h-[220px]">
-            <div className="p-3 border-b border-[rgba(5,213,250,0.2)] flex items-center gap-2 bg-[rgba(5,213,250,0.05)]">
-              <div className="w-6 h-6 rounded bg-[rgba(5,213,250,0.15)] flex items-center justify-center text-[#05D5FA] shadow-[0_0_10px_rgba(5,213,250,0.2)]">
-                <Bot className="w-3.5 h-3.5" />
+          {/* Trade Copilot Chat */}
+          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl flex flex-col flex-1 min-h-[200px]">
+            <div className="px-3 py-2.5 border-b border-[rgba(99,102,241,0.06)] flex items-center gap-2 fluxx-hover-shimmer">
+              <div className="w-5 h-5 rounded-md bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
+                <Bot className="w-3 h-3 text-[#818CF8]" />
               </div>
-              <span className="font-bold text-sm text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Trade Copilot</span>
-              <span className="badge-indigo text-[10px] ml-auto">AI</span>
+              <span className="font-bold text-xs text-white uppercase tracking-wider">Copilot</span>
+              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
             </div>
             
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-hide text-sm" ref={copilotScrollRef}>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2.5 scrollbar-hide text-[13px]" ref={copilotScrollRef} data-lenis-prevent>
               {copilotMessages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-2.5 rounded-xl ${msg.role === 'user' ? 'bg-[linear-gradient(135deg,#FF2A6D,#E61E5B)] text-white rounded-tr-sm shadow-[0_0_10px_rgba(255,42,109,0.3)]' : 'bg-[#120721] border border-[rgba(5,213,250,0.2)] text-[#F8F0FF] rounded-tl-sm shadow-[0_0_10px_rgba(5,213,250,0.1)]'}`}>
+                  <div className={`max-w-[85%] px-3 py-2 rounded-xl leading-relaxed ${
+                    msg.role === 'user' 
+                      ? 'bg-[rgba(99,102,241,0.12)] text-white rounded-tr-sm border border-[rgba(99,102,241,0.15)]' 
+                      : 'bg-[rgba(0,0,0,0.5)] text-[#94A3B8] rounded-tl-sm border border-[rgba(99,102,241,0.06)]'
+                  }`}>
                     {msg.content}
                   </div>
                 </div>
               ))}
               {copilotLoading && (
                 <div className="flex justify-start">
-                  <div className="max-w-[85%] p-2.5 rounded-xl bg-[#120721] border border-[rgba(5,213,250,0.2)] text-[#05D5FA] rounded-tl-sm flex gap-1 items-center shadow-[0_0_10px_rgba(5,213,250,0.1)]">
-                    <span className="w-1.5 h-1.5 bg-[#05D5FA] rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-[#05D5FA] rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
-                    <span className="w-1.5 h-1.5 bg-[#05D5FA] rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
+                  <div className="max-w-[85%] px-3 py-2 rounded-xl bg-[rgba(0,0,0,0.5)] text-[#818CF8] rounded-tl-sm flex gap-1.5 items-center border border-[rgba(99,102,241,0.06)]">
+                    <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" />
+                    <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
+                    <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
                   </div>
                 </div>
               )}
             </div>
             
-            <div className="p-2 border-t border-[rgba(5,213,250,0.2)]">
-              <div className="bg-[#120721] border border-[rgba(255,42,109,0.3)] rounded-lg p-1 flex shadow-[0_0_10px_rgba(255,42,109,0.1)] focus-within:shadow-[0_0_15px_rgba(255,42,109,0.3)] transition-all">
+            <div className="p-2 border-t border-[rgba(99,102,241,0.06)]">
+              <div className="bg-[rgba(0,0,0,0.5)] border border-[rgba(99,102,241,0.08)] rounded-lg p-0.5 flex focus-within:border-[rgba(99,102,241,0.2)] transition-all">
                 <input 
                   type="text"
                   value={copilotInput}
                   onChange={e => setCopilotInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendCopilotMessage(copilotInput)}
                   placeholder="Ask about this trade..."
-                  className="flex-1 bg-transparent px-2 py-1.5 text-sm text-white placeholder:text-[#8B6A8B] focus:outline-none"
+                  className="flex-1 bg-transparent px-2.5 py-1.5 text-sm text-white placeholder:text-[#334155] focus-visible:ring-0 focus-visible:outline-none"
                 />
                 <button 
                   onClick={() => sendCopilotMessage(copilotInput)}
                   disabled={!copilotInput.trim() || copilotLoading}
-                  className="w-8 flex items-center justify-center text-[#FF2A6D] hover:text-[#FF5C97] disabled:opacity-50 transition-colors drop-shadow-[0_0_5px_currentColor]"
+                  className="w-7 flex items-center justify-center text-[#818CF8] hover:text-[#A5B4FC] disabled:opacity-30 transition-colors active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
                 >
-                  <SendHorizonal className="w-4 h-4" />
+                  <SendHorizonal className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>

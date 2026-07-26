@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Wallet, Activity, Shield, Award, Zap, TrendingUp, Users, Flame, Star, Crown, ChevronRight, Copy, Check } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
+import AnimatedCounter from '@/components/AnimatedCounter';
+import MagneticButton from '@/components/MagneticButton';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -26,8 +28,8 @@ const CREATOR_ECONOMY = {
   launches: 12,
   successRate: "100%",
   avgRetention: "78%",
-  earnings: "$42,500",
-  followers: 4520,
+  earnings: "--",
+  followers: 0,
   following: 124,
 };
 
@@ -58,13 +60,13 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto w-full pt-8 pb-16">
+    <div className="max-w-6xl mx-auto w-full pt-8 pb-16 w-full max-w-full overflow-x-hidden">
       
       {/* ── TOP SECTION ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         
         {/* IDENTITY CARD */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="surface-card p-6 flex flex-col justify-between border-t-4 border-t-[#6366F1] shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 flex flex-col justify-between border-t-4 border-t-[#6366F1] shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
           
           <div className="flex justify-between items-start mb-4 relative z-10">
@@ -73,38 +75,40 @@ export default function ProfilePage() {
                 <User className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+                <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">
                   DegenDave
                   <span className="bg-[#6366F1] text-[10px] text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-bold shadow-[0_0_10px_rgba(99,102,241,0.5)]">Pro</span>
                 </h2>
                 <div className="flex items-center gap-2">
                   <span className="text-[#818CF8] font-mono text-sm">@degendave</span>
-                  <button className="text-[#475569] hover:text-white transition-colors" title="Copy Address">
+                  <button className="text-[#475569] hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none" title="Copy Address">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
             </div>
             
-            <button 
-              onClick={() => setIsFollowing(!isFollowing)}
-              className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border flex items-center gap-2 ${isFollowing ? 'bg-transparent border-[rgba(255,255,255,0.2)] text-white hover:border-[rgba(244,63,94,0.5)] hover:text-[#F43F5E]' : 'bg-[#6366F1] border-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5]'}`}
-            >
-              {isFollowing ? (
-                <>Following</>
-              ) : (
-                <>Follow</>
-              )}
-            </button>
+            <MagneticButton as="div" strength={0.25}>
+              <button 
+                onClick={() => setIsFollowing(!isFollowing)}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isFollowing ? 'bg-transparent border-[rgba(255,255,255,0.2)] text-white hover:border-[rgba(244,63,94,0.5)] hover:text-[#F43F5E]' : 'bg-[#6366F1] border-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5]'}`}
+              >
+                {isFollowing ? (
+                  <>Following</>
+                ) : (
+                  <>Follow</>
+                )}
+              </button>
+            </MagneticButton>
           </div>
 
           <div className="flex items-center gap-6 mb-6 relative z-10 text-sm">
             <div className="flex flex-col">
-              <span className="text-white font-bold text-lg">{CREATOR_ECONOMY.followers.toLocaleString()}</span>
+              <span className="text-white font-bold text-lg">{CREATOR_ECONOMY.followers > 0 ? <AnimatedCounter value={CREATOR_ECONOMY.followers} /> : "--"}</span>
               <span className="text-[#94A3B8]">Followers</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-bold text-lg">{CREATOR_ECONOMY.following.toLocaleString()}</span>
+              <span className="text-white font-bold text-lg"><AnimatedCounter value={CREATOR_ECONOMY.following} /></span>
               <span className="text-[#94A3B8]">Following</span>
             </div>
           </div>
@@ -112,44 +116,46 @@ export default function ProfilePage() {
           <div className="relative z-10 border-t border-[rgba(255,255,255,0.05)] pt-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[#94A3B8] text-sm flex items-center gap-1.5"><Crown className="w-4 h-4 text-[#F59E0B]" /> Level 42</span>
-              <span className="text-[#818CF8] font-mono font-bold">94,200 XP</span>
+              <span className="text-[#818CF8] font-mono font-bold"><AnimatedCounter value={94200} /> XP</span>
             </div>
             <div className="h-2 w-full bg-[rgba(99,102,241,0.1)] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
-              <div className="h-full bg-[#6366F1] w-[75%] shadow-[0_0_10px_#6366F1]" />
+              <div className="h-full bg-[#6366F1] w-[75%] shadow-[0_0_10px_#6366F1] transition-all duration-700 ease-out" />
             </div>
           </div>
         </motion.div>
 
         {/* PORTFOLIO SUMMARY */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="surface-card p-6 flex flex-col justify-center border border-[rgba(16,185,129,0.2)] shadow-[0_0_20px_rgba(16,185,129,0.05)] relative overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 flex flex-col justify-center border border-[rgba(16,185,129,0.2)] shadow-[0_0_20px_rgba(16,185,129,0.05)] relative overflow-hidden">
           <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_bottom,rgba(16,185,129,0.8),transparent_70%)]" />
           <div className="flex items-center gap-2 text-[#94A3B8] mb-2 font-semibold relative z-10">
             <Wallet className="w-4 h-4" /> Total Balance
           </div>
-          <div className="text-4xl font-mono font-bold text-white mb-2 relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">$14,560.00</div>
+          <div className="text-4xl font-mono font-bold text-white mb-2 relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">$--</div>
           <div className="flex items-center gap-2 relative z-10">
             <span className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-1 rounded text-sm font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)] border border-[rgba(16,185,129,0.3)]">
-              <TrendingUp className="w-3.5 h-3.5" /> +24.5%
+              <TrendingUp className="w-3.5 h-3.5" /> --%
             </span>
             <span className="text-[#475569] text-sm">Past 30 days</span>
           </div>
         </motion.div>
 
         {/* AI WALLET ROAST */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="surface-card p-6 border border-[rgba(244,63,94,0.3)] bg-[rgba(244,63,94,0.02)] relative overflow-hidden flex flex-col">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 border border-[rgba(244,63,94,0.3)] bg-[rgba(244,63,94,0.02)] relative overflow-hidden flex flex-col">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,rgba(244,63,94,0.8),transparent_60%)]" />
           <div className="flex justify-between items-center mb-4 relative z-10">
             <div className="flex items-center gap-2 text-[#F43F5E] font-bold text-sm uppercase tracking-wider drop-shadow-[0_0_5px_currentColor]">
               <Flame className="w-4 h-4" /> AI Wallet Roast
             </div>
             {!roastData && (
-              <button 
-                onClick={handleRoast} 
-                disabled={isRoasting}
-                className="bg-[rgba(244,63,94,0.15)] hover:bg-[rgba(244,63,94,0.25)] text-[#F43F5E] text-xs font-bold px-3 py-1.5 rounded transition-all border border-[rgba(244,63,94,0.3)] disabled:opacity-50"
-              >
-                {isRoasting ? 'Roasting...' : 'Roast Me'}
-              </button>
+              <MagneticButton as="div" strength={0.25}>
+                <button 
+                  onClick={handleRoast} 
+                  disabled={isRoasting}
+                  className="bg-[rgba(244,63,94,0.15)] hover:bg-[rgba(244,63,94,0.25)] text-[#F43F5E] text-xs font-bold px-3 py-1.5 rounded transition-all border border-[rgba(244,63,94,0.3)] disabled:opacity-50 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
+                >
+                  {isRoasting ? 'Roasting...' : 'Roast Me'}
+                </button>
+              </MagneticButton>
             )}
           </div>
           
@@ -163,7 +169,7 @@ export default function ProfilePage() {
                     <div className="text-[10px] uppercase text-[#94A3B8]">Score</div>
                   </div>
                 </div>
-                <p className="text-[#F1F5F9] text-sm leading-relaxed italic border-l-2 border-[#F43F5E] pl-3">
+                <p className="text-[#F1F5F9] text-sm leading-relaxed border-l-2 border-[#F43F5E] pl-3">
                   "{roastData.roast}"
                 </p>
                 <div className="flex justify-between text-xs pt-2 font-mono">
@@ -184,18 +190,18 @@ export default function ProfilePage() {
 
       {/* ── TABS ── */}
       <div className="flex gap-4 mb-6 border-b border-[rgba(255,255,255,0.05)]">
-        <button
+        <MagneticButton
           onClick={() => setActiveTab('portfolio')}
-          className={`pb-3 font-medium transition-colors border-b-2 ${activeTab === 'portfolio' ? 'border-[#6366F1] text-white shadow-[0_2px_10px_rgba(99,102,241,0.3)]' : 'border-transparent text-[#94A3B8] hover:text-white'}`}
+          className={`pb-3 font-medium transition-colors border-b-2 focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${activeTab === 'portfolio' ? 'border-[#6366F1] text-white shadow-[0_2px_10px_rgba(99,102,241,0.3)]' : 'border-transparent text-[#94A3B8] hover:text-white'}`}
         >
           Portfolio & Assets
-        </button>
-        <button
+        </MagneticButton>
+        <MagneticButton
           onClick={() => setActiveTab('creator')}
-          className={`pb-3 font-medium transition-colors border-b-2 ${activeTab === 'creator' ? 'border-[#10B981] text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]' : 'border-transparent text-[#94A3B8] hover:text-white'}`}
+          className={`pb-3 font-medium transition-colors border-b-2 focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${activeTab === 'creator' ? 'border-[#10B981] text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]' : 'border-transparent text-[#94A3B8] hover:text-white'}`}
         >
           Creator Economy
-        </button>
+        </MagneticButton>
       </div>
 
       {/* ── PORTFOLIO TAB ── */}
@@ -203,14 +209,14 @@ export default function ProfilePage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
           
           {/* Holdings Table */}
-          <div className="surface-card overflow-hidden">
-            <div className="p-5 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(0,0,0,0.2)]">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] overflow-hidden">
+            <div className="p-5 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)]">
               <h3 className="text-lg font-bold text-white">Current Holdings</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-[rgba(255,255,255,0.05)] text-[#94A3B8] font-mono text-xs uppercase bg-[#0D1117]">
+                  <tr className="border-b border-[rgba(255,255,255,0.05)] text-[#94A3B8] font-mono text-xs uppercase bg-[var(--color-surface-1)]">
                     <th className="p-4 font-semibold">Asset</th>
                     <th className="p-4 font-semibold">Balance</th>
                     <th className="p-4 font-semibold">Value</th>
@@ -250,9 +256,9 @@ export default function ProfilePage() {
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
               <Award className="w-5 h-5 text-[#F59E0B]" /> Achievements
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {ACHIEVEMENTS.map((ach, i) => (
-                <div key={i} className={`surface-card p-5 border relative overflow-hidden transition-all ${ach.unlocked ? 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] shadow-[0_0_10px_rgba(0,0,0,0.5)]' : 'border-[rgba(255,255,255,0.05)] opacity-50 grayscale'}`}>
+                <div key={i} className={`bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 border relative overflow-hidden transition-all ${ach.unlocked ? 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] shadow-[0_0_10px_rgba(0,0,0,0.5)]' : 'border-[rgba(255,255,255,0.05)] opacity-50 grayscale'}`}>
                   {ach.unlocked && (
                     <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full opacity-10" style={{ backgroundColor: ach.color }} />
                   )}
@@ -274,49 +280,49 @@ export default function ProfilePage() {
       {activeTab === 'creator' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
           
-          <div className="surface-card p-8 border border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.02)] flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-8 border border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.02)] flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.05)]">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_left,rgba(16,185,129,0.8),transparent_50%)]" />
             <div className="relative z-10">
-              <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+              <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">
                 <Crown className="w-6 h-6 text-[#10B981]" /> Creator Status: Elite
               </h2>
               <p className="text-[#94A3B8] max-w-lg">You are ranked in the top 5% of creators on MoonFluxx. Your launches receive priority indexing and verified badges.</p>
             </div>
             <div className="flex items-center gap-4 relative z-10">
               <div className="text-center">
-                <div className="text-3xl font-mono font-bold text-[#10B981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">{CREATOR_ECONOMY.score}</div>
+                <div className="text-3xl font-mono font-bold text-[#10B981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"><AnimatedCounter value={CREATOR_ECONOMY.score} /></div>
                 <div className="text-[10px] text-[#94A3B8] uppercase font-bold tracking-wider">Creator Score</div>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="surface-card p-5 border-l-2 border-l-[#10B981]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 border-l-2 border-l-[#10B981]">
               <div className="text-[#94A3B8] text-sm mb-1">Total Earnings</div>
               <div className="text-2xl font-mono font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{CREATOR_ECONOMY.earnings}</div>
             </div>
-            <div className="surface-card p-5 border-l-2 border-l-[#6366F1]">
+            <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 border-l-2 border-l-[#6366F1]">
               <div className="text-[#94A3B8] text-sm mb-1">Tokens Launched</div>
               <div className="text-2xl font-mono font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{CREATOR_ECONOMY.launches}</div>
             </div>
-            <div className="surface-card p-5 border-l-2 border-l-[#F43F5E]">
+            <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 border-l-2 border-l-[#F43F5E]">
               <div className="text-[#94A3B8] text-sm mb-1">Success Rate</div>
               <div className="text-2xl font-mono font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{CREATOR_ECONOMY.successRate}</div>
             </div>
-            <div className="surface-card p-5 border-l-2 border-l-[#F59E0B]">
+            <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 border-l-2 border-l-[#F59E0B]">
               <div className="text-[#94A3B8] text-sm mb-1">Avg Retention</div>
               <div className="text-2xl font-mono font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{CREATOR_ECONOMY.avgRetention}</div>
             </div>
           </div>
 
-          <div className="surface-card p-6">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6">
             <h3 className="text-lg font-bold text-white mb-6">Recent Launches</h3>
             <div className="space-y-4">
               {[
-                { name: "Luna Doge", ticker: "LDOGE", mcap: "$1.87M", date: "2 weeks ago", rev: "$12,400", status: "Graduated" },
-                { name: "AstroCat", ticker: "ACAT", mcap: "$420K", date: "1 month ago", rev: "$4,200", status: "Live" },
+                { name: "Luna Doge", ticker: "LDOGE", mcap: "--", date: "2 weeks ago", rev: "--", status: "Graduated" },
+                { name: "AstroCat", ticker: "ACAT", mcap: "--", date: "1 month ago", rev: "--", status: "Live" },
               ].map((launch, i) => (
-                <div key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-[#080B12] rounded-xl border border-[rgba(255,255,255,0.05)] gap-4 hover:border-[rgba(99,102,241,0.3)] transition-colors">
+                <div key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-xl border border-[rgba(255,255,255,0.05)] gap-4 hover:border-[rgba(99,102,241,0.3)] transition-colors">
                   <div>
                     <div className="font-bold text-white flex items-center gap-2">
                       {launch.name} <span className="text-[#6366F1] font-mono text-xs">${launch.ticker}</span>

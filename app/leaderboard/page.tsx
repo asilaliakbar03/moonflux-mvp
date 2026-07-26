@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Trophy, Flame, Target, Star, ChevronRight, Crown } from "lucide-react";
+import { Trophy, Flame, Target, Star } from "lucide-react";
 import { useState } from "react";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
+import AnimatedCounter from "@/components/AnimatedCounter";
+import MagneticButton from "@/components/MagneticButton";
 
 const ALL_TRADERS = {
   "top-traders": [
@@ -46,100 +46,88 @@ export default function LeaderboardPage() {
   const [activeCat, setActiveCat] = useState<CategoryKey>("top-traders");
   const traders = ALL_TRADERS[activeCat];
 
-  // Podium order: 2nd, 1st, 3rd
-  const podium = [traders[1], traders[0], traders[2]].filter(Boolean);
+  // Top 3 featured
+  const topThree = traders.slice(0, 3);
   const rest = traders.slice(3);
 
   return (
-    <div className="max-w-5xl mx-auto w-full pt-8 pb-16">
+    <div className="max-w-5xl mx-auto w-full pt-8 pb-16 px-4">
       
-      {/* ── HEADER ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16 text-center md:text-left">
+      {/* HEADER */}
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 text-center md:text-left">
         <div>
           <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-            <h1 className="text-4xl font-bold font-display text-[#F1F5F9] flex items-center gap-3">
-              <Trophy className="w-8 h-8 text-[#F59E0B]" />
+            <h1 className="text-3xl font-semibold text-[#F1F5F9] flex items-center gap-3 tracking-tight">
+              <Trophy className="w-7 h-7 text-[#F59E0B]" />
               Leaderboard
             </h1>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[rgba(99,102,241,0.15)] text-[#818CF8] border border-[rgba(99,102,241,0.3)]">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(99,102,241,0.1)] text-[#818CF8] border border-[rgba(99,102,241,0.2)]">
               Season 1
             </span>
           </div>
-          <p className="text-[#94A3B8]">The highest ranked traders on MoonFluxx. Updated in real-time.</p>
+          <p className="text-[#94A3B8] text-sm">The highest ranked traders on MoonFluxx. Updated in real-time.</p>
         </div>
         
-        <div className="flex p-1.5 flex-nowrap overflow-x-auto max-w-full fluxx-card rounded-2xl">
+        <div className="flex p-1 flex-nowrap overflow-x-auto max-w-full rounded-xl bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)]" role="tablist">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon;
             const active = activeCat === cat.id;
             return (
-              <button
+              <MagneticButton
                 key={cat.id}
+                role="tab"
+                aria-selected={active}
                 onClick={() => setActiveCat(cat.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl whitespace-nowrap font-medium text-sm transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap font-medium text-sm transition-all duration-200 focus-visible:outline-none ${
                   active 
-                    ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
-                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[rgba(255,255,255,0.05)]'
+                    ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8]' 
+                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[rgba(99,102,241,0.04)]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 {cat.label}
-              </button>
+              </MagneticButton>
             );
           })}
         </div>
       </motion.div>
 
-      {/* ── PODIUM ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col md:flex-row justify-center items-end gap-4 md:gap-6 mb-16 px-4">
-        {podium.map((trader, i) => {
-          const isFirst = i === 1; // 2nd, 1st, 3rd mapping
-          const rankNum = isFirst ? 1 : i === 0 ? 2 : 3;
+      {/* TOP 3 FEATURED CARDS */}
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {topThree.map((trader, i) => {
+          const rankNum = i + 1;
+          const borderColors = {
+            1: 'border-[#F59E0B]',
+            2: 'border-[#94A3B8]',
+            3: 'border-[#CD7F32]'
+          };
           
-          const colors = {
-            1: { border: '#F59E0B', shadow: 'rgba(245,158,11,0.3)', bg: 'rgba(245,158,11,0.15)', text: '#F59E0B' },
-            2: { border: '#94A3B8', shadow: 'rgba(148,163,184,0.2)', bg: 'rgba(148,163,184,0.15)', text: '#94A3B8' },
-            3: { border: '#CD7F32', shadow: 'rgba(205,127,50,0.2)', bg: 'rgba(205,127,50,0.15)', text: '#CD7F32' }
-          }[rankNum];
-
           return (
-            <div key={trader.name} className={`flex flex-col items-center relative transition-transform duration-500 hover:-translate-y-4 ${isFirst ? 'order-1 md:order-2 z-20' : 'order-2 md:order-1 z-10'} ${i===2 ? 'md:order-3' : ''}`}>
-              
-              <div 
-                className={`w-full min-w-[160px] md:min-w-[200px] flex flex-col items-center justify-between rounded-t-3xl border-t-2 border-x border-b-0 relative overflow-hidden pt-8 pb-6 px-4 fluxx-card`}
-                style={{ 
-                  height: isFirst ? '280px' : '220px', 
-                  borderColor: colors.border,
-                  boxShadow: `0 0 ${isFirst ? '30px' : '20px'} ${colors.shadow}`
-                }}
-              >
-                {/* Top Glow Ray */}
-                <div className="absolute top-0 inset-x-0 h-40 opacity-40 mix-blend-screen" style={{ background: `radial-gradient(circle at top, ${colors.border}, transparent 70%)` }} />
+            <div key={trader.name} className={`flex items-center p-5 rounded-xl bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] border-l-2 ${borderColors[rankNum as keyof typeof borderColors]}`}>
+              <div className="flex-1 flex flex-col">
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-4xl font-light text-[#F1F5F9] font-mono leading-none">#{rankNum}</span>
+                  <div>
+                    <div className="font-semibold text-[#F1F5F9] truncate">{trader.name}</div>
+                    <div className="text-xs text-[#94A3B8] font-mono">{trader.handle}</div>
+                  </div>
+                </div>
                 
-                {/* Avatar */}
-                <div className="w-20 h-20 rounded-full border-2 flex items-center justify-center text-3xl font-display font-bold fluxx-card relative z-10 shadow-2xl"
-                     style={{ borderColor: colors.border, color: '#F1F5F9', boxShadow: `0 0 20px ${colors.bg}` }}>
-                  {trader.name.charAt(0)}
-                  {isFirst && <Crown className="absolute -top-7 w-8 h-8 drop-shadow-[0_0_12px_rgba(245,158,11,0.8)] text-[#F59E0B]" />}
-                  <div className="absolute -bottom-3 border rounded-full px-3 py-0.5 text-xs font-bold font-mono shadow-lg"
-                       style={{ borderColor: colors.border, color: colors.text, background: colors.bg }}>
-                    #{rankNum}
+                <div className="grid grid-cols-3 gap-2 text-sm mt-1">
+                  <div>
+                    <div className="text-[#475569] text-xs mb-0.5">XP</div>
+                    <AnimatedCounter value={trader.xp} className="text-[#F1F5F9] font-mono" />
                   </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex flex-col items-center relative z-10 w-full mt-auto">
-                  <div className="font-bold text-[#F1F5F9] text-lg md:text-xl truncate w-full text-center drop-shadow-md mb-1">{trader.name}</div>
-                  <div className="text-[#94A3B8] font-mono text-xs md:text-sm mb-3">{trader.xp.toLocaleString()} XP</div>
-                  <div className="font-bold font-mono tracking-tight px-4 py-1.5 rounded-xl border text-[#10B981]"
-                       style={{ borderColor: colors.border, backgroundColor: colors.bg, boxShadow: `0 0 10px ${colors.bg}` }}>
-                    {trader.pnl}
+                  <div>
+                    <div className="text-[#475569] text-xs mb-0.5">Win Rate</div>
+                    <div className={`font-mono ${trader.win >= 80 ? 'text-[#10B981]' : 'text-[#F1F5F9]'}`}>
+                      <AnimatedCounter value={trader.win} suffix="%" decimals={1} className="font-mono" />
+                    </div>
                   </div>
-                </div>
-
-                {/* Large Background Number */}
-                <div className="absolute -bottom-6 -right-2 text-[120px] font-black font-display opacity-[0.07] select-none pointer-events-none leading-none" style={{ color: colors.text }}>
-                  {rankNum}
+                  <div>
+                    <div className="text-[#475569] text-xs mb-0.5">PNL</div>
+                    <div className="text-[#10B981] font-mono">{trader.pnl}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -147,71 +135,58 @@ export default function LeaderboardPage() {
         })}
       </motion.div>
 
-      {/* ── LEADERBOARD LIST ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <div className="flex flex-col gap-2">
+      {/* LEADERBOARD LIST */}
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="w-full overflow-x-auto pb-4">
+        <div className="flex flex-col gap-1 min-w-[700px] bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl p-2">
           {/* Header Row */}
-          <div className="flex items-center px-4 py-3 text-[#94A3B8] font-mono text-xs uppercase tracking-wider hidden md:flex">
-            <div className="w-16">Rank</div>
-            <div className="flex-1">Trader</div>
-            <div className="w-32 text-right">XP Score</div>
-            <div className="w-48 text-center">Win Rate</div>
-            <div className="w-32 text-right">Total PNL</div>
-            <div className="w-24 text-right">Streak</div>
+          <div className="flex items-center px-4 py-3 text-[#475569] font-mono text-xs uppercase tracking-wider">
+            <div className="w-12 text-center">Rank</div>
+            <div className="flex-1 pl-4">Trader</div>
+            <div className="w-28 text-right">XP</div>
+            <div className="w-24 text-right">Win Rate</div>
+            <div className="w-28 text-right">PNL</div>
+            <div className="w-20 text-right">Streak</div>
           </div>
 
           {rest.map((trader) => (
-            <div key={trader.rank} className="fluxx-card rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 transition-colors odd:bg-[rgba(99,102,241,0.03)] hover:bg-[rgba(99,102,241,0.05)]">
-              <div className="flex items-center gap-4 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center font-mono text-[#94A3B8] font-bold border border-[rgba(255,255,255,0.1)]">
-                  {trader.rank}
+            <div key={trader.rank} className="group flex items-center px-4 py-3 rounded-lg hover:bg-[rgba(99,102,241,0.04)] transition-colors">
+              <div className="w-12 text-center font-mono text-[#94A3B8] text-sm">
+                {trader.rank}
+              </div>
+              
+              <div className="flex-1 flex items-center gap-3 pl-4 min-w-0">
+                <div className="w-8 h-8 rounded bg-[rgba(99,102,241,0.08)] flex items-center justify-center font-medium text-[#818CF8] text-sm shrink-0">
+                  {trader.name.charAt(0)}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[rgba(99,102,241,0.1)] border border-[rgba(99,102,241,0.2)] flex items-center justify-center font-bold text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]">
-                    {trader.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#F1F5F9] transition-colors">{trader.name}</div>
-                    <div className="text-xs font-mono text-[#94A3B8]">{trader.handle}</div>
-                  </div>
+                <div className="min-w-0">
+                  <div className="font-medium text-[#F1F5F9] truncate text-sm">{trader.name}</div>
+                  <div className="text-xs font-mono text-[#475569] truncate">{trader.handle}</div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-0">
-                <div className="md:w-32 md:text-right font-mono font-bold text-[#F1F5F9]">
-                  <span className="text-[#94A3B8] text-xs uppercase md:hidden block mb-1">XP Score</span>
-                  {trader.xp.toLocaleString()}
-                </div>
-                
-                <div className="md:w-48 md:flex md:justify-center">
-                  <div className="w-full max-w-[120px]">
-                    <span className="text-[#94A3B8] text-xs uppercase md:hidden block mb-1">Win Rate</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`font-mono text-sm ${trader.win >= 80 ? 'text-[#10B981]' : 'text-[#F59E0B]'}`}>{trader.win}%</span>
-                      <div className="flex-1 h-1.5 bg-[rgba(255,255,255,0.05)] rounded-full overflow-hidden">
-                        <div className="h-full bg-current rounded-full" style={{ width: `${trader.win}%`, color: trader.win >= 80 ? '#10B981' : '#F59E0B' }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="w-28 text-right font-mono text-sm text-[#F1F5F9]">
+                {trader.xp.toLocaleString()}
+              </div>
+              
+              <div className={`w-24 text-right font-mono text-sm ${trader.win >= 80 ? 'text-[#10B981]' : 'text-[#F1F5F9]'}`}>
+                {trader.win}%
+              </div>
 
-                <div className="md:w-32 md:text-right font-mono font-bold text-[#10B981]">
-                  <span className="text-[#94A3B8] text-xs uppercase md:hidden block mb-1">Total PNL</span>
-                  {trader.pnl}
-                </div>
+              <div className="w-28 text-right font-mono text-sm text-[#10B981]">
+                {trader.pnl}
+              </div>
 
-                <div className="md:w-24 md:flex md:justify-end">
-                  <span className="text-[#94A3B8] text-xs uppercase md:hidden block mb-1">Streak</span>
-                  {trader.streak > 3 ? (
-                    <div className="inline-flex items-center gap-1 bg-[rgba(245,158,11,0.15)] text-[#F59E0B] font-bold font-mono px-2.5 py-1 rounded-full text-sm">
-                      <Flame className="w-4 h-4" /> {trader.streak}
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1 text-[#94A3B8] font-bold font-mono px-2.5 py-1 text-sm">
-                      <Flame className="w-4 h-4 opacity-50" /> {trader.streak}
-                    </div>
-                  )}
-                </div>
+              <div className="w-20 flex justify-end items-center gap-1.5 font-mono text-sm">
+                {trader.streak > 3 ? (
+                  <>
+                    <Flame className="w-3.5 h-3.5 text-[#F59E0B]" />
+                    <span className="text-[#F1F5F9]">{trader.streak}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[#475569]">{trader.streak}</span>
+                  </>
+                )}
               </div>
             </div>
           ))}

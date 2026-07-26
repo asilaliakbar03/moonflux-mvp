@@ -25,10 +25,10 @@ export default function TopBar() {
         right: 0,
         height: 64,
         zIndex: 50,
-        background: 'rgba(8,11,18,0.95)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(99,102,241,0.15)',
+        background: 'rgba(0,0,0,0.85)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(99,102,241,0.06)',
         display: 'flex',
         alignItems: 'center',
         padding: '0 20px',
@@ -115,7 +115,7 @@ export default function TopBar() {
             style={{
               width: '100%',
               height: 40,
-              background: '#161B27',
+              background: '#0A0E27',
               border: '1px solid rgba(99,102,241,0.15)',
               borderRadius: 8,
               paddingLeft: 36,
@@ -154,7 +154,7 @@ export default function TopBar() {
                 style={{
                   height: 36,
                   width: 130,
-                  background: '#161B27',
+                  background: '#0A0E27',
                   border: '1px solid rgba(99,102,241,0.30)',
                   borderRadius: 8,
                   paddingLeft: 32,
@@ -264,3 +264,4 @@ export default function TopBar() {
     </header>
   );
 }
+

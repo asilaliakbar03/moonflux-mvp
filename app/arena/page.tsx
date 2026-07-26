@@ -1,8 +1,10 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Swords, ChevronDown, RefreshCw } from "lucide-react";
+import { Swords, RefreshCw } from "lucide-react";
+import MagneticButton from '@/components/MagneticButton';
+import AnimatedCounter from '@/components/AnimatedCounter';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -21,7 +23,7 @@ function useCountdown(initialSeconds: number) {
 
 const BATTLE = {
   tokenA: { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', icon:'🐶', color:'#10B981', votes:8432, pct:57 },
-  tokenB: { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', icon:'💎', color:'#F43F5E', votes:6318, pct:43 },
+  tokenB: { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', icon:'💎', color:'#EF4444', votes:6318, pct:43 },
 };
 
 const PAST_BATTLES = [
@@ -32,7 +34,7 @@ const PAST_BATTLES = [
 ];
 
 export default function ArenaPage() {
-  const countdown = useCountdown(24137); // random start
+  const countdown = useCountdown(24137);
 
   const [voted, setVoted] = useState<'a' | 'b' | null>(null);
   const [confirming, setConfirming] = useState<'a' | 'b' | null>(null);
@@ -82,194 +84,198 @@ export default function ArenaPage() {
     <div className="max-w-4xl mx-auto w-full pt-8 pb-16">
       
       {/* ── HEADER ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div>
-          <h1 className="text-4xl font-bold font-display text-white mb-2">Token Arena</h1>
-          <p className="text-[#94A3B8]">Daily battle. Two tokens. One winner. You decide.</p>
+          <h1 className="text-2xl font-bold text-[#F1F5F9] mb-1">Token Arena</h1>
+          <p className="text-[#94A3B8] text-sm">Daily battle. Two tokens. One winner. You decide.</p>
         </div>
-        <div className="bg-[#0D1117] border border-[rgba(99,102,241,0.2)] rounded-xl px-6 py-3 flex flex-col items-center shadow-[0_0_15px_rgba(99,102,241,0.1)]">
-          <span className="text-[#94A3B8] text-xs uppercase tracking-wider font-semibold mb-1">Resets in</span>
-          <span className="text-2xl font-mono font-bold text-white tracking-widest" style={{ textShadow: '0 0 10px rgba(99,102,241,0.5)' }}>{countdown}</span>
+        <div className="bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl px-4 py-2 flex items-center gap-4">
+          <span className="text-[#475569] text-xs uppercase tracking-wider font-semibold">Resets in</span>
+          <span className="text-lg font-mono font-medium text-[#F1F5F9]">{countdown}</span>
         </div>
       </motion.div>
 
       {/* ── TODAY'S BATTLE ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <div className="flex justify-center mb-4 relative z-10">
-          <span className="bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.3)] text-[#818CF8] px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-[0_0_10px_rgba(99,102,241,0.2)]">
-            Today's Battle
-          </span>
-        </div>
-
-        <div className="relative mb-8">
-          {/* Dynamic Ambient Lighting */}
-          <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none opacity-[0.12] bg-[#10B981] fluxx-light-leak" />
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none opacity-[0.12] bg-[#F43F5E] fluxx-light-leak" />
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }}>
+        <div className="mb-8 bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl p-6 md:p-8 relative">
           
-          <div className="fluxx-card p-6 md:p-10 relative z-10 bg-[#080B12]/80 backdrop-blur-xl border border-[rgba(99,102,241,0.15)] rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
             
-            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-4 relative z-10">
-              
-              {/* Token A */}
-              <div className="flex-1 flex flex-col items-center text-center p-6 rounded-2xl border border-[rgba(16,185,129,0.3)] transition-all hover:border-[#10B981] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] bg-[#0D1117]/50 w-full">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 shadow-[0_0_15px_rgba(16,185,129,0.2)]" style={{ backgroundColor: `${BATTLE.tokenA.color}20`, border: `2px solid ${BATTLE.tokenA.color}40` }}>
-                  {BATTLE.tokenA.icon}
+            {/* Token A */}
+            <motion.div 
+              whileHover={{ y: -2 }}
+              className="flex-1 flex flex-col p-5 rounded-xl border border-[rgba(99,102,241,0.06)] bg-[rgba(0,0,0,0.5)] w-full transition-colors hover:border-[#10B981]/30"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl bg-[#10B981]/10 border border-[#10B981]/20">
+                    {BATTLE.tokenA.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-[#F1F5F9] font-bold text-lg leading-tight">{BATTLE.tokenA.name}</h2>
+                    <span className="text-[#94A3B8] text-sm font-mono">${BATTLE.tokenA.ticker}</span>
+                  </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenA.name}</h2>
-                <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenA.ticker}</span>
-                
-                <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenA.color, textShadow: '0 0 10px rgba(16,185,129,0.4)' }}>{BATTLE.tokenA.pct}%</div>
-                <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenA.votes.toLocaleString()} votes</div>
-                
+                <div className="text-right">
+                  <div className="text-[#F1F5F9] font-mono text-xl font-medium"><AnimatedCounter value={BATTLE.tokenA.pct} suffix="%" className="font-mono" /></div>
+                  <div className="text-[#475569] text-xs"><AnimatedCounter value={BATTLE.tokenA.votes} /> votes</div>
+                </div>
+              </div>
+              
+              <MagneticButton as="div" strength={0.25} className="w-full">
                 {!voted ? (
                   confirming === 'a' ? (
-                    <div className="flex gap-2 w-full max-w-[200px]">
-                      <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
-                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+                    <div className="flex gap-2 w-full">
+                      <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
+                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg text-sm border border-[rgba(99,102,241,0.06)] text-[#94A3B8] transition-colors hover:bg-[rgba(99,102,241,0.04)] flex-1">Cancel</button>
                     </div>
                   ) : (
-                    <button onClick={() => setConfirming('a')} className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-[#10B981] to-[#059669] text-white active:scale-95 transition-transform w-full max-w-[200px] shadow-[0_4px_15px_rgba(16,185,129,0.4)]">
-                      Vote {BATTLE.tokenA.name}
+                    <button onClick={() => setConfirming('a')} className="px-4 py-2 rounded-lg text-sm font-medium bg-[#10B981] text-white transition-colors hover:bg-[#059669] w-full">
+                      Vote {BATTLE.tokenA.ticker}
                     </button>
                   )
                 ) : voted === 'a' ? (
-                  <div className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                    ✓ You voted For
-                  </div>
+                  <button disabled className="bg-[#10B981]/10 text-[#10B981] px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center border border-[#10B981]/20 w-full opacity-100 cursor-not-allowed">
+                    Voted
+                  </button>
                 ) : (
-                  <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
+                  <button disabled className="px-4 py-2 text-[#475569] text-sm font-medium w-full bg-[rgba(0,0,0,0.2)] rounded-lg cursor-not-allowed border border-[rgba(99,102,241,0.06)]">Voted elsewhere</button>
                 )}
-              </div>
+              </MagneticButton>
+            </motion.div>
 
-              {/* VS Badge */}
-              <div className="w-16 h-16 rounded-full bg-[#080B12] border-flow flex items-center justify-center shrink-0 z-20 md:my-0 my-4 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-                <span className="font-bold font-display text-white text-xl">VS</span>
-              </div>
+            {/* VS Badge */}
+            <div className="w-10 h-10 rounded-full bg-[#000000] border border-[rgba(99,102,241,0.12)] flex items-center justify-center shrink-0 z-20 md:my-0 my-2 fluxx-breathe">
+              <span className="font-medium text-[#94A3B8] text-xs">VS</span>
+            </div>
 
-              {/* Token B */}
-              <div className="flex-1 flex flex-col items-center text-center p-6 rounded-2xl border border-[rgba(244,63,94,0.3)] transition-all hover:border-[#F43F5E] hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] bg-[#0D1117]/50 w-full">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-4 shadow-[0_0_15px_rgba(244,63,94,0.2)]" style={{ backgroundColor: `${BATTLE.tokenB.color}20`, border: `2px solid ${BATTLE.tokenB.color}40` }}>
-                  {BATTLE.tokenB.icon}
+            {/* Token B */}
+            <motion.div 
+              whileHover={{ y: -2 }}
+              className="flex-1 flex flex-col p-5 rounded-xl border border-[rgba(99,102,241,0.06)] bg-[rgba(0,0,0,0.5)] w-full transition-colors hover:border-[#EF4444]/30"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
+                    {BATTLE.tokenB.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-[#F1F5F9] font-bold text-lg leading-tight">{BATTLE.tokenB.name}</h2>
+                    <span className="text-[#94A3B8] text-sm font-mono">${BATTLE.tokenB.ticker}</span>
+                  </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-1">{BATTLE.tokenB.name}</h2>
-                <span className="text-[#94A3B8] font-mono mb-4">${BATTLE.tokenB.ticker}</span>
-                
-                <div className="text-4xl font-bold font-mono mb-1" style={{ color: BATTLE.tokenB.color, textShadow: '0 0 10px rgba(244,63,94,0.4)' }}>{BATTLE.tokenB.pct}%</div>
-                <div className="text-[#475569] text-sm mb-6">{BATTLE.tokenB.votes.toLocaleString()} votes</div>
-                
+                <div className="text-right">
+                  <div className="text-[#F1F5F9] font-mono text-xl font-medium"><AnimatedCounter value={BATTLE.tokenB.pct} suffix="%" className="font-mono" /></div>
+                  <div className="text-[#475569] text-xs"><AnimatedCounter value={BATTLE.tokenB.votes} /> votes</div>
+                </div>
+              </div>
+              
+              <MagneticButton as="div" strength={0.25} className="w-full">
                 {!voted ? (
                   confirming === 'b' ? (
-                    <div className="flex gap-2 w-full max-w-[200px]">
-                      <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg font-medium text-white transition-all flex-1 bg-[#F43F5E] hover:bg-[#E11D48]">Confirm</button>
-                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#94A3B8] transition-colors hover:bg-[rgba(255,255,255,0.05)] flex-1">Cancel</button>
+                    <div className="flex gap-2 w-full">
+                      <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-all flex-1 bg-[#EF4444] hover:bg-[#DC2626]">Confirm</button>
+                      <button onClick={() => setConfirming(null)} className="px-4 py-2 rounded-lg text-sm border border-[rgba(99,102,241,0.06)] text-[#94A3B8] transition-colors hover:bg-[rgba(99,102,241,0.04)] flex-1">Cancel</button>
                     </div>
                   ) : (
-                    <button onClick={() => setConfirming('b')} className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-[#F43F5E] to-[#E11D48] text-white active:scale-95 transition-transform w-full max-w-[200px] shadow-[0_4px_15px_rgba(244,63,94,0.4)]">
-                      Vote {BATTLE.tokenB.name}
+                    <button onClick={() => setConfirming('b')} className="px-4 py-2 rounded-lg text-sm font-medium bg-[#EF4444] text-white transition-colors hover:bg-[#DC2626] w-full">
+                      Vote {BATTLE.tokenB.ticker}
                     </button>
                   )
                 ) : voted === 'b' ? (
-                  <div className="bg-[rgba(244,63,94,0.15)] text-[#F43F5E] px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.2)]">
-                    ✓ You voted For
-                  </div>
+                  <button disabled className="bg-[#EF4444]/10 text-[#EF4444] px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center border border-[#EF4444]/20 w-full opacity-100 cursor-not-allowed">
+                    Voted
+                  </button>
                 ) : (
-                  <div className="px-4 py-2 text-[#475569] font-medium">Voted elsewhere</div>
+                  <button disabled className="px-4 py-2 text-[#475569] text-sm font-medium w-full bg-[rgba(0,0,0,0.2)] rounded-lg cursor-not-allowed border border-[rgba(99,102,241,0.06)]">Voted elsewhere</button>
                 )}
-              </div>
+              </MagneticButton>
+            </motion.div>
 
-            </div>
+          </div>
 
-            {/* Progress Bar */}
-            <div className="mt-10 max-w-2xl mx-auto relative z-10">
-              <div className="flex justify-center text-xs font-mono text-[#94A3B8] mb-2">
-                {BATTLE.tokenA.pct}% vs {BATTLE.tokenB.pct}%
-              </div>
-              <div className="h-4 w-full bg-[#080B12] rounded-full overflow-hidden flex border border-[rgba(255,255,255,0.05)] shadow-inner">
-                <motion.div 
-                  initial={{ width: 0 }} animate={{ width: `${BATTLE.tokenA.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                  className="h-full bg-[#10B981] shadow-[0_0_10px_rgba(16,185,129,0.8)]" 
-                />
-                <motion.div 
-                  initial={{ width: '100%' }} animate={{ width: `${BATTLE.tokenB.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                  className="h-full bg-[#F43F5E] shadow-[0_0_10px_rgba(244,63,94,0.8)]" 
-                />
-              </div>
+          {/* Progress Bar */}
+          <div className="mt-8 max-w-2xl mx-auto relative z-10">
+            <div className="h-2 w-full bg-[rgba(0,0,0,0.6)] rounded-full overflow-hidden flex border border-[rgba(99,102,241,0.06)]">
+              <motion.div 
+                initial={{ width: 0 }} animate={{ width: `${BATTLE.tokenA.pct}%` }} transition={{ duration: 1, ease: EASE }}
+                className="h-full bg-[#10B981]" 
+              />
+              <motion.div 
+                initial={{ width: '100%' }} animate={{ width: `${BATTLE.tokenB.pct}%` }} transition={{ duration: 1, ease: EASE }}
+                className="h-full bg-[#EF4444]" 
+              />
             </div>
           </div>
         </div>
       </motion.div>
 
       {/* ── AI ANALYSIS ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
-        <button 
-          onClick={() => setAnalysisOpen(!analysisOpen)}
-          className="w-full flex justify-between items-center bg-[#0D1117] border border-[rgba(99,102,241,0.3)] fluxx-card rounded-xl p-5 hover:bg-[rgba(99,102,241,0.1)] transition-colors shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
-              <Swords className="w-4 h-4" />
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="mb-10">
+        <div className="bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl overflow-hidden">
+          <button 
+            onClick={() => setAnalysisOpen(!analysisOpen)}
+            className="w-full flex justify-between items-center p-4 hover:bg-[rgba(99,102,241,0.02)] transition-colors focus:outline-none"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-[#818CF8]">
+                <Swords className="w-4 h-4" />
+              </div>
+              <span className="font-medium text-[#F1F5F9] text-sm">AI Battle Analysis</span>
             </div>
-            <span className="font-bold text-white text-lg">AI Battle Analysis</span>
-          </div>
-          <ChevronDown className={`w-5 h-5 text-[#94A3B8] transition-transform ${analysisOpen ? 'rotate-180' : ''}`} />
-        </button>
+            <span className="text-xs text-[#94A3B8]">{analysisOpen ? 'Hide' : 'Show'}</span>
+          </button>
 
-        <AnimatePresence>
           {analysisOpen && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }} 
-              animate={{ height: 'auto', opacity: 1 }} 
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="bg-[#080B12] border border-t-0 border-[rgba(99,102,241,0.15)] rounded-b-xl p-6 md:p-8 -mt-2 pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                  <div>
-                    <h3 className="font-bold text-[#10B981] mb-3 flex items-center gap-2">
-                      {BATTLE.tokenA.icon} {BATTLE.tokenA.name}
-                    </h3>
-                    <p className="text-[#94A3B8] text-sm leading-relaxed">{analysisText.a}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#F43F5E] mb-3 flex items-center gap-2">
-                      {BATTLE.tokenB.icon} {BATTLE.tokenB.name}
-                    </h3>
-                    <p className="text-[#94A3B8] text-sm leading-relaxed">{analysisText.b}</p>
-                  </div>
+            <div className="p-4 pt-0 border-t border-[rgba(99,102,241,0.06)] bg-[rgba(0,0,0,0.2)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <h3 className="font-medium text-[#10B981] text-sm mb-2 flex items-center gap-2">
+                    {BATTLE.tokenA.icon} {BATTLE.tokenA.name}
+                  </h3>
+                  <p className="text-[#94A3B8] text-sm leading-relaxed">{analysisText.a}</p>
                 </div>
-                
-                <div className="flex justify-center border-t border-[rgba(99,102,241,0.1)] pt-6">
-                  <button 
-                    onClick={regenerateAnalysis}
-                    disabled={analysisLoading}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[#818CF8] border border-[rgba(99,102,241,0.3)] hover:bg-[rgba(99,102,241,0.1)] hover:text-white active:scale-95 transition-all disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${analysisLoading ? 'animate-spin' : ''}`} />
-                    {analysisLoading ? "Regenerating..." : "Regenerate Analysis"}
-                  </button>
+                <div>
+                  <h3 className="font-medium text-[#EF4444] text-sm mb-2 flex items-center gap-2">
+                    {BATTLE.tokenB.icon} {BATTLE.tokenB.name}
+                  </h3>
+                  <p className="text-[#94A3B8] text-sm leading-relaxed">{analysisText.b}</p>
                 </div>
               </div>
-            </motion.div>
+              
+              <div className="flex justify-start mt-6">
+                <button 
+                  onClick={regenerateAnalysis}
+                  disabled={analysisLoading}
+                  className="flex items-center gap-2 text-xs text-[#475569] hover:text-[#94A3B8] transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3 h-3 ${analysisLoading ? 'animate-spin' : ''}`} />
+                  {analysisLoading ? "Regenerating..." : "Regenerate Analysis"}
+                </button>
+              </div>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </motion.div>
 
       {/* ── PAST BATTLES ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-        <div className="fluxx-card bg-[#0D1117] border border-[rgba(99,102,241,0.15)] rounded-xl overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.05)]">
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.3 }}>
+        <h3 className="text-sm font-medium text-[#F1F5F9] mb-4">Recent Results</h3>
+        <div className="bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl overflow-hidden">
           {PAST_BATTLES.map((b, i) => (
-            <div key={i} className={`flex items-center justify-between p-4 ${i !== PAST_BATTLES.length - 1 ? 'border-b border-[rgba(99,102,241,0.1)]' : ''} odd:bg-[rgba(99,102,241,0.03)] hover:bg-[rgba(99,102,241,0.06)] transition-colors`}>
-              <div className="text-[#475569] text-sm w-16">{b.date}</div>
-              <div className="flex-1 flex items-center gap-3">
-                <span className="text-xl">{b.icon}</span>
-                <div>
-                  <span className="text-white font-bold block">{b.winner}</span>
-                  <span className="text-xs text-[#94A3B8]">Defeated {b.loser}</span>
+            <div key={i} className={`flex items-center justify-between p-4 ${i !== PAST_BATTLES.length - 1 ? 'border-b border-[rgba(99,102,241,0.06)]' : ''} hover:bg-[rgba(99,102,241,0.04)] transition-colors`}>
+              <div className="flex items-center gap-4">
+                <div className="text-[#475569] text-sm font-mono w-14">{b.date}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{b.icon}</span>
+                  <span className="text-[#F1F5F9] font-medium text-sm">{b.winner}</span>
                 </div>
               </div>
-              <div className="text-[#10B981] font-mono font-bold bg-[rgba(16,185,129,0.1)] px-3 py-1 rounded">
-                {b.pct}%
+              <div className="flex items-center gap-4">
+                <span className="text-xs text-[#475569] hidden sm:block">Defeated {b.loser}</span>
+                <div className="text-[#10B981] text-xs font-mono font-medium bg-[#10B981]/10 border border-[#10B981]/20 px-2 py-1 rounded-full">
+                  {b.pct}%
+                </div>
               </div>
             </div>
           ))}
