@@ -73,13 +73,13 @@ function FeedItem({ token, idx, activeIndex }: any) {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#F43F5E] opacity-20 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl h-full flex flex-col justify-end gap-4">
+      <div className="relative z-10 w-full max-w-3xl h-full flex flex-row items-end pb-20 px-4 gap-4 sm:gap-8">
         
         <motion.div 
           initial={{ x: -50, opacity: 0 }}
           animate={activeIndex === idx ? { x: 0, opacity: 1 } : {}}
           transition={{ delay: 0.1, type: "spring" }}
-          className="flex flex-col gap-4 pr-16" // Right padding for action bar
+          className="flex-1 flex flex-col gap-4 min-w-0" // Removed pr-16, added flex-1 and min-w-0
         >
           {/* Top Badges */}
           <div className="flex flex-wrap gap-2">
@@ -142,7 +142,7 @@ function FeedItem({ token, idx, activeIndex }: any) {
           initial={{ opacity: 0, x: 20 }}
           animate={activeIndex === idx ? { opacity: 1, x: 0 } : {}}
           transition={{ delay: 0.2 }}
-          className="absolute right-4 bottom-24 flex flex-col items-center gap-4 z-20"
+          className="flex flex-col items-center gap-4 z-20 shrink-0 pb-4"
         >
           <div className="flex flex-col items-center gap-1 group cursor-pointer">
             <div className={`w-12 h-12 flex items-center justify-center border-2 ${bBg} ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'} shadow-[4px_4px_0px_0px_#000] group-hover:shadow-[2px_2px_0px_0px_#000] group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all`}>
