@@ -147,22 +147,22 @@ export default function LaunchPage() {
   const bMuted = isDark ? "text-gray-400" : "text-gray-600";
 
   return (
-    <div className="max-w-4xl mx-auto w-full px-2 sm:px-4 py-2 font-mono flex flex-col justify-center min-h-[calc(100vh-90px)] max-h-[calc(100vh-70px)] overflow-hidden">
+    <div className="max-w-5xl mx-auto w-full px-4 py-4 font-mono flex flex-col justify-center min-h-[calc(100vh-80px)]">
       
       {/* ── INIT MODE SELECTION ── */}
       {mode === 'none' && (
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease: EASE }} className="flex flex-col justify-center h-full gap-3 sm:gap-4">
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease: EASE }} className="flex flex-col justify-center h-full gap-4 sm:gap-6">
           
-          {/* Compact Header Banner */}
-          <div className={`p-4 sm:p-5 text-center relative overflow-hidden shrink-0 ${bBorder} ${bShadow} ${bBg}`}>
-            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 mb-2 text-[10px] font-black uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"}`}>
-              <Terminal className="w-3 h-3" /> TOKEN LAUNCHPAD FORGE
+          {/* Prominent Header Banner */}
+          <div className={`p-6 sm:p-10 text-center relative overflow-hidden shrink-0 ${bBorder} ${bShadow} ${bBg}`}>
+            <div className={`inline-flex items-center gap-2 px-3.5 py-1 mb-3 text-xs font-black uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"}`}>
+              <Terminal className="w-4 h-4" /> TOKEN LAUNCHPAD FORGE
             </div>
             
-            <h1 className={`text-xl sm:text-3xl font-black uppercase tracking-tight mb-1 ${bText}`}>
+            <h1 className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter mb-3 ${bText}`}>
               LAUNCH YOUR <span className="text-[#6366F1]">TOKEN</span>
             </h1>
-            <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider max-w-md mx-auto ${bMuted}`}>
+            <p className={`text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest max-w-xl mx-auto ${bMuted}`}>
               {">"} TWO WAYS TO FORGE YOUR TOKEN ON-CHAIN IN MINUTES.
             </p>
           </div>
