@@ -13,6 +13,13 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 // Helper to convert array of numbers into recharts object format
 const formatSparkline = (data: number[]) => data.map((val, i) => ({ x: i, y: val }));
 
+// Helper to generate unique meme/crypto character images
+const getMemeImage = (ticker: string) => {
+  const sets = ['set1', 'set2', 'set3', 'set4'];
+  const set = sets[ticker.length % 4];
+  return `https://robohash.org/${ticker.toLowerCase()}?set=${set}&bgset=bg1&size=400x400`;
+};
+
 export default function HomePage() {
   const { address } = useMoonWallet();
   const { theme } = useTheme();
@@ -140,7 +147,7 @@ export default function HomePage() {
                     {/* Artwork Header */}
                     <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"}`}>
                       <img 
-                        src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                        src={getMemeImage(t.ticker)} 
                         alt={t.name}
                         className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
                       />
@@ -213,7 +220,7 @@ export default function HomePage() {
                   >
                     <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"}`}>
                       <img 
-                        src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                        src={getMemeImage(t.ticker)} 
                         alt={t.name}
                         className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
                       />

@@ -13,6 +13,13 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 // Helper to convert array of numbers into recharts object format
 const formatSparkline = (data: number[]) => data.map((val, i) => ({ x: i, y: val }));
 
+// Helper to generate unique meme/crypto character images
+const getMemeImage = (ticker: string) => {
+  const sets = ['set1', 'set2', 'set3', 'set4'];
+  const set = sets[ticker.length % 4];
+  return `https://robohash.org/${ticker.toLowerCase()}?set=${set}&bgset=bg1&size=400x400`;
+};
+
 const TOKENS = [
   { id:'tok_ai_swarm', name:'AI Swarm', ticker:'SWRM', price:0.00671, change24h:211.4, marketCap:2300000, holders:4821, tag:'🔥 ABOUT TO GRADUATE', category:'ai', color:'#F43F5E', sparkline:formatSparkline([5,8,12,15,14,18,25,32,28,40,55,70,90,85,110]), progress: 95, creator: 'cyberpunk_dev', timeAgo: '2h', isLive: true },
   { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', price:0.00156, change24h:388.2, marketCap:970000, holders:2109, tag:'⚡ NEW LAUNCHES', category:'token', color:'#6366F1', sparkline:formatSparkline([2,3,4,5,6,10,15,12,20,30,25,40,60,50,80]), progress: 60, creator: 'ape_lord', timeAgo: '15m', isLive: false },
@@ -201,9 +208,9 @@ export default function ExplorePage() {
                   
                   {/* Artwork Header */}
                   <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#1A1A2E]" : "border-black bg-gray-200"}`}>
-                    {/* Unique artwork image generated via Picsum based on ticker string */}
+                    {/* Unique artwork image generated via robohash based on ticker string */}
                     <img 
-                      src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                      src={getMemeImage(t.ticker)} 
                       alt={t.name}
                       className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
                     />
