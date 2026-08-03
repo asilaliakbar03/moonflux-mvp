@@ -58,7 +58,7 @@ export default function RootLayout({
 
               {/* Main content */}
               <main
-                className="relative z-10 pt-[64px] md:pl-[72px] pb-20 md:pb-0 min-h-screen"
+                className="relative z-10 pt-[64px] md:pl-[220px] pb-20 md:pb-0 min-h-screen transition-[padding] duration-300"
               >
                 <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-6 max-w-[1400px] mx-auto">
                     {children}

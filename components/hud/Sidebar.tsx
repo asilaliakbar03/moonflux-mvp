@@ -14,11 +14,13 @@ import {
   Film,
   Menu,
   X,
+  PanelLeftClose,
+  PanelLeft,
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ThemeProvider';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -26,10 +28,9 @@ type NavItem = { icon: LucideIcon; label: string; href: string };
 
 /* ─── Nav data ───────────────────────────────────────────────── */
 const MAIN_ITEMS: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard',   href: '/'            },
+  { icon: LayoutDashboard, label: 'Home',        href: '/'            },
   { icon: Compass,         label: 'Explore',     href: '/explore'     },
   { icon: Film,            label: 'Feed',        href: '/feed'        },
-  { icon: Rocket,          label: 'Launch',      href: '/launch'      },
   { icon: LineChart,       label: 'Terminal',    href: '/terminal'    },
   { icon: Trophy,          label: 'Leaderboard', href: '/leaderboard' },
   { icon: Swords,          label: 'Arena',       href: '/arena'       },
@@ -57,70 +58,41 @@ function NavLink({
 
   return (
     <Link href={item.href} className="block relative group/link">
-      <motion.div
-        whileTap={{ scale: 0.96 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 26 }}
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors duration-150 fluxx-hover-shimmer ${isActive ? 'fluxx-active-bar' : ''}`}
-        style={{
-          background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
-          borderLeft: isActive ? '2px solid #6366F1' : '2px solid transparent',
-          color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-        }}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-            e.currentTarget.style.color = 'var(--color-text-primary)';
+      <div
+        className={`
+          flex items-center gap-3 px-3 py-3 cursor-pointer transition-all duration-150 font-mono font-black uppercase tracking-wider text-sm
+          ${isActive 
+            ? `${isDark ? 'bg-[#10B981] text-black border-2 border-[rgba(255,255,255,0.2)]' : 'bg-[#10B981] text-black border-3 border-black'}` 
+            : `${isDark ? 'text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]' : 'text-gray-500 hover:text-black hover:bg-gray-100'} border-2 border-transparent`
           }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'var(--color-text-secondary)';
-          }
-        }}
+        `}
       >
         {/* Icon */}
-        <div 
-          className="flex items-center justify-center w-8 h-8 shrink-0 rounded-md transition-shadow duration-300"
-          style={{
-            boxShadow: isActive ? '0 0 12px rgba(99,102,241,0.4)' : 'none'
-          }}
-        >
-          <Icon size={20} strokeWidth={isActive ? 2.2 : 1.8} />
+        <div className="flex items-center justify-center w-7 h-7 shrink-0">
+          <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
         </div>
 
         {/* Label */}
-        <span
-          className={`whitespace-nowrap font-medium transition-opacity duration-200 ${expanded ? 'text-hover-slide' : ''}`}
-          style={{
-            fontSize: '13px',
-            fontFamily: "'Outfit', sans-serif",
-            opacity: expanded ? 1 : 0,
-            pointerEvents: expanded ? 'auto' : 'none',
-          }}
-        >
-          <span data-text={item.label}>{item.label}</span>
-        </span>
-      </motion.div>
+        {expanded && (
+          <span className="whitespace-nowrap text-sm">
+            {item.label}
+          </span>
+        )}
+      </div>
 
       {/* Tooltip — only when collapsed */}
       {!expanded && (
         <div
-          className="
+          className={`
             absolute left-full top-1/2 -translate-y-1/2 ml-3
-            px-2.5 py-1.5 rounded-md
-            text-xs font-medium whitespace-nowrap
+            px-3 py-2
+            text-xs font-mono font-black uppercase tracking-wider whitespace-nowrap
             opacity-0 group-hover/link:opacity-100
             transition-opacity duration-150
             pointer-events-none z-50
-          "
-          style={{
-            background: isDark ? '#050510' : '#FFFFFF',
-            color: 'var(--color-text-primary)',
-            border: '1px solid rgba(99,102,241,0.18)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-            fontFamily: "'Outfit', sans-serif",
-          }}
+            ${isDark ? 'bg-black text-white border-2 border-[rgba(255,255,255,0.2)]' : 'bg-white text-black border-3 border-black'}
+            shadow-[3px_3px_0px_0px_#10B981]
+          `}
         >
           {item.label}
         </div>
@@ -134,42 +106,47 @@ export default function Sidebar() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true); // Default OPEN
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setExpanded(true);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => setExpanded(false), 80);
-  };
-
+  // Close mobile menu on route change
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
+    setShowMobileMenu(false);
+  }, [pathname]);
+
+  const sidebarWidth = expanded ? 220 : 64;
+
+  const borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#000';
 
   return (
     <>
       <aside
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden transition-colors"
+        className={`hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden`}
         style={{
-          width: expanded ? 220 : 72,
-          backgroundColor: isDark ? 'rgba(0,0,0,0.70)' : 'rgba(255,255,255,0.80)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderRight: '1px solid rgba(99,102,241,0.08)',
-          transition: 'width 300ms cubic-bezier(0.16,1,0.3,1)',
+          width: sidebarWidth,
+          backgroundColor: isDark ? '#050510' : '#FFFFFF',
+          borderRight: `3px solid ${borderColor}`,
+          transition: 'width 250ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
+        {/* ── Toggle Button ── */}
+        <div className="flex items-center justify-end px-2 pt-4 pb-2">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className={`
+              p-2 font-mono font-black transition-all
+              ${isDark 
+                ? 'text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)]' 
+                : 'text-gray-400 hover:text-black hover:bg-gray-100 border-2 border-gray-200 hover:border-black'}
+            `}
+            title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {expanded ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+          </button>
+        </div>
+
         {/* ── Main nav ── */}
-        <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-6 overflow-hidden">
+        <nav className="flex-1 flex flex-col gap-1 px-2 pt-2 overflow-y-auto overflow-x-hidden">
           {MAIN_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -182,16 +159,12 @@ export default function Sidebar() {
 
         {/* ── Divider ── */}
         <div
-          className="mx-3 my-1"
-          style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}
+          className="mx-2 my-2"
+          style={{ borderTop: `2px solid ${borderColor}` }}
         />
 
         {/* ── Bottom section ── */}
-        <div className="flex flex-col gap-0.5 px-2 pb-4">
-          <div
-            className="mx-1 mb-1"
-            style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}
-          />
+        <div className="flex flex-col gap-1 px-2 pb-2">
           {BOTTOM_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -201,19 +174,39 @@ export default function Sidebar() {
             />
           ))}
         </div>
+
+        {/* ── LAUNCH BUTTON (like pump.fun Create) ── */}
+        <div className="px-2 pb-4">
+          <Link href="/launch">
+            <div
+              className={`
+                flex items-center justify-center gap-2 py-3 font-mono font-black uppercase tracking-widest text-base cursor-pointer
+                bg-[#10B981] text-black transition-all
+                ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'}
+                ${isDark ? 'shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]' : 'shadow-[3px_3px_0px_0px_#000]'}
+                hover:shadow-[5px_5px_0px_0px_#F59E0B] hover:-translate-y-0.5
+                active:translate-y-0.5 active:shadow-none
+              `}
+            >
+              <Rocket size={18} strokeWidth={2.5} />
+              {expanded && <span>Launch</span>}
+            </div>
+          </Link>
+        </div>
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
       <nav 
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[100] backdrop-blur-2xl border-t border-[rgba(99,102,241,0.08)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)] transition-colors"
-        style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.70)' : 'rgba(255,255,255,0.80)' }}
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-[100] flex justify-around items-center h-16 px-1 pb-[env(safe-area-inset-bottom)] ${
+          isDark ? 'bg-[#050510] border-t-3 border-[rgba(255,255,255,0.2)]' : 'bg-white border-t-3 border-black'
+        }`}
       >
         {[
-          MAIN_ITEMS[0], // Dashboard
+          MAIN_ITEMS[0], // Home
           MAIN_ITEMS[1], // Explore
           MAIN_ITEMS[2], // Feed
-          MAIN_ITEMS[3], // Launch
-          { icon: Menu, label: 'More', href: '#more' } // More
+          { icon: Rocket, label: 'Launch', href: '/launch' },
+          { icon: Menu, label: 'More', href: '#more' }
         ].map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -221,27 +214,18 @@ export default function Sidebar() {
           if (item.href === '#more') {
             return (
               <button key="more" onClick={() => setShowMobileMenu(true)} className="flex flex-col items-center justify-center w-full h-full gap-1">
-                <div className={`flex items-center justify-center p-1 rounded-md transition-shadow duration-300 ${showMobileMenu ? 'shadow-[0_0_12px_rgba(99,102,241,0.4)]' : ''}`}>
-                  <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#6366F1]" : "text-text-faint"} />
-                </div>
-                <span className="text-[10px] font-medium" style={{ color: showMobileMenu ? "var(--color-text-primary)" : "var(--color-text-faint)" }}>More</span>
+                <Icon size={22} strokeWidth={2.5} className={isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400'} />
+                <span className={`text-[10px] font-mono font-black uppercase ${isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400'}`}>More</span>
               </button>
             );
           }
 
           return (
-            <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1 fluxx-hover-shimmer">
-              <div className={`flex items-center justify-center p-1 rounded-md transition-shadow duration-300 ${isActive ? 'shadow-[0_0_12px_rgba(99,102,241,0.4)] fluxx-active-bar' : ''}`}>
-                <Icon 
-                  size={22} 
-                  strokeWidth={isActive ? 2.5 : 2} 
-                  className={isActive ? "text-[#6366F1]" : "text-text-faint"} 
-                />
+            <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1">
+              <div className={`flex items-center justify-center p-1 ${isActive ? (isDark ? 'text-[#10B981]' : 'text-[#10B981]') : (isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400')}`}>
+                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span 
-                className="text-[10px] font-medium" 
-                style={{ color: isActive ? "var(--color-text-primary)" : "var(--color-text-faint)" }}
-              >
+              <span className={`text-[10px] font-mono font-black uppercase ${isActive ? 'text-[#10B981]' : (isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400')}`}>
                 {item.label}
               </span>
             </Link>
@@ -249,6 +233,7 @@ export default function Sidebar() {
         })}
       </nav>
 
+      {/* ── Mobile Full Menu ── */}
       <AnimatePresence>
         {showMobileMenu && (
           <motion.div 
@@ -256,50 +241,70 @@ export default function Sidebar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="md:hidden fixed inset-0 z-[110] overflow-y-auto pb-24 pt-6 px-6 flex flex-col transition-colors"
-            style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.97)' }}
+            className={`md:hidden fixed inset-0 z-[110] overflow-y-auto pb-24 pt-6 px-4 flex flex-col ${
+              isDark ? 'bg-[#050510]' : 'bg-white'
+            }`}
           >
             <div className="flex items-center justify-between mb-8 mt-2">
-              <h2 className={`text-3xl font-bold font-display ${isDark ? 'text-white' : 'text-text-primary'}`}>Menu</h2>
-              <button onClick={() => setShowMobileMenu(false)} className={`p-2 ${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[#F1F5F9]' : 'bg-black/5 text-text-primary'} rounded-full hover:text-[#6366F1] hover:bg-[rgba(99,102,241,0.1)] transition-colors`}>
+              <h2 className="text-3xl font-mono font-black uppercase tracking-widest">[ MENU ]</h2>
+              <button 
+                onClick={() => setShowMobileMenu(false)} 
+                className={`p-3 font-black ${isDark ? 'bg-[#F43F5E] text-black border-2 border-[rgba(255,255,255,0.2)]' : 'bg-[#F43F5E] text-white border-3 border-black'} shadow-[3px_3px_0px_0px_#000]`}
+              >
                 <X size={24} />
               </button>
             </div>
             
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
               <div>
-                <h3 className="text-[10px] font-mono font-bold text-[#6366F1] tracking-widest uppercase mb-3 px-2">Main</h3>
-                <div className="flex flex-col gap-1">
+                <h3 className="text-xs font-mono font-black text-[#06B6D4] tracking-widest uppercase mb-3 px-2">[ NAVIGATION ]</h3>
+                <div className="flex flex-col gap-2">
                   {MAIN_ITEMS.map(item => (
                     <Link 
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? `bg-[rgba(99,102,241,0.15)] ${isDark ? 'text-white' : 'text-text-primary'} border border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0.15)] fluxx-active-bar` : `${isDark ? 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white' : 'text-text-secondary hover:bg-black/5 hover:text-text-primary'} border border-transparent`}`}
+                      className={`flex items-center gap-4 p-4 font-mono font-black uppercase tracking-wider text-base transition-all active:scale-95 ${
+                        pathname === item.href 
+                          ? `bg-[#10B981] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
+                          : `${isDark ? 'text-[rgba(255,255,255,0.5)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] hover:text-white' : 'text-gray-500 border-2 border-gray-200 hover:border-black hover:text-black'}`
+                      }`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#6366F1]" : "text-text-faint"} />
-                      <span className="font-bold text-base">{item.label}</span>
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} />
+                      <span>{item.label}</span>
                     </Link>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-[10px] font-mono font-bold text-[#A78BFA] tracking-widest uppercase mb-3 px-2">Account</h3>
-                <div className="flex flex-col gap-1">
+                <h3 className="text-xs font-mono font-black text-[#F59E0B] tracking-widest uppercase mb-3 px-2">[ ACCOUNT ]</h3>
+                <div className="flex flex-col gap-2">
                   {BOTTOM_ITEMS.map(item => (
                     <Link 
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? `bg-[rgba(167,139,250,0.15)] ${isDark ? 'text-white' : 'text-text-primary'} border border-[rgba(167,139,250,0.3)] shadow-[0_0_15px_rgba(167,139,250,0.15)] fluxx-active-bar` : `${isDark ? 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white' : 'text-text-secondary hover:bg-black/5 hover:text-text-primary'} border border-transparent`}`}
+                      className={`flex items-center gap-4 p-4 font-mono font-black uppercase tracking-wider text-base transition-all active:scale-95 ${
+                        pathname === item.href 
+                          ? `bg-[#F59E0B] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
+                          : `${isDark ? 'text-[rgba(255,255,255,0.5)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] hover:text-white' : 'text-gray-500 border-2 border-gray-200 hover:border-black hover:text-black'}`
+                      }`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#A78BFA]" : "text-text-faint"} />
-                      <span className="font-bold text-base">{item.label}</span>
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} />
+                      <span>{item.label}</span>
                     </Link>
                   ))}
                 </div>
               </div>
+
+              {/* Launch Button */}
+              <Link href="/launch" onClick={() => setShowMobileMenu(false)}>
+                <div className={`flex items-center justify-center gap-3 py-5 font-mono font-black uppercase tracking-widest text-xl bg-[#10B981] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[5px_5px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all`}>
+                  <Rocket size={24} strokeWidth={2.5} />
+                  <span>[ LAUNCH TOKEN ]</span>
+                </div>
+              </Link>
             </div>
           </motion.div>
         )}
