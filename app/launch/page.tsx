@@ -1,12 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useMemo, useRef, useCallback } from "react";
-import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown, CheckCircle2, ShieldAlert, Zap, Shield, TrendingUp, Flame, Terminal, ArrowLeft } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Sparkles, Settings, Loader2, Rocket, Shield, Zap, TrendingUp, Terminal, ArrowLeft, Flame } from "lucide-react";
 import { useTheme } from '@/components/ThemeProvider';
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useTokenDeploy, TokenDeployFormData } from "@/hooks/useTokenDeploy";
-import BondingCurveChart from "@/components/BondingCurveChart";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -16,7 +15,7 @@ type Step = 1 | 2 | 3;
 /* ── Step Indicator ── */
 function StepIndicator({ labels, currentStep, isDark }: { labels: string[]; currentStep: number; isDark: boolean }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8 font-mono">
+    <div className="flex items-center justify-center gap-2 mb-4 font-mono">
       {labels.map((label, i) => {
         const stepNum = i + 1;
         const isActive = currentStep === stepNum;
@@ -24,11 +23,11 @@ function StepIndicator({ labels, currentStep, isDark }: { labels: string[]; curr
         return (
           <div key={label} className="flex items-center gap-2">
             <div
-              className={`px-3 py-1.5 text-xs font-black uppercase border transition-all ${
+              className={`px-2.5 py-1 text-[10px] font-black uppercase border transition-all ${
                 isActive
                   ? isDark 
-                    ? 'bg-[#10B981] text-black border-[#10B981] shadow-[3px_3px_0px_0px_#FFF]' 
-                    : 'bg-black text-white border-black shadow-[3px_3px_0px_0px_#10B981]'
+                    ? 'bg-[#10B981] text-black border-[#10B981] shadow-[2px_2px_0px_0px_#FFF]' 
+                    : 'bg-black text-white border-black shadow-[2px_2px_0px_0px_#10B981]'
                   : isDone
                   ? isDark ? 'bg-black text-[#10B981] border-[#10B981]' : 'bg-gray-200 text-black border-black'
                   : isDark ? 'bg-black text-gray-600 border-gray-800' : 'bg-white text-gray-400 border-gray-300'
@@ -37,7 +36,7 @@ function StepIndicator({ labels, currentStep, isDark }: { labels: string[]; curr
               [ 0{stepNum}: {label} ]
             </div>
             {i < labels.length - 1 && (
-              <span className={`text-xs font-bold ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>➔</span>
+              <span className={`text-[10px] font-bold ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>➔</span>
             )}
           </div>
         );
@@ -66,9 +65,8 @@ export default function LaunchPage() {
   });
 
   const [selectedCurve, setSelectedCurve] = useState<"fast" | "balanced" | "stable" | "aggressive">("balanced");
-  const [selectedLiquidity, setSelectedLiquidity] = useState<string>("fair");
   const [devAllocation, setDevAllocation] = useState<number>(0);
-  const [isAdvancedMode, setIsAdvancedMode] = useState<boolean>(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // AI Prompt State
   const [aiPrompt, setAiPrompt] = useState("");
@@ -77,8 +75,6 @@ export default function LaunchPage() {
   const isTickerValid = useMemo(() => {
     return formData.ticker.length >= 2 && formData.ticker.length <= 10 && /^[A-Z0-9]+$/.test(formData.ticker);
   }, [formData.ticker]);
-
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleDeploy = async () => {
     try {
@@ -91,11 +87,11 @@ export default function LaunchPage() {
   const simulateAIGeneration = async () => {
     if (!aiPrompt) return;
     setGeneratingStep(1);
-    await new Promise((r) => setTimeout(r, 1200));
-    setGeneratingStep(2);
-    await new Promise((r) => setTimeout(r, 1400));
-    setGeneratingStep(3);
     await new Promise((r) => setTimeout(r, 1000));
+    setGeneratingStep(2);
+    await new Promise((r) => setTimeout(r, 1200));
+    setGeneratingStep(3);
+    await new Promise((r) => setTimeout(r, 800));
 
     try {
       const prefixes = ["NEO", "CYBER", "QUANTUM", "SOL", "FLUX", "LUNA", "HYPER", "ASTRO"];
@@ -132,75 +128,72 @@ export default function LaunchPage() {
     desc: string;
     risk: string;
     color: string;
-    svg: string;
     icon: React.ReactNode;
     recommended?: boolean;
   };
 
   const CURVES: CurveOption[] = [
-    { id: 'fast', name: 'Fast Launch', desc: 'High velocity momentum.', risk: 'High', color: '#F43F5E', svg: 'M0,25 L10,22 L20,15 L30,5 L40,0', icon: <Flame className="w-4 h-4" /> },
-    { id: 'balanced', name: 'Balanced', desc: 'Steady growth curve.', risk: 'Medium', color: '#F59E0B', recommended: true, svg: 'M0,25 L10,22 L20,18 L30,12 L40,0', icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'stable', name: 'Stable', desc: 'Low volatility growth.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0', icon: <Shield className="w-4 h-4" /> },
-    { id: 'aggressive', name: 'Aggressive', desc: 'Max Degen mode.', risk: 'Very High', color: '#8B5CF6', svg: 'M0,25 L10,20 L20,10 L30,2 L40,0', icon: <Zap className="w-4 h-4" /> }
+    { id: 'fast', name: 'Fast Launch', desc: 'High velocity momentum.', risk: 'High', color: '#F43F5E', icon: <Flame className="w-4 h-4" /> },
+    { id: 'balanced', name: 'Balanced', desc: 'Steady growth curve.', risk: 'Medium', color: '#F59E0B', recommended: true, icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'stable', name: 'Stable', desc: 'Low volatility growth.', risk: 'Low', color: '#10B981', icon: <Shield className="w-4 h-4" /> },
+    { id: 'aggressive', name: 'Aggressive', desc: 'Max Degen mode.', risk: 'Very High', color: '#8B5CF6', icon: <Zap className="w-4 h-4" /> }
   ];
-
-  const devSolCost = ((devAllocation / 100) * 85).toFixed(2);
 
   // Brutalist style helpers
   const bBorder = isDark ? "border-2 border-[rgba(255,255,255,0.2)]" : "border-3 border-black";
-  const bShadow = isDark ? "shadow-[6px_6px_0px_0px_#10B981]" : "shadow-[6px_6px_0px_0px_#000]";
+  const bShadow = isDark ? "shadow-[4px_4px_0px_0px_#10B981]" : "shadow-[4px_4px_0px_0px_#000]";
   const bBg = isDark ? "bg-[#050510]" : "bg-white";
   const bText = isDark ? "text-white" : "text-black";
   const bMuted = isDark ? "text-gray-400" : "text-gray-600";
 
   return (
-    <div className="max-w-4xl mx-auto w-full pt-4 pb-24 font-mono overflow-x-hidden">
+    <div className="max-w-4xl mx-auto w-full px-2 sm:px-4 py-2 font-mono flex flex-col justify-center min-h-[calc(100vh-90px)] max-h-[calc(100vh-70px)] overflow-hidden">
       
       {/* ── INIT MODE SELECTION ── */}
       {mode === 'none' && (
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, ease: EASE }} className="flex flex-col justify-center h-full gap-3 sm:gap-4">
           
-          {/* Header Banner */}
-          <div className={`p-8 sm:p-12 mb-10 text-center relative overflow-hidden ${bBorder} ${bShadow} ${bBg}`}>
-            <div className={`inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-black uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"}`}>
-              <Terminal className="w-4 h-4" /> TOKEN LAUNCHPAD FORGE
+          {/* Compact Header Banner */}
+          <div className={`p-4 sm:p-5 text-center relative overflow-hidden shrink-0 ${bBorder} ${bShadow} ${bBg}`}>
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 mb-2 text-[10px] font-black uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"}`}>
+              <Terminal className="w-3 h-3" /> TOKEN LAUNCHPAD FORGE
             </div>
             
-            <h1 className={`text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight mb-4 ${bText}`}>
+            <h1 className={`text-xl sm:text-3xl font-black uppercase tracking-tight mb-1 ${bText}`}>
               LAUNCH YOUR <span className="text-[#6366F1]">TOKEN</span>
             </h1>
-            <p className={`text-sm sm:text-base font-bold uppercase tracking-wider max-w-lg mx-auto ${bMuted}`}>
+            <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider max-w-md mx-auto ${bMuted}`}>
               {">"} TWO WAYS TO FORGE YOUR TOKEN ON-CHAIN IN MINUTES.
             </p>
           </div>
           
           {/* Mode Selection Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 items-stretch">
             
             {/* AI Launch Card */}
             <div 
               onClick={() => { setMode('ai'); setCurrentStep(1); }}
-              className={`p-6 sm:p-8 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-1 hover:translate-x-0.5 group`}
+              className={`p-4 sm:p-5 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-0.5 group`}
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className={`w-14 h-14 border-2 flex items-center justify-center ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
-                    <Sparkles className="w-8 h-8" />
+                <div className="flex justify-between items-start mb-3">
+                  <div className={`w-10 h-10 border-2 flex items-center justify-center ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                    <Sparkles className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#10B981] text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#10B981] text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
                     RECOMMENDED
                   </span>
                 </div>
                 
-                <h2 className={`text-2xl font-black uppercase mb-3 ${bText}`}>[ AI LAUNCH FORGE ]</h2>
-                <p className={`text-xs font-bold leading-relaxed mb-6 ${bMuted}`}>
-                  Describe your idea in plain text. Our AI generates the token narrative, name, ticker, and optimal launch settings automatically.
+                <h2 className={`text-lg sm:text-xl font-black uppercase mb-1.5 ${bText}`}>[ AI LAUNCH FORGE ]</h2>
+                <p className={`text-[11px] font-bold leading-normal mb-3 ${bMuted}`}>
+                  Describe your idea in plain text. AI generates token narrative, ticker, and optimal curve settings automatically.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <span className={`text-[10px] font-black uppercase ${isDark ? "text-[#10B981]" : "text-black"}`}>ESTIMATED TIME: ~2 MINS</span>
-                <div className={`w-full py-3.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-[#6366F1] text-white border-white group-hover:bg-[#10B981] group-hover:text-black" : "bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
+              <div className="flex flex-col gap-2">
+                <span className={`text-[9px] font-black uppercase ${isDark ? "text-[#10B981]" : "text-black"}`}>ESTIMATED TIME: ~2 MINS</span>
+                <div className={`w-full py-2.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-[#6366F1] text-white border-white group-hover:bg-[#10B981] group-hover:text-black" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
                   [ START WITH AI ]
                 </div>
               </div>
@@ -209,27 +202,27 @@ export default function LaunchPage() {
             {/* Custom Launch Card */}
             <div 
               onClick={() => { setMode('custom'); setCurrentStep(1); }}
-              className={`p-6 sm:p-8 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-1 hover:translate-x-0.5 group`}
+              className={`p-4 sm:p-5 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-0.5 group`}
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className={`w-14 h-14 border-2 flex items-center justify-center ${isDark ? "border-white bg-white/10 text-white" : "border-black bg-gray-100 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
-                    <Settings className="w-8 h-8" />
+                <div className="flex justify-between items-start mb-3">
+                  <div className={`w-10 h-10 border-2 flex items-center justify-center ${isDark ? "border-white bg-white/10 text-white" : "border-black bg-gray-100 text-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                    <Settings className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 border ${isDark ? "bg-black text-gray-300 border-gray-600" : "bg-gray-200 text-black border-black"}`}>
+                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 border ${isDark ? "bg-black text-gray-300 border-gray-600" : "bg-gray-200 text-black border-black"}`}>
                     MANUAL CONTROL
                   </span>
                 </div>
                 
-                <h2 className={`text-2xl font-black uppercase mb-3 ${bText}`}>[ CUSTOM LAUNCH ]</h2>
-                <p className={`text-xs font-bold leading-relaxed mb-6 ${bMuted}`}>
+                <h2 className={`text-lg sm:text-xl font-black uppercase mb-1.5 ${bText}`}>[ CUSTOM LAUNCH ]</h2>
+                <p className={`text-[11px] font-bold leading-normal mb-3 ${bMuted}`}>
                   Full manual control. Define your token name, symbol, description, bonding curve parameters, and initial liquidity.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <span className={`text-[10px] font-black uppercase ${bMuted}`}>ESTIMATED TIME: ~5 MINS</span>
-                <div className={`w-full py-3.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-black text-white border-white hover:border-[#10B981]" : "bg-white text-black border-black shadow-[4px_4px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
+              <div className="flex flex-col gap-2">
+                <span className={`text-[9px] font-black uppercase ${bMuted}`}>ESTIMATED TIME: ~5 MINS</span>
+                <div className={`w-full py-2.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-black text-white border-white hover:border-[#10B981]" : "bg-white text-black border-black shadow-[3px_3px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
                   [ START CUSTOM ]
                 </div>
               </div>
@@ -238,26 +231,26 @@ export default function LaunchPage() {
           </div>
 
           {/* Trust Indicators */}
-          <div className={`flex flex-wrap items-center justify-center gap-6 mt-12 p-4 border ${isDark ? "border-[rgba(255,255,255,0.1)] bg-black/40 text-gray-400" : "border-black bg-gray-50 text-black"} text-xs font-black uppercase`}>
-            <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#10B981]" /> AUDITED CONTRACTS</div>
+          <div className={`flex flex-wrap items-center justify-center gap-4 p-2.5 border ${isDark ? "border-[rgba(255,255,255,0.1)] bg-black/40 text-gray-400" : "border-black bg-gray-50 text-black"} text-[10px] font-black uppercase shrink-0`}>
+            <div className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-[#10B981]" /> AUDITED CONTRACTS</div>
             <span>//</span>
-            <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-[#F59E0B]" /> INSTANT DEPLOYMENT</div>
+            <div className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-[#F59E0B]" /> INSTANT DEPLOYMENT</div>
             <span>//</span>
-            <div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#6366F1]" /> MULTI-CHAIN</div>
+            <div className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-[#6366F1]" /> MULTI-CHAIN</div>
           </div>
         </motion.div>
       )}
 
       {/* ── SHARED FORM FOR AI & CUSTOM MODE ── */}
       {mode !== 'none' && (
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col justify-center h-full">
           
           {/* Back Button */}
           <button 
             onClick={resetLaunch} 
-            className={`flex items-center gap-2 mb-6 px-3 py-1.5 text-xs font-black uppercase border transition-all ${isDark ? "bg-black text-gray-300 border-gray-700 hover:text-white hover:border-white" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}
+            className={`self-start flex items-center gap-1.5 mb-3 px-2.5 py-1 text-[10px] font-black uppercase border transition-all ${isDark ? "bg-black text-gray-300 border-gray-700 hover:text-white hover:border-white" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}
           >
-            <ArrowLeft size={14} /> [ CANCEL & RETURN ]
+            <ArrowLeft size={12} /> [ CANCEL & RETURN ]
           </button>
           
           <StepIndicator
@@ -267,18 +260,18 @@ export default function LaunchPage() {
           />
 
           {/* Main Form Box */}
-          <div className={`p-6 sm:p-10 ${bBorder} ${bShadow} ${bBg}`}>
+          <div className={`p-4 sm:p-6 ${bBorder} ${bShadow} ${bBg}`}>
             
             <AnimatePresence mode="wait">
               
               {/* AI STEP 1: Describe */}
               {mode === 'ai' && currentStep === 1 && (
                 <motion.div key="ai-step-1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center text-center">
-                  <div className={`w-16 h-16 border-2 flex items-center justify-center mb-4 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
-                    <Sparkles className="w-8 h-8" />
+                  <div className={`w-12 h-12 border-2 flex items-center justify-center mb-3 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                    <Sparkles className="w-6 h-6" />
                   </div>
-                  <h2 className={`text-2xl sm:text-3xl font-black uppercase mb-2 ${bText}`}>[ WHAT IS YOUR TOKEN ABOUT? ]</h2>
-                  <p className={`text-xs sm:text-sm font-bold uppercase mb-6 max-w-md ${bMuted}`}>
+                  <h2 className={`text-lg sm:text-xl font-black uppercase mb-1 ${bText}`}>[ WHAT IS YOUR TOKEN ABOUT? ]</h2>
+                  <p className={`text-[10px] sm:text-xs font-bold uppercase mb-4 max-w-md ${bMuted}`}>
                     DESCRIBE YOUR TOKEN IDEA AND AI WILL FORGE NAME, TICKER & PARAMETERS.
                   </p>
                   
@@ -287,21 +280,21 @@ export default function LaunchPage() {
                     onChange={(e) => setAiPrompt(e.target.value)}
                     disabled={generatingStep > 0}
                     placeholder="E.g. 'A meme coin for cat lovers on Solana with community rewards and 100% fair launch...'"
-                    className={`w-full max-w-xl h-36 border-2 p-4 text-xs sm:text-sm font-bold uppercase outline-none resize-none mb-2 ${
+                    className={`w-full max-w-lg h-24 border-2 p-3 text-xs font-bold uppercase outline-none resize-none mb-1 ${
                       isDark 
                         ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' 
-                        : 'bg-gray-50 text-black border-black focus:bg-white shadow-[4px_4px_0px_0px_#000]'
+                        : 'bg-gray-50 text-black border-black focus:bg-white shadow-[3px_3px_0px_0px_#000]'
                     }`}
                   />
-                  <div className={`text-[10px] font-mono mb-6 ${bMuted}`}>{aiPrompt.length} / 280 CHARS</div>
+                  <div className={`text-[9px] font-mono mb-4 ${bMuted}`}>{aiPrompt.length} / 280 CHARS</div>
                   
                   <button 
                     onClick={simulateAIGeneration}
                     disabled={aiPrompt.length < 5 || generatingStep > 0}
-                    className={`w-full max-w-sm py-4 text-xs font-black uppercase border-2 transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full max-w-xs py-3 text-xs font-black uppercase border-2 transition-all flex items-center justify-center gap-2 ${
                       isDark 
                         ? 'bg-[#10B981] text-black border-[#10B981] hover:bg-[#059669] disabled:opacity-40' 
-                        : 'bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40'
+                        : 'bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40'
                     }`}
                   >
                     {generatingStep > 0 ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -315,25 +308,25 @@ export default function LaunchPage() {
 
               {/* DETAILS / REVIEW STEP */}
               {((mode === 'custom' && currentStep === 1) || (mode === 'ai' && currentStep === 2)) && (
-                <motion.div key="details-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
-                  <div className="border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
-                    <h2 className={`text-xl sm:text-2xl font-black uppercase ${bText}`}>
+                <motion.div key="details-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-4">
+                  <div className="border-b pb-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <h2 className={`text-lg sm:text-xl font-black uppercase ${bText}`}>
                       {mode === 'ai' ? "[ REVIEW AI CREATION ]" : "[ TOKEN DETAILS ]"}
                     </h2>
-                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>
+                    <p className={`text-[10px] font-bold uppercase mt-0.5 ${bMuted}`}>
                       {mode === 'ai' ? 'EDIT ANY GENERATED DETAILS BEFORE CONTINUING.' : 'ENTER YOUR TOKEN IDENTITY.'}
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Name */}
                     <div>
-                      <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>TOKEN NAME *</label>
+                      <label className={`block text-[10px] font-black uppercase mb-1 ${bText}`}>TOKEN NAME *</label>
                       <input 
                         type="text" 
                         value={formData.name} 
                         onChange={e => setFormData({...formData, name: e.target.value})} 
-                        className={`w-full border-2 p-3 text-xs font-bold uppercase outline-none ${
+                        className={`w-full border-2 p-2.5 text-xs font-bold uppercase outline-none ${
                           isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
                         }`} 
                         placeholder="E.G. MOON FLUX"
@@ -341,15 +334,15 @@ export default function LaunchPage() {
                     </div>
                     {/* Ticker */}
                     <div>
-                      <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>TICKER SYMBOL *</label>
+                      <label className={`block text-[10px] font-black uppercase mb-1 ${bText}`}>TICKER SYMBOL *</label>
                       <div className="relative">
-                        <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black ${bMuted}`}>$</span>
+                        <span className={`absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-black ${bMuted}`}>$</span>
                         <input 
                           type="text" 
                           value={formData.ticker} 
                           onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} 
                           maxLength={10} 
-                          className={`w-full border-2 p-3 pl-7 text-xs font-bold uppercase outline-none ${
+                          className={`w-full border-2 p-2.5 pl-6 text-xs font-bold uppercase outline-none ${
                             isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
                           }`} 
                           placeholder="FLUX"
@@ -360,11 +353,11 @@ export default function LaunchPage() {
                   
                   {/* Description */}
                   <div>
-                    <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>DESCRIPTION *</label>
+                    <label className={`block text-[10px] font-black uppercase mb-1 ${bText}`}>DESCRIPTION *</label>
                     <textarea 
                       value={formData.description} 
                       onChange={e => setFormData({...formData, description: e.target.value})} 
-                      className={`w-full h-24 border-2 p-3 text-xs font-bold uppercase outline-none resize-none ${
+                      className={`w-full h-16 border-2 p-2.5 text-xs font-bold uppercase outline-none resize-none ${
                         isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
                       }`} 
                     />
@@ -373,23 +366,23 @@ export default function LaunchPage() {
                   {/* Curve Options */}
                   {mode === 'ai' && (
                     <div>
-                      <label className={`block text-xs font-black uppercase mb-3 ${bText}`}>BONDING CURVE CONFIG</label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className={`block text-[10px] font-black uppercase mb-2 ${bText}`}>BONDING CURVE CONFIG</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                         {CURVES.slice(0, 2).map(curve => (
                           <div 
                             key={curve.id} 
                             onClick={() => setSelectedCurve(curve.id)}
-                            className={`p-4 border-2 cursor-pointer transition-all ${
+                            className={`p-3 border-2 cursor-pointer transition-all ${
                               selectedCurve === curve.id 
-                                ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]' 
+                                ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[2px_2px_0px_0px_#000]' 
                                 : isDark ? 'border-gray-800 bg-black text-gray-400' : 'border-gray-300 bg-white text-black'
                             }`}
                           >
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-1.5 mb-0.5">
                               {curve.icon}
                               <h3 className="font-black text-xs uppercase">{curve.name}</h3>
                             </div>
-                            <p className="text-[10px] font-bold uppercase mb-2 opacity-80">{curve.desc}</p>
+                            <p className="text-[9px] font-bold uppercase opacity-80">{curve.desc}</p>
                           </div>
                         ))}
                       </div>
@@ -397,17 +390,17 @@ export default function LaunchPage() {
                   )}
 
                   {/* Navigation */}
-                  <div className="flex gap-4 pt-4 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                  <div className="flex gap-3 pt-2 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
                     {mode === 'ai' ? (
                       <>
-                        <button onClick={() => setCurrentStep(1)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
-                        <button onClick={() => setCurrentStep(3)} disabled={!isTickerValid || !formData.name} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] disabled:opacity-40"}`}>[ CONTINUE TO DEPLOY ]</button>
+                        <button onClick={() => setCurrentStep(1)} className={`flex-1 py-2.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                        <button onClick={() => setCurrentStep(3)} disabled={!isTickerValid || !formData.name} className={`flex-1 py-2.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[2px_2px_0px_0px_#000] disabled:opacity-40"}`}>[ CONTINUE TO DEPLOY ]</button>
                       </>
                     ) : (
                       <button 
                         onClick={() => setCurrentStep(2)}
                         disabled={!formData.name || !formData.ticker || !formData.description || !isTickerValid}
-                        className={`w-full py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] disabled:opacity-40"}`}
+                        className={`w-full py-2.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[2px_2px_0px_0px_#000] disabled:opacity-40"}`}
                       >
                         [ CONTINUE TO SETTINGS ]
                       </button>
@@ -418,93 +411,93 @@ export default function LaunchPage() {
 
               {/* CUSTOM STEP 2: Settings */}
               {mode === 'custom' && currentStep === 2 && (
-                <motion.div key="settings-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
-                  <div className="border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
-                    <h2 className={`text-xl sm:text-2xl font-black uppercase ${bText}`}>[ LAUNCH SETTINGS ]</h2>
-                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>CONFIGURE BONDING CURVE & LIQUIDITY SPLIT.</p>
+                <motion.div key="settings-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-4">
+                  <div className="border-b pb-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <h2 className={`text-lg sm:text-xl font-black uppercase ${bText}`}>[ LAUNCH SETTINGS ]</h2>
+                    <p className={`text-[10px] font-bold uppercase mt-0.5 ${bMuted}`}>CONFIGURE BONDING CURVE & LIQUIDITY SPLIT.</p>
                   </div>
                   
                   {/* Curve Selection */}
                   <div>
-                    <label className={`block text-xs font-black uppercase mb-3 ${bText}`}>SELECT BONDING CURVE</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label className={`block text-[10px] font-black uppercase mb-2 ${bText}`}>SELECT BONDING CURVE</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                       {CURVES.map(curve => (
                         <div 
                           key={curve.id} 
                           onClick={() => setSelectedCurve(curve.id)}
-                          className={`p-4 border-2 cursor-pointer transition-all ${
+                          className={`p-3 border-2 cursor-pointer transition-all ${
                             selectedCurve === curve.id 
-                              ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]' 
+                              ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[2px_2px_0px_0px_#000]' 
                               : isDark ? 'border-gray-800 bg-black text-gray-400' : 'border-gray-300 bg-white text-black'
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
                             {curve.icon}
                             <h3 className="font-black text-xs uppercase">{curve.name}</h3>
                           </div>
-                          <p className="text-[10px] font-bold uppercase opacity-80">{curve.desc}</p>
+                          <p className="text-[9px] font-bold uppercase opacity-80">{curve.desc}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex gap-4 pt-4 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
-                    <button onClick={() => setCurrentStep(1)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
-                    <button onClick={() => setCurrentStep(3)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000]"}`}>[ REVIEW & DEPLOY ]</button>
+                  <div className="flex gap-3 pt-2 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                    <button onClick={() => setCurrentStep(1)} className={`flex-1 py-2.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                    <button onClick={() => setCurrentStep(3)} className={`flex-1 py-2.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#6366F1] text-white border-black shadow-[2px_2px_0px_0px_#000]"}`}>[ REVIEW & DEPLOY ]</button>
                   </div>
                 </motion.div>
               )}
               
               {/* STEP 3: Deploy */}
               {currentStep === 3 && (
-                <motion.div key="deploy-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
-                  <div className="text-center border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
-                    <div className={`w-14 h-14 border-2 flex items-center justify-center mx-auto mb-3 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-[#10B981] text-black shadow-[3px_3px_0px_0px_#000]"}`}>
-                      <Rocket className="w-7 h-7" />
+                <motion.div key="deploy-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-4">
+                  <div className="text-center border-b pb-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <div className={`w-10 h-10 border-2 flex items-center justify-center mx-auto mb-2 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-[#10B981] text-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                      <Rocket className="w-5 h-5" />
                     </div>
-                    <h2 className={`text-2xl font-black uppercase ${bText}`}>[ READY TO DEPLOY ]</h2>
-                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>REVIEW YOUR TOKEN RECEIPT BEFORE LAUNCHING ON-CHAIN.</p>
+                    <h2 className={`text-lg sm:text-xl font-black uppercase ${bText}`}>[ READY TO DEPLOY ]</h2>
+                    <p className={`text-[10px] font-bold uppercase mt-0.5 ${bMuted}`}>REVIEW YOUR TOKEN RECEIPT BEFORE LAUNCHING ON-CHAIN.</p>
                   </div>
                   
                   {/* Receipt Box */}
-                  <div className={`p-6 border-2 flex flex-col gap-3 ${isDark ? "border-white bg-black" : "border-black bg-gray-50 shadow-[4px_4px_0px_0px_#000]"}`}>
-                    <div className="flex justify-between text-xs font-black uppercase">
+                  <div className={`p-4 border-2 flex flex-col gap-2 ${isDark ? "border-white bg-black" : "border-black bg-gray-50 shadow-[3px_3px_0px_0px_#000]"}`}>
+                    <div className="flex justify-between text-[11px] font-black uppercase">
                       <span>TOKEN NAME:</span>
                       <span className="text-[#6366F1]">{formData.name}</span>
                     </div>
-                    <div className="flex justify-between text-xs font-black uppercase">
+                    <div className="flex justify-between text-[11px] font-black uppercase">
                       <span>TICKER SYMBOL:</span>
                       <span className="text-[#6366F1]">${formData.ticker}</span>
                     </div>
-                    <div className="flex justify-between text-xs font-black uppercase">
+                    <div className="flex justify-between text-[11px] font-black uppercase">
                       <span>BONDING CURVE:</span>
                       <span className="text-[#10B981]">{selectedCurve}</span>
                     </div>
-                    <div className="flex justify-between text-xs font-black uppercase">
+                    <div className="flex justify-between text-[11px] font-black uppercase">
                       <span>NETWORK:</span>
                       <span>SOLANA MULTI-CHAIN</span>
                     </div>
                     
-                    <div className="border-t my-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }} />
+                    <div className="border-t my-1" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }} />
 
-                    <div className="flex justify-between text-sm font-black uppercase">
+                    <div className="flex justify-between text-xs font-black uppercase">
                       <span>ESTIMATED COST:</span>
                       <span className="text-[#F59E0B]">~0.002 SOL</span>
                     </div>
                   </div>
                   
-                  <div className="flex gap-4 pt-2">
-                    <button onClick={() => setCurrentStep(2)} className={`py-4 px-6 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                  <div className="flex gap-3 pt-1">
+                    <button onClick={() => setCurrentStep(2)} className={`py-3 px-5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
                     <button 
                       onClick={handleDeploy}
                       disabled={isDeploying || !anchorWallet}
-                      className={`flex-1 py-4 text-sm font-black uppercase border-2 flex items-center justify-center gap-2 ${
+                      className={`flex-1 py-3 text-xs font-black uppercase border-2 flex items-center justify-center gap-2 ${
                         isDark 
                           ? "bg-[#10B981] text-black border-[#10B981] hover:bg-[#059669] disabled:opacity-40" 
-                          : "bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40"
+                          : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40"
                       }`}
                     >
-                      {isDeploying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                      {isDeploying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
                       {isDeploying ? "[ DEPLOYING ON-CHAIN... ]" : !anchorWallet ? "[ CONNECT WALLET TO DEPLOY ]" : "[ FORGE TOKEN ON-CHAIN ]"}
                     </button>
                   </div>
