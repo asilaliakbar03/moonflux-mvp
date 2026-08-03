@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, MessageCircle, Share2, Flame, Bot, Bookmark, X } from 'lucide-react';
+import { ChevronDown, MessageCircle, Share2, Flame, Bot, Bookmark, X, Terminal } from 'lucide-react';
 import Link from 'next/link';
 import AnimatedCounter from '@/components/AnimatedCounter';
-import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/components/ThemeProvider';
 
 const getMemeImage = (ticker: string) => {
@@ -32,190 +31,120 @@ interface FeedToken {
 function FeedItem({ token, idx, activeIndex, savedTokens, handleSave }: any) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: any) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    setTilt({ x: -y / 40, y: x / 40 });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-  };
-
-  const getScoreStyles = (score: number) => {
-    if (score > 85) return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#10B981] text-[#10B981]';
-    if (score >= 50) return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#6366F1] text-[#6366F1]';
-    return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#475569] text-[#475569]';
-  };
-
-  const getUrgencyColor = (signal: string = '') => {
-    const s = (signal || '').toLowerCase();
-    if (s.includes('high')) return 'text-[#F43F5E]';
-    if (s.includes('medium')) return 'text-[#F59E0B]';
-    return 'text-[#10B981]';
-  };
+  const tokenImg = getMemeImage(token.ticker);
 
   return (
-    <div className="h-full w-full max-w-[100vw] overflow-x-hidden snap-start snap-always relative flex items-end md:items-end justify-center p-3 sm:p-8 pb-20 sm:pb-24">
-      {/* Cyberpunk Video Background Placeholder */}
-      <div className={`absolute inset-0 z-0 ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'}`}>
-        <div className={`absolute inset-0 opacity-20 ${isDark ? 'bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.2)_0%,rgba(0,0,0,1)_70%)]' : 'bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.1)_0%,rgba(255,255,255,1)_70%)]'}`} />
-        <div className={`absolute inset-0 border-[1px] ${isDark ? 'border-[rgba(99,102,241,0.08)]' : 'border-[var(--color-border-subtle)]'} m-2 sm:m-4 rounded-3xl`} />
+    <div className="h-full w-full max-w-[100vw] overflow-x-hidden snap-start snap-always relative flex items-center justify-center p-4 sm:p-8 pb-20 sm:pb-24 font-mono">
+      {/* Cyberpunk Grid Background */}
+      <div className={`absolute inset-0 z-0 ${isDark ? 'bg-[#050510]' : 'bg-gray-100'}`}>
+        <div className={`absolute inset-0 opacity-10 ${isDark ? "bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(0,0,0,1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,1)_1px,transparent_1px)]"}`} style={{ backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-4xl h-full flex flex-row justify-between items-end gap-2 md:gap-6 overflow-y-auto md:overflow-visible scrollbar-hide">
+      <div className="relative z-10 w-full max-w-5xl h-full flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 overflow-y-auto scrollbar-hide py-6">
         
-        {/* Main Info (Bottom Left) */}
+        {/* ── LARGE TOKEN ARTWORK CARD ── */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={activeIndex === idx ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.4, type: "spring" }}
+          className="w-full max-w-[340px] sm:max-w-[400px] aspect-square relative shrink-0"
+        >
+          <div className={`w-full h-full relative overflow-hidden ${isDark ? "border-2 border-[rgba(255,255,255,0.2)] bg-black shadow-[6px_6px_0px_0px_#10B981]" : "border-3 border-black bg-white shadow-[6px_6px_0px_0px_#000]"}`}>
+            {/* Big Token Avatar Image */}
+            <img 
+              src={tokenImg} 
+              alt={token.name}
+              className="w-full h-full object-cover"
+            />
+
+            {/* Badges overlay */}
+            <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+              <div className={`px-2.5 py-1 text-xs font-black uppercase border ${isDark ? "bg-black text-[#10B981] border-[#10B981]" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                AI MATCH: {token.matchScore}%
+              </div>
+              <div className={`px-2.5 py-1 text-xs font-black uppercase border ${isDark ? "bg-red-950/90 text-[#F43F5E] border-[#F43F5E]" : "bg-red-100 text-red-600 border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                {token.urgencySignal || 'HIGH CONVICTION'}
+              </div>
+            </div>
+
+            <div className="absolute top-3 right-3 z-10">
+              <span className={`px-2 py-1 text-xs font-black uppercase border ${isDark ? "bg-black text-white border-white" : "bg-black text-white border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                ${token.marketCap || '4.2M'} MC
+              </span>
+            </div>
+
+            {/* Bottom Title Bar Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-black/80 to-transparent text-white z-10">
+              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight truncate">{token.name}</h2>
+              <div className="text-sm font-bold text-[#818CF8]">{token.ticker}</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── DETAILS & ACTIONS BOX ── */}
         <motion.div 
-          initial={{ x: -50, opacity: 0 }}
+          initial={{ x: 30, opacity: 0 }}
           animate={activeIndex === idx ? { x: 0, opacity: 1 } : {}}
           transition={{ delay: 0.1, type: "spring" }}
-          className="flex-1 min-w-0 max-w-2xl flex flex-col justify-end"
+          className="flex-1 w-full max-w-xl flex flex-col gap-4"
         >
-          <div className="inline-flex flex-col gap-1 sm:gap-2 mb-3 sm:mb-6">
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${getScoreStyles(token.matchScore)} text-xs font-mono font-bold w-fit ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-2xl`}>
-              <Bot size={14} /> AI MATCH: <AnimatedCounter value={token.matchScore} suffix="%" />
-            </div>
-            <div className={`text-[10px] uppercase tracking-wider font-bold ml-1 ${getUrgencyColor(token.urgencySignal)}`}>
-              {token.urgencySignal}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 mb-2 sm:mb-4">
-            <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 ${isDark ? 'border-[rgba(99,102,241,0.4)] shadow-[0_0_20px_rgba(99,102,241,0.3)] bg-black' : 'border-black shadow-[4px_4px_0px_0px_#000] bg-gray-100'} shrink-0`}>
-              <img 
-                src={getMemeImage(token.ticker)} 
-                alt={token.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="min-w-0">
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-1 shadow-[0_0_25px_rgba(99,102,241,0.25)] flex items-center gap-3 display-safe truncate">
-                {token.name} 
-              </h2>
-              <div className="text-lg sm:text-xl md:text-2xl font-mono text-[#6366F1] font-bold">{token.ticker}</div>
-            </div>
-          </div>
-
-          <div 
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-            className={`transition-all duration-300 ease-out ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl border p-3 sm:p-4 md:p-5 rounded-2xl mb-2 sm:mb-4 md:mb-6 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-          >
-            <p className="text-sm md:text-base text-[var(--color-text-primary)] mb-4 leading-relaxed font-medium">
+          {/* Explanation Card */}
+          <div className={`p-5 sm:p-6 ${isDark ? "border-2 border-[rgba(255,255,255,0.2)] bg-[#050510] shadow-[6px_6px_0px_0px_#10B981]" : "border-3 border-black bg-white shadow-[6px_6px_0px_0px_#000]"}`}>
+            <h3 className={`text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 ${isDark ? "text-[#10B981]" : "text-[#6366F1]"}`}>
+              <Terminal size={14} /> [ AI SIGNAL DIAGNOSTIC ]
+            </h3>
+            <p className={`text-sm sm:text-base font-bold leading-relaxed mb-4 ${isDark ? "text-gray-200" : "text-black"}`}>
               {token.explanation}
             </p>
             <div className="flex flex-wrap gap-2">
               {(token.matchReasons || []).map((r: string, i: number) => (
-                <span key={i} className="px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full bg-[rgba(99,102,241,0.1)] text-[#6366F1] border border-[rgba(99,102,241,0.2)]">
+                <span key={i} className={`px-2.5 py-1 text-xs font-bold uppercase border ${isDark ? "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30" : "bg-black text-white border-black"}`}>
                   #{r.replace(/ /g, '')}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Bonding Curve & Actions */}
-          <div 
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-            className={`transition-all duration-300 ease-out ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl border p-3 sm:p-4 md:p-5 rounded-2xl flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-4 md:gap-6 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-          >
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between text-[10px] md:text-xs font-mono text-[var(--color-text-secondary)] mb-2 uppercase">
-                <span>Bonding Curve</span>
-                <span className="text-[#6366F1]"><AnimatedCounter value={token.progress} suffix="%" /></span>
+          {/* Bonding Curve & Action Bar */}
+          <div className={`p-5 sm:p-6 ${isDark ? "border-2 border-[rgba(255,255,255,0.2)] bg-[#050510] shadow-[6px_6px_0px_0px_#10B981]" : "border-3 border-black bg-white shadow-[6px_6px_0px_0px_#000]"} flex flex-col gap-4`}>
+            <div>
+              <div className="flex justify-between text-xs font-black uppercase mb-1.5">
+                <span className={isDark ? "text-gray-400" : "text-gray-600"}>BONDING CURVE PROGRESS</span>
+                <span className="text-[#6366F1]">{token.progress || 78}%</span>
               </div>
-              <div className={`h-2 md:h-2.5 ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-2)]'} rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]`}>
-                <div className="h-full bg-[#6366F1] shadow-[0_0_25px_rgba(99,102,241,0.25)] transition-all duration-700 ease-out" style={{ width: `${token.progress}%` }} />
+              <div className={`h-3 w-full border-2 ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-100"} p-0.5`}>
+                <div className="h-full bg-[#10B981]" style={{ width: `${token.progress || 78}%` }} />
               </div>
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 shrink-0">
-              <MagneticButton as="div" strength={0.2} className="flex-1">
-                <button 
-                  onClick={() => handleSave(token)}
-                  className={`w-full flex items-center justify-center gap-2 px-4 md:px-5 py-2 md:py-2.5 ${isDark ? 'bg-[#000000]/40' : 'bg-[var(--color-surface-base)]/40'} rounded-xl font-bold transition-all border border-[rgba(99,102,241,0.15)] text-sm md:text-base hover:bg-[rgba(99,102,241,0.15)] hover:border-[#6366F1] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${savedTokens.find((t: any) => t.id === token.id) ? 'text-[#F59E0B]' : 'text-[#6366F1]'}`}
-                  aria-label={savedTokens.find((t: any) => t.id === token.id) ? "Unsave token" : "Save token"}
-                >
-                  <Bookmark size={18} className={savedTokens.find((t: any) => t.id === token.id) ? "fill-[#F59E0B]" : ""} />
-                  {savedTokens.find((t: any) => t.id === token.id) ? "Saved" : "Save"}
-                </button>
-              </MagneticButton>
-              <MagneticButton as="div" strength={0.25} className="flex-1">
-                <Link 
-                  href={`/token/${token.id}`} 
-                  className="w-full flex items-center justify-center px-4 md:px-6 py-2 md:py-2.5 bg-[#6366F1] text-white rounded-xl font-bold shadow-[0_0_25px_rgba(99,102,241,0.25)] hover:bg-[#4F46E5] transition-all text-sm md:text-base active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                  aria-label="Trade Now"
-                >
-                  Trade Now
-                </Link>
-              </MagneticButton>
+
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => handleSave(token)}
+                className={`flex-1 py-3 px-4 text-xs sm:text-sm font-black uppercase border-2 transition-all flex items-center justify-center gap-2 ${
+                  savedTokens.find((t: any) => t.id === token.id) 
+                    ? "bg-[#F59E0B] text-black border-black shadow-[3px_3px_0px_0px_#000]" 
+                    : isDark ? "bg-black text-white border-[rgba(255,255,255,0.2)] hover:bg-[#10B981] hover:text-black" : "bg-gray-100 text-black border-black hover:bg-black hover:text-white shadow-[3px_3px_0px_0px_#000]"
+                }`}
+              >
+                <Bookmark size={16} />
+                {savedTokens.find((t: any) => t.id === token.id) ? "[ SAVED ]" : "[ SAVE TOKEN ]"}
+              </button>
+              <Link 
+                href={`/token/${token.id}`} 
+                className={`flex-1 py-3 px-4 text-xs sm:text-sm font-black uppercase border-2 ${isDark ? "border-white bg-[#6366F1] text-white shadow-[3px_3px_0px_0px_#10B981]" : "border-black bg-[#6366F1] text-white shadow-[3px_3px_0px_0px_#000]"} hover:bg-[#4F46E5] text-center flex items-center justify-center`}
+              >
+                [ TRADE NOW ]
+              </Link>
             </div>
           </div>
         </motion.div>
 
-        {/* Right Action Bar (TikTok Style) */}
-        <motion.div 
-          initial={{ x: 50, opacity: 0 }}
-          animate={activeIndex === idx ? { x: 0, opacity: 1 } : {}}
-          transition={{ delay: 0.2, type: "spring" }}
-          className={`flex flex-col gap-4 md:gap-6 items-center justify-end md:justify-center p-2 rounded-[32px] ${isDark ? 'bg-[rgba(5,5,16,0.90)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.90)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-xl border pb-4 pt-4 mb-4 shrink-0 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-        >
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Boost"
-            onClick={() => {
-              console.log('Boost clicked');
-              alert('Coming soon');
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <Flame className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Boost</span>
-          </button>
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Chat"
-            onClick={() => {
-              console.log('Chat clicked');
-              alert('Coming soon');
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Chat</span>
-          </button>
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Share"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: token.name, url: window.location.href }).catch(console.error);
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('URL copied to clipboard');
-              }
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <Share2 className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Share</span>
-          </button>
-        </motion.div>
       </div>
 
       {/* Scroll Hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[var(--color-text-muted)] animate-bounce z-10 flex flex-col items-center">
-        <span className="text-[10px] uppercase font-mono mb-1 tracking-widest text-[var(--color-text-secondary)]">Scroll</span>
-        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-gray-400 animate-bounce z-10 flex flex-col items-center">
+        <span className="text-[10px] uppercase font-black tracking-widest">Scroll</span>
+        <ChevronDown size={20} />
       </div>
     </div>
   );
@@ -225,8 +154,8 @@ export default function FeedPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [tokens, setTokens] = useState<FeedToken[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [savedTokens, setSavedTokens] = useState<FeedToken[]>([]);
   const [showSavedModal, setShowSavedModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -234,40 +163,21 @@ export default function FeedPage() {
   useEffect(() => {
     async function loadFeed() {
       try {
-        const res = await fetch('/api/personalized-feed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
-        });
+        const res = await fetch('/api/trade-copilot');
+        if (!res.ok) throw new Error('Copilot endpoint failed');
+        const data = await res.json();
         
-        let tokenList = [];
-        if (res.ok) {
-          const data = await res.json();
-          tokenList = data.tokens || [];
+        if (data.recommendations && Array.isArray(data.recommendations)) {
+          setTokens(data.recommendations);
+        } else {
+          throw new Error('Invalid schema from copilot');
         }
-        
-        if (!tokenList || tokenList.length === 0) {
-          tokenList = [
-            { id: 'tok_luna_doge', name: 'Luna Doge', ticker: '$LDOGE', matchScore: 94, urgencySignal: 'High Conviction', matchReasons: ['High Momentum', 'AI Narrative', 'Whale Inflows'], explanation: 'Whale wallets accumulated $420k in the last 2 hours following AI agent volume spike.', progress: 78, marketCap: '4.2M', risk: 'Medium' },
-            { id: 'tok_cyber_pepe', name: 'Cyber Pepe', ticker: '$CPEPE', matchScore: 88, urgencySignal: 'Medium Signal', matchReasons: ['Breakout Pattern', 'Community Growth'], explanation: 'Consolidating above 200 EMA with expanding volume on DEX. Technical breakout imminent.', progress: 62, marketCap: '1.8M', risk: 'Low' },
-            { id: 'tok_sol_quantum', name: 'Quantum SOL', ticker: '$QSOL', matchScore: 82, urgencySignal: 'High Conviction', matchReasons: ['DePIN AI', 'Cross-chain Bridge'], explanation: 'Node network hash rate up 340% week-over-week with automated yield distribution.', progress: 91, marketCap: '12.5M', risk: 'Low' },
-          ];
-        }
-        
-        const enhanced = tokenList.map((t: any) => ({
-          ...t,
-          name: t.name || t.id.replace('tok_', '').split('_').map((s:string) => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-          ticker: t.ticker || '$' + t.id.replace('tok_', '').substring(0, 4).toUpperCase(),
-          progress: t.progress || Math.floor(Math.random() * 60) + 40,
-          marketCap: t.marketCap || (Math.random() * 50 + 10).toFixed(1) + 'k',
-          risk: t.risk || 'Medium'
-        }));
-        setTokens(enhanced);
-      } catch (e) {
-        console.error('Feed API error:', e);
+      } catch (err) {
+        console.warn('Fallback to mock feed', err);
         setTokens([
           { id: 'tok_luna_doge', name: 'Luna Doge', ticker: '$LDOGE', matchScore: 94, urgencySignal: 'High Conviction', matchReasons: ['High Momentum', 'AI Narrative'], explanation: 'Whale wallets accumulated $420k in the last 2 hours following AI agent volume spike.', progress: 78, marketCap: '4.2M', risk: 'Medium' },
           { id: 'tok_cyber_pepe', name: 'Cyber Pepe', ticker: '$CPEPE', matchScore: 88, urgencySignal: 'Medium Signal', matchReasons: ['Breakout Pattern'], explanation: 'Consolidating above 200 EMA with expanding volume on DEX.', progress: 62, marketCap: '1.8M', risk: 'Low' },
+          { id: 'tok_ai_swarm', name: 'AI Swarm', ticker: '$SWRM', matchScore: 96, urgencySignal: 'High Conviction', matchReasons: ['Whale Buys', 'Trending AI'], explanation: 'Multi-sig wallet created 15 minutes ago. Trading volume surge +210%.', progress: 95, marketCap: '8.9M', risk: 'Medium' },
         ]);
       } finally {
         setLoading(false);
@@ -324,13 +234,12 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className={`flex flex-col gap-4 h-screen w-full items-center justify-center ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'} text-[#6366F1] font-mono overflow-x-hidden`}>
+      <div className={`flex flex-col gap-4 h-screen w-full items-center justify-center ${isDark ? 'bg-[#000000]' : 'bg-gray-100'} text-[#6366F1] font-mono overflow-x-hidden`}>
         <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin shadow-[0_0_25px_rgba(99,102,241,0.25)]" />
-        <span className="animate-pulse shadow-[0_0_25px_rgba(99,102,241,0.25)]">[INITIALIZING FEED...]</span>
+        <span className="animate-pulse shadow-[0_0_25px_rgba(99,102,241,0.25)] font-black">[ INITIALIZING AI FEED... ]</span>
       </div>
     );
   }
-
 
   return (
     <div 
@@ -338,17 +247,21 @@ export default function FeedPage() {
       onScroll={handleScroll}
       data-lenis-prevent
       data-lenis-prevent-touch
-      className={`fixed top-[64px] left-0 md:left-[72px] right-0 bottom-16 md:bottom-0 overflow-y-scroll overflow-x-hidden snap-y snap-mandatory ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'} z-40 scrollbar-hide`}
+      className={`fixed top-[64px] left-0 md:left-[72px] right-0 bottom-16 md:bottom-0 overflow-y-scroll overflow-x-hidden snap-y snap-mandatory ${isDark ? 'bg-[#000000]' : 'bg-gray-100'} z-40 scrollbar-hide font-mono`}
     >
       {/* Top Right Saved Tokens Button */}
       <div className="absolute top-6 right-6 z-50">
         <button 
           onClick={() => setShowSavedModal(true)}
-          className={`flex items-center gap-2 ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl px-4 py-2 rounded-full border text-[#6366F1] hover:bg-[rgba(99,102,241,0.15)] hover:text-[#818CF8] hover:border-[rgba(99,102,241,0.30)] transition-all shadow-[0_0_25px_rgba(99,102,241,0.25)] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none`}
+          className={`flex items-center gap-2 border-2 px-4 py-2 font-black uppercase text-xs transition-all ${
+            isDark 
+              ? 'bg-black text-white border-[rgba(255,255,255,0.2)] hover:border-[#10B981]' 
+              : 'bg-white text-black border-black shadow-[3px_3px_0px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5'
+          }`}
           aria-label="View Saved Tokens"
         >
           <Bookmark size={16} />
-          <span className="font-mono text-sm font-bold">Saved ({savedTokens.length})</span>
+          <span>[ SAVED ({savedTokens.length}) ]</span>
         </button>
       </div>
 
@@ -370,64 +283,62 @@ export default function FeedPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 z-[100] ${isDark ? 'bg-black/80' : 'bg-white/80'} backdrop-blur-md flex justify-end`}
+            className={`fixed inset-0 z-[100] ${isDark ? 'bg-black/80' : 'bg-black/40'} backdrop-blur-md flex justify-end font-mono`}
           >
             <motion.div 
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`w-full max-w-md h-full ${isDark ? 'bg-[rgba(5,5,16,0.95)] border-[rgba(99,102,241,0.08)] shadow-[-10px_0_30px_rgba(0,0,0,0.8)]' : 'bg-[rgba(255,255,255,0.95)] border-[rgba(99,102,241,0.2)] shadow-[-10px_0_30px_rgba(0,0,0,0.1)]'} backdrop-blur-2xl border-l p-6 overflow-y-auto`}
+              className={`w-full max-w-md h-full ${isDark ? 'bg-[#050510] border-l border-[rgba(255,255,255,0.2)]' : 'bg-white border-l-4 border-black'} p-6 overflow-y-auto`}
             >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2 display-safe drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                  <Bookmark className="text-[#6366F1]" /> Saved Tokens
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-500/20">
+                <h3 className="text-xl font-black uppercase flex items-center gap-2">
+                  <Bookmark className="text-[#6366F1]" /> [ SAVED TOKENS ]
                 </h3>
                 <button 
                   onClick={() => setShowSavedModal(false)}
-                  className="p-2 rounded-full text-[var(--color-text-primary)] hover:text-[#818CF8] hover:bg-[rgba(99,102,241,0.15)] transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
+                  className="p-1.5 border border-black font-black hover:bg-black hover:text-white transition-all"
                   aria-label="Close saved tokens modal"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               </div>
 
               {savedTokens.length === 0 ? (
-                <div className="text-center text-[var(--color-text-muted)] mt-20 font-mono text-sm">
-                  No saved tokens yet.
+                <div className="text-center text-gray-500 mt-20 font-black uppercase text-sm">
+                  [ NO SAVED TOKENS YET ]
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   {savedTokens.map((token) => (
-                    <div key={token.id} className={`${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl p-4 rounded-xl border shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:border-[rgba(99,102,241,0.20)] transition-all`}>
+                    <div key={token.id} className={`p-4 border-2 ${isDark ? 'border-[rgba(255,255,255,0.2)] bg-black' : 'border-black bg-gray-50 shadow-[3px_3px_0px_0px_#000]'}`}>
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-3">
                           <img 
                             src={getMemeImage(token.ticker)} 
                             alt={token.name}
-                            className="w-10 h-10 rounded-lg object-cover border border-black shadow-[2px_2px_0px_0px_#000] shrink-0"
+                            className="w-12 h-12 border-2 border-black object-cover shrink-0"
                           />
                           <div>
-                            <h4 className="text-lg font-bold text-[var(--color-text-primary)] display-safe">{token.name}</h4>
-                            <span className="text-xs font-mono text-[#6366F1]">{token.ticker}</span>
+                            <h4 className="text-base font-black uppercase">{token.name}</h4>
+                            <span className="text-xs font-bold text-[#6366F1]">{token.ticker}</span>
                           </div>
                         </div>
-                        <span className={`text-xs font-bold px-2 py-1 rounded ${isDark ? 'bg-[#000000]/60 border-[rgba(99,102,241,0.08)]' : 'bg-[var(--color-surface-2)] border-[rgba(99,102,241,0.2)]'} border ${getUrgencyColor(token.urgencySignal)}`}>
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 border ${isDark ? 'border-white text-white' : 'border-black text-black bg-yellow-300'}`}>
                           {token.urgencySignal}
                         </span>
                       </div>
                       <div className="flex gap-2 mt-4">
                         <Link 
                           href={`/token/${token.id}`} 
-                          className="flex-1 text-center py-2 bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.2)] text-[#818CF8] hover:bg-[rgba(99,102,241,0.25)] rounded-lg text-sm font-bold transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                          aria-label={`Trade ${token.name}`}
+                          className="flex-1 text-center py-2 bg-[#6366F1] text-white border border-black text-xs font-black uppercase"
                         >
-                          Trade
+                          [ TRADE ]
                         </Link>
                         <button 
                           onClick={() => setSavedTokens(savedTokens.filter(t => t.id !== token.id))}
-                          className="px-3 py-2 border border-[rgba(244,63,94,0.2)] text-[#F43F5E] hover:bg-[rgba(244,63,94,0.15)] hover:border-[rgba(244,63,94,0.3)] rounded-lg transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                          aria-label={`Remove ${token.name} from saved`}
+                          className="px-3 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs font-black"
                         >
                           <X size={16} />
                         </button>
