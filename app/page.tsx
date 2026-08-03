@@ -1,13 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Rocket, Search, ArrowRight, CheckCircle2, Zap, AtSign, MessageCircle } from "lucide-react";
+import { TrendingUp, Rocket, Search, Zap, AtSign, MessageCircle, Terminal, Radio } from "lucide-react";
 import Link from "next/link";
 import { useMoonWallet } from "@/components/WalletProvider";
 import AnimatedCounter from '@/components/AnimatedCounter';
 import { useTheme } from '@/components/ThemeProvider';
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+// Helper to convert array of numbers into recharts object format
+const formatSparkline = (data: number[]) => data.map((val, i) => ({ x: i, y: val }));
 
 export default function HomePage() {
   const { address } = useMoonWallet();
@@ -15,264 +19,251 @@ export default function HomePage() {
   const isDark = theme === 'dark';
 
   const MOCK_TRENDING = [
-    { id:'tok_ai_swarm', name:'AI Swarm', ticker:'$SWRM', icon:'🤖', change:+211.4, price:'$0.00671', category:'AI', color:'#F43F5E', marketCap:2300000, riskScore:5, holders:4821, progress:85, sparkline:[5,8,12,15,14,18,25,32,28,40,55,70,90,85,110] },
-    { id:'tok_degen_ape', name:'DegenApe', ticker:'$DAPE', icon:'💎', change:+388.2, price:'$0.00156', category: 'Token', color:'#6366F1', marketCap:970000, riskScore:9, holders:2109, progress:60, sparkline:[2,3,4,5,6,10,15,12,20,30,25,40,60,50,80] },
-    { id:'tok_nova_flux', name:'NovaFlux', ticker:'$NVFX', icon:'⚡', change:+67.8, price:'$0.0445', category:'DeFi', color:'#10B981', marketCap:8900000, riskScore:3, holders:11432, progress:100, sparkline:[30,35,38,42,48,52,58,65,70,68,75,80,90,95,100] },
+    { id:'tok_ai_swarm', name:'AI Swarm', ticker:'SWRM', change:+211.4, price:'$0.00671', category:'AI', color:'#F43F5E', marketCap:2300000, riskScore:5, holders:4821, progress:85, sparkline:[5,8,12,15,14,18,25,32,28,40,55,70,90,85,110], isLive: true },
+    { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', change:+388.2, price:'$0.00156', category: 'TOKEN', color:'#6366F1', marketCap:970000, riskScore:9, holders:2109, progress:60, sparkline:[2,3,4,5,6,10,15,12,20,30,25,40,60,50,80], isLive: false },
+    { id:'tok_nova_flux', name:'NovaFlux', ticker:'NVFX', change:+67.8, price:'$0.0445', category:'DEFI', color:'#10B981', marketCap:8900000, riskScore:3, holders:11432, progress:100, sparkline:[30,35,38,42,48,52,58,65,70,68,75,80,90,95,100], isLive: false },
+    { id:'tok_rwa_king', name:'RWA King', ticker:'RWAK', change:+18.9, price:'$2.34', category:'RWA', color:'#8B5CF6', marketCap:45000000, riskScore:1, holders:23450, progress:100, sparkline:[60,62,65,68,70,72,75,78,80,82,85,88,90,92], isLive: true },
   ];
 
   const MOCK_LAUNCHES = [
-    { id:'tok_luna_doge', name:'Luna Doge', ticker:'$LDOGE', icon:'🐶', creator:'@moondev', timeAgo:'2h ago', progress:73, color:'#F43F5E', change:+142.5, price:'$0.00234', marketCap:1870000, riskScore:3, sparkline:[8,12,19,25,31,44,52,71,65,89,95,120,110,140] },
-    { id:'tok_pixel_cat', name:'PixelCat', ticker:'$PCAT', icon:'🐱', creator:'@pixelwiz', timeAgo:'4h ago', progress:31, color:'#94A3B8', change:-5.4, price:'$0.00329', marketCap:1100000, riskScore:6, sparkline:[50,48,45,46,44,42,40,41,39,37,35,33,34,32] },
-    { id:'tok_storm_cat', name:'StormCat', ticker:'$STMC', icon:'⚡', creator:'@stormking', timeAgo:'6h ago', progress:18, color:'#F43F5E', change:-23.1, price:'$0.00082', marketCap:440000, riskScore:8, sparkline:[80,75,70,65,60,55,68,72,65,58,50,45,48,42] },
+    { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', creator:'@moondev', timeAgo:'2H AGO', progress:73, color:'#F59E0B', change:+142.5, price:'$0.00234', marketCap:1870000, riskScore:3, sparkline:[8,12,19,25,31,44,52,71,65,89,95,120,110,140] },
+    { id:'tok_pixel_cat', name:'PixelCat', ticker:'PCAT', creator:'@pixelwiz', timeAgo:'4H AGO', progress:31, color:'#8B5CF6', change:-5.4, price:'$0.00329', marketCap:1100000, riskScore:6, sparkline:[50,48,45,46,44,42,40,41,39,37,35,33,34,32] },
+    { id:'tok_storm_cat', name:'StormCat', ticker:'STMC', creator:'@stormking', timeAgo:'6H AGO', progress:18, color:'#F43F5E', change:-23.1, price:'$0.00082', marketCap:440000, riskScore:8, sparkline:[80,75,70,65,60,55,68,72,65,58,50,45,48,42] },
+    { id:'tok_void_inu', name:'Void Inu', ticker:'VINU', creator:'@void_walker', timeAgo:'30M AGO', progress:25, color:'#475569', change:-12.7, price:'$0.00045', marketCap:890000, riskScore:7, sparkline:[100,95,88,80,75,70,68,65,72,69,60,55,52,50] },
   ];
 
+  // Brutalist styling variables
+  const bBorder = isDark ? "border-2 border-[rgba(255,255,255,0.2)]" : "border-3 border-black";
+  const bShadow = isDark ? "shadow-[4px_4px_0px_0px_#10B981]" : "shadow-[4px_4px_0px_0px_#000]";
+  const bHoverShadow = isDark ? "hover:shadow-[2px_2px_0px_0px_#10B981] hover:translate-x-[2px] hover:translate-y-[2px]" : "hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]";
+  const bBg = isDark ? "bg-[#050510]" : "bg-white";
+  const bText = isDark ? "text-white" : "text-black";
+  const bMuted = isDark ? "text-gray-400" : "text-gray-600";
+
+  const formatCompact = (num: number) => new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num);
+
   return (
-    <div className="flex flex-col gap-8 md:gap-12 pb-16 relative overflow-hidden transition-colors">
+    <div className="w-full font-mono pb-24 overflow-x-hidden">
       
-      {/* ── HERO SECTION ── */}
-      <motion.section 
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="flex flex-col md:flex-row items-center gap-8 md:gap-12 pt-4 md:pt-8 relative z-10"
-      >
-        <div className="flex-1 flex flex-col gap-6 relative z-10 md:items-center md:text-center md:max-w-3xl md:mx-auto">
-          <div className={`inline-flex items-center gap-2 ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-xl border border-[rgba(99,102,241,0.3)] rounded-full px-4 py-1.5 w-fit shadow-[0_0_15px_rgba(99,102,241,0.15)] md:mx-auto transition-colors`}>
-            <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-pulse shadow-[0_0_10px_#6366F1]" />
-            <span className="text-xs font-bold text-[var(--color-text-primary)] uppercase tracking-wider">The Multi-Chain Token Launchpad</span>
+      {/* ── LIVE MARQUEE TICKER ──────────────────────────────────────────────── */}
+      <div className={`w-full overflow-hidden border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#10B981]/20 text-[#10B981]" : "border-black bg-[#10B981] text-black"}`}>
+        <div className="flex whitespace-nowrap py-1.5 animate-marquee text-xs font-black tracking-widest uppercase">
+           {[...Array(10)].map((_, i) => (
+              <span key={i} className="mx-4">
+                {`> MOONFLUXX V1.0 // 🚀 ASTROCAT HIT 85% BONDING CURVE // 💸 12.4 SOL BUY ON $LDOGE // `}
+              </span>
+           ))}
+        </div>
+      </div>
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
+
+        {/* ── HERO SECTION ── */}
+        <motion.section 
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className={`mt-6 mb-12 flex flex-col items-center justify-center text-center p-8 sm:p-16 ${bBorder} ${bShadow} ${bBg} relative overflow-hidden`}
+        >
+          {/* Grid background pattern */}
+          <div className={`absolute inset-0 opacity-10 pointer-events-none ${isDark ? "bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(0,0,0,1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,1)_1px,transparent_1px)]"}`} style={{ backgroundSize: '40px 40px' }} />
+
+          <div className={`inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-black tracking-widest uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"} relative z-10`}>
+            <Terminal className="w-4 h-4" /> MULTI-CHAIN LAUNCHPAD
           </div>
           
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold font-display leading-[1.1] tracking-tight display-safe text-[var(--color-text-primary)] transition-colors">
-            Launch & Trade <br/>
-            Tokens in <span className="fluxx-text-flow text-transparent bg-clip-text bg-gradient-to-r from-[#818CF8] to-[#A5B4FC] text-fluxx-shimmer drop-shadow-[0_0_40px_rgba(99,102,241,0.3)]">60 Seconds</span>
+          <h1 className={`text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none mb-6 relative z-10 ${bText}`}>
+            LAUNCH & TRADE<br/>
+            <span className="text-[#6366F1]">IN 60 SECONDS</span>
           </h1>
           
-          <p className="text-base md:text-xl text-[var(--color-text-secondary)] max-w-xl leading-relaxed mt-3 mb-6 md:mt-4 md:mb-8 md:mx-auto transition-colors">
-            AI-powered token launchpad. No code required. Multi-chain ready.
+          <p className={`text-sm sm:text-base md:text-lg font-bold uppercase tracking-wider mb-8 max-w-2xl relative z-10 ${bMuted}`}>
+            {">"} AI-POWERED TOKEN LAUNCHPAD.<br/>
+            {">"} NO CODE REQUIRED. MULTI-CHAIN READY.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-            <Link href="/explore" className="active:scale-[0.98] w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-[#fff] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)]">
-              <Search className="w-5 h-5" />
-              Explore Tokens
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto relative z-10">
+            <Link href="/explore" className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-black text-sm uppercase transition-all ${bBorder} ${isDark ? "bg-[#10B981] text-black hover:bg-[#059669]" : "bg-[#10B981] text-black hover:bg-black hover:text-[#10B981]"} shadow-[4px_4px_0px_0px_#6366F1] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#6366F1]`}>
+              <Search className="w-5 h-5" /> [ EXPLORE TOKENS ]
             </Link>
-            <Link href="/launch" className="active:scale-[0.98] w-full sm:w-auto px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold transition-all bg-[rgba(99,102,241,0.1)] hover:bg-[rgba(99,102,241,0.15)] text-[#818CF8] border border-[rgba(99,102,241,0.3)] shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-              <Rocket className="w-5 h-5" />
-              Launch a Token
+            <Link href="/launch" className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-black text-sm uppercase transition-all ${bBorder} ${isDark ? "bg-black text-white hover:bg-[#6366F1]" : "bg-white text-black hover:bg-black hover:text-white"} ${bHoverShadow}`}>
+              <Rocket className="w-5 h-5" /> [ LAUNCH TOKEN ]
+            </Link>
+          </div>
+        </motion.section>
+
+        {/* ── STATS BAR ── */}
+        <motion.section 
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+          className={`grid grid-cols-1 md:grid-cols-3 gap-0 border-y ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"} mb-12`}
+        >
+          <div className={`flex flex-col items-center justify-center py-8 border-b md:border-b-0 md:border-r ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#050510]" : "border-black bg-gray-100"}`}>
+            <div className={`text-4xl font-black ${bText}`}>$4.2M</div>
+            <div className={`text-xs font-bold uppercase tracking-widest ${bMuted} mt-2`}>24H VOLUME</div>
+          </div>
+          <div className={`flex flex-col items-center justify-center py-8 border-b md:border-b-0 md:border-r ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#0A0A1A]" : "border-black bg-white"}`}>
+            <div className={`text-4xl font-black ${bText}`}>12,847</div>
+            <div className={`text-xs font-bold uppercase tracking-widest ${bMuted} mt-2`}>ACTIVE TRADERS</div>
+          </div>
+          <div className={`flex flex-col items-center justify-center py-8 ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#050510]" : "border-black bg-gray-100"}`}>
+            <div className={`text-4xl font-black ${bText}`}>2,341</div>
+            <div className={`text-xs font-bold uppercase tracking-widest ${bMuted} mt-2`}>TOKENS LAUNCHED</div>
+          </div>
+        </motion.section>
+
+        {/* ── TRENDING NOW ── */}
+        <section className="mb-16">
+          <div className="flex items-end justify-between mb-6 border-b pb-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+            <h2 className={`text-2xl font-black uppercase flex items-center gap-2 ${bText}`}>
+              <TrendingUp className="text-[#F43F5E] w-6 h-6" /> [ TRENDING NOW ]
+            </h2>
+            <Link href="/explore" className={`text-xs font-bold uppercase ${isDark ? "text-[#10B981] hover:text-white" : "text-[#6366F1] hover:text-black"} transition-colors`}>
+              VIEW ALL {">"}
             </Link>
           </div>
           
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-6 text-xs sm:text-sm text-[var(--color-text-faint)] font-mono font-bold transition-colors">
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#06B6D4]" /> No coding required</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#06B6D4]" /> AI-powered</div>
-            <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#06B6D4]" /> Multi-chain</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {MOCK_TRENDING.map((t, i) => {
+              const isPos = t.change >= 0;
+              const sparkColor = isPos ? "#10B981" : "#F43F5E";
+
+              return (
+                <Link href={`/token/${t.id}`} key={t.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, ease: EASE }}
+                    className={`group flex flex-col h-full overflow-hidden ${bBorder} ${bShadow} ${bBg} transition-all ${bHoverShadow} hover:-translate-y-1 cursor-pointer`}
+                  >
+                    {/* Artwork Header */}
+                    <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"}`}>
+                      <img 
+                        src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                        alt={t.name}
+                        className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                      />
+                      {t.isLive && (
+                        <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-[9px] font-black tracking-widest uppercase border border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1 z-10 animate-pulse">
+                          <Radio className="w-3 h-3" /> LIVE
+                        </div>
+                      )}
+                      <div className={`absolute top-2 left-2 px-1.5 py-0.5 text-[9px] font-black uppercase border z-10 ${isDark ? "bg-black/80 text-[#10B981] border-[#10B981]" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                        [{t.progress}% CURVE]
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                      <div className="absolute bottom-0 left-0 right-0 h-16 z-20 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={formatSparkline(t.sparkline)}>
+                            <Line type="monotone" dataKey="y" stroke={sparkColor} strokeWidth={3} dot={false} isAnimationActive={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    {/* Token Meta */}
+                    <div className="p-3 flex flex-col justify-between gap-2 relative z-30">
+                      <div>
+                        <h3 className={`font-black text-sm uppercase leading-tight truncate ${bText}`}>{t.name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-[10px] font-bold ${isDark ? "text-[#818CF8]" : "text-[#6366F1]"}`}>{t.ticker}</span>
+                          <span className={`text-[10px] font-black px-1 border ${isDark ? "border-[rgba(255,255,255,0.2)] text-white" : "border-black text-black bg-gray-100"}`}>
+                            ${formatCompact(t.marketCap)} MC
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-end mt-2">
+                        <div className={`text-lg font-black ${bText}`}>{t.price}</div>
+                        <div className={`text-[10px] font-black px-1 py-0.5 border ${isPos ? (isDark ? "border-[#10B981] text-[#10B981]" : "border-black bg-[#10B981] text-black") : (isDark ? "border-[#F43F5E] text-[#F43F5E]" : "border-black bg-[#F43F5E] text-white")}`}>
+                          {isPos ? "+" : ""}{t.change}%
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })}
           </div>
-        </div>
-      </motion.section>
+        </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <motion.section
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className={`${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-2xl rounded-2xl border border-[rgba(99,102,241,0.08)] p-5 sm:p-8 md:p-12 relative z-10 mx-auto w-full transition-colors`}
-      >
-        <h2 className="text-2xl font-bold font-display mb-8 text-center text-[var(--color-text-primary)] transition-colors">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex flex-col items-center text-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
-              <Search className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-lg font-display text-[var(--color-text-primary)] transition-colors">1. Discover</h3>
-            <p className="text-[var(--color-text-secondary)] text-sm transition-colors">Browse trending tokens with AI-powered insights. Filter by category, risk, and momentum.</p>
-          </div>
-          <div className="flex flex-col items-center text-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-lg font-display text-[var(--color-text-primary)] transition-colors">2. Trade</h3>
-            <p className="text-[var(--color-text-secondary)] text-sm transition-colors">Buy and sell tokens through the bonding curve. Early buyers get the best prices.</p>
-          </div>
-          <div className="flex flex-col items-center text-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[rgba(99,102,241,0.15)] text-[#818CF8] flex items-center justify-center">
-              <Rocket className="w-6 h-6" />
-            </div>
-            <h3 className="font-bold text-lg font-display text-[var(--color-text-primary)] transition-colors">3. Launch</h3>
-            <p className="text-[var(--color-text-secondary)] text-sm transition-colors">Create your own token in 3 steps. AI helps you craft the perfect narrative.</p>
-          </div>
-        </div>
-      </motion.section>
-      
-      {/* ── STATS BAR ── */}
-      <motion.section 
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className={`grid grid-cols-1 md:grid-cols-3 gap-6 border-y border-[rgba(99,102,241,0.08)] py-8 relative z-10 ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-xl transition-colors`}
-      >
-        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.08)] pb-6 md:pb-0">
-          <div className="text-3xl font-display font-bold font-mono text-[var(--color-text-primary)] transition-colors">
-            <AnimatedCounter value={4.2} prefix="$" suffix="M" decimals={1} />
-          </div>
-          <div className="text-[var(--color-text-secondary)] text-sm mt-1 flex items-center gap-1.5 transition-colors">24H Volume</div>
-        </div>
-        <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(99,102,241,0.08)] pb-6 md:pb-0">
-          <div className="text-3xl font-display font-bold font-mono text-[var(--color-text-primary)] transition-colors">
-            <AnimatedCounter value={12847} />
-          </div>
-          <div className="text-[var(--color-text-secondary)] text-sm mt-1 flex items-center gap-1.5 transition-colors">Active Traders</div>
-        </div>
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-3xl font-display font-bold font-mono text-[var(--color-text-primary)] transition-colors">
-            <AnimatedCounter value={2341} />
-          </div>
-          <div className="text-[var(--color-text-secondary)] text-sm mt-1 flex items-center gap-1.5 transition-colors">Tokens Launched</div>
-        </div>
-      </motion.section>
-
-
-
-      {/* ── TRENDING NOW ── */}
-      <motion.section
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="relative z-10"
-      >
-        <div className="flex items-end mb-6">
-          <h2 className="text-2xl font-bold font-display flex items-center gap-2 text-[var(--color-text-primary)] transition-colors">
-            <TrendingUp className="text-[#F43F5E]" /> Trending Now
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {MOCK_TRENDING.map((token, i) => (
-            <Link href={`/token/${token.id}`} key={token.id} className={`p-5 group hover:border-[rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-300 ease-out flex flex-col h-full relative overflow-hidden ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl`}>
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
-              
-              {/* Top */}
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_0_15px_rgba(244,63,94,0.2)]" style={{ backgroundColor: `${token.color}20` }}>
-                  {token.icon}
-                </div>
-                <AnimatedCounter 
-                  value={Math.abs(token.change)} 
-                  prefix={token.change > 0 ? '+' : '-'} 
-                  suffix="%" 
-                  decimals={1} 
-                  className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${token.change >= 0 ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981] border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E] border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.2)]'}`} 
-                />
-              </div>
-
-              {/* Middle */}
-              <div className="mb-4 flex-1 relative z-10">
-                <h3 className={`text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-2 transition-colors ${isDark ? 'drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]' : ''}`}>
-                  {token.name}
-                  <span className="text-[10px] px-2 py-0.5 rounded-sm bg-[rgba(99,102,241,0.15)] text-[#6366F1] uppercase tracking-wider font-semibold border border-[rgba(99,102,241,0.3)]">{token.category}</span>
-                </h3>
-                <div className="text-[var(--color-text-secondary)] text-sm font-mono mt-1 transition-colors">{token.ticker}</div>
-              </div>
-
-              {/* Market Data */}
-              <div className="flex justify-between items-end mb-4 relative z-10">
-                <div>
-                  <div className={`text-xl font-mono text-[var(--color-text-primary)] font-bold transition-colors ${isDark ? 'drop-shadow-[0_0_8px_rgba(241,245,249,0.3)]' : ''}`}>{token.price}</div>
-                  <AnimatedCounter value={token.marketCap / 1000000} prefix="MCap $" suffix="M" decimals={2} className="text-xs text-[var(--color-text-faint)] mt-1 font-mono block transition-colors" />
-                </div>
-                
-                {/* Mini sparkline */}
-                <svg viewBox="0 0 80 32" className={`w-[80px] h-[32px] overflow-visible ${token.change >= 0 ? 'drop-shadow-[0_2px_6px_rgba(16,185,129,0.4)]' : 'drop-shadow-[0_2px_6px_rgba(244,63,94,0.4)]'}`}>
-                  <path 
-                    d={`M0,${32 - (token.sparkline[0]/140)*32} ${token.sparkline.map((val, idx) => `L${(idx / (token.sparkline.length - 1)) * 80},${32 - (val/140)*32}`).join(' ')}`}
-                    fill="none" 
-                    stroke={token.change < 0 ? '#F43F5E' : '#818CF8'} 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                  />
-                </svg>
-              </div>
-
-              {/* Bonding Curve Quick Look */}
-              <div className="mb-4 relative z-10">
-                <div className="flex justify-between text-[10px] font-mono text-[var(--color-text-secondary)] mb-1.5 uppercase transition-colors">
-                  <span>Curve Progress</span>
-                  <span className="text-[#6366F1]">{token.progress}%</span>
-                </div>
-                <div className={`h-1.5 ${isDark ? 'bg-[#000000]' : 'bg-[#E2E8F0]'} rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)] transition-colors`}>
-                  <div className="h-full bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.6)]" style={{ width: `${token.progress}%` }} />
-                </div>
-              </div>
-
+        {/* ── JUST LAUNCHED ── */}
+        <section className="mb-16">
+          <div className="flex items-end justify-between mb-6 border-b pb-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+            <h2 className={`text-2xl font-black uppercase flex items-center gap-2 ${bText}`}>
+              <Zap className="text-[#F59E0B] w-6 h-6" /> [ JUST LAUNCHED ]
+            </h2>
+            <Link href="/explore" className={`text-xs font-bold uppercase ${isDark ? "text-[#10B981] hover:text-white" : "text-[#6366F1] hover:text-black"} transition-colors`}>
+              VIEW ALL {">"}
             </Link>
-          ))}
-        </div>
-      </motion.section>
-      
-      {/* ── JUST LAUNCHED ── */}
-      <motion.section
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="relative z-10 mt-8"
-      >
-        <div className="flex items-end mb-6">
-          <h2 className="text-2xl font-bold font-display flex items-center gap-2 text-[var(--color-text-primary)] transition-colors">
-            <Zap className="text-[#F59E0B]" /> Just Launched
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {MOCK_LAUNCHES.map((token) => (
-            <Link href={`/token/${token.id}`} key={token.id} className={`p-5 group hover:border-[rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] transition-all duration-300 ease-out flex flex-col h-full relative overflow-hidden ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl`}>
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
-              
-              <div className="flex justify-between items-start relative z-10 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[rgba(255,255,255,0.1)] shadow-[0_0_15px_rgba(99,102,241,0.2)]" style={{ backgroundColor: `${token.color}20` }}>
-                    {token.icon}
-                  </div>
-                  <div>
-                    <div className={`font-bold text-[var(--color-text-primary)] transition-colors ${isDark ? 'drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]' : ''}`}>{token.name}</div>
-                    <div className="text-[var(--color-text-secondary)] text-sm font-mono transition-colors">{token.ticker}</div>
-                  </div>
-                </div>
-                <div className="bg-[rgba(16,185,129,0.15)] text-[#10B981] border border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.2)] text-[10px] px-2 py-1 rounded-md font-bold uppercase">NEW</div>
-              </div>
-              
-              <div className="text-sm text-[var(--color-text-faint)] flex items-center justify-between relative z-10 mb-6 font-mono transition-colors">
-                <span>by <span className="text-[#6366F1]">{token.creator}</span></span>
-                <span>{token.timeAgo}</span>
-              </div>
-              
-              <div className="relative z-10 mt-auto">
-                <div className="flex justify-between text-[10px] font-mono text-[var(--color-text-secondary)] mb-1.5 uppercase transition-colors">
-                  <span>Bonding Curve</span>
-                  <span className="text-[#6366F1]">{token.progress}%</span>
-                </div>
-                <div className={`h-1.5 ${isDark ? 'bg-[#000000]' : 'bg-[#E2E8F0]'} rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)] transition-colors`}>
-                  <div className="h-full bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.6)]" style={{ width: `${token.progress}%` }} />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </motion.section>
-      
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {MOCK_LAUNCHES.map((t, i) => {
+              const isPos = t.change >= 0;
+              const sparkColor = isPos ? "#10B981" : "#F43F5E";
 
+              return (
+                <Link href={`/token/${t.id}`} key={t.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, ease: EASE }}
+                    className={`group flex flex-col h-full overflow-hidden ${bBorder} ${bShadow} ${bBg} transition-all ${bHoverShadow} hover:-translate-y-1 cursor-pointer`}
+                  >
+                    <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"}`}>
+                      <img 
+                        src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                        alt={t.name}
+                        className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                      />
+                      <div className={`absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-black uppercase border z-10 ${isDark ? "bg-black text-[#10B981] border-[#10B981]" : "bg-[#10B981] text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                        NEW
+                      </div>
+                      <div className={`absolute top-2 left-2 px-1.5 py-0.5 text-[9px] font-black uppercase border z-10 ${isDark ? "bg-black/80 text-[#F59E0B] border-[#F59E0B]" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                        [{t.progress}% CURVE]
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                      <div className="absolute bottom-0 left-0 right-0 h-16 z-20 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={formatSparkline(t.sparkline)}>
+                            <Line type="monotone" dataKey="y" stroke={sparkColor} strokeWidth={3} dot={false} isAnimationActive={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="p-3 flex flex-col justify-between gap-2 relative z-30">
+                      <div>
+                        <h3 className={`font-black text-sm uppercase leading-tight truncate ${bText}`}>{t.name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-[10px] font-bold ${isDark ? "text-[#818CF8]" : "text-[#6366F1]"}`}>{t.ticker}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                        <div className={`text-[9px] font-bold uppercase truncate ${bMuted}`}>{t.creator}</div>
+                        <div className={`text-[9px] font-bold uppercase ${isDark ? "text-[#10B981]" : "text-[#10B981]"}`}>{t.timeAgo}</div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+      </div>
       
       {/* ── FOOTER ── */}
-      <footer className={`mt-4 md:mt-8 p-5 sm:p-8 border border-[rgba(99,102,241,0.08)] ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-xl shadow-[0_0_30px_rgba(167,139,250,0.20)] rounded-t-3xl flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[var(--color-text-secondary)] relative z-10 transition-colors`}>
-        <div>MoonFluxx © 2025</div>
-        <div className="flex items-center gap-6">
-          <a href="#" className="fluxx-interactive hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-1.5"><AtSign className="w-4 h-4"/> Twitter</a>
-          <a href="#" className="fluxx-interactive hover:text-[var(--color-text-primary)] transition-colors flex items-center gap-1.5"><MessageCircle className="w-4 h-4"/> Discord</a>
-          <a href="#" className="fluxx-interactive hover:text-[var(--color-text-primary)] transition-colors">Docs</a>
+      <footer className={`border-t ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#050510]" : "border-black bg-black text-white"} mt-20 p-8 sm:p-12`}>
+        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="font-black text-xl tracking-tighter">MOONFLUXX_V1.0</div>
+          <div className="flex items-center gap-8 text-sm font-bold uppercase tracking-wider">
+            <a href="#" className={`flex items-center gap-2 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-300 hover:text-white"} transition-colors`}><AtSign className="w-4 h-4"/> TWITTER</a>
+            <a href="#" className={`flex items-center gap-2 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-300 hover:text-white"} transition-colors`}><MessageCircle className="w-4 h-4"/> DISCORD</a>
+            <a href="#" className={`flex items-center gap-2 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-300 hover:text-white"} transition-colors`}>DOCS</a>
+          </div>
         </div>
       </footer>
       
