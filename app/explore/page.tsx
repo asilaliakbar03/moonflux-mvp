@@ -3,12 +3,10 @@
 import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import { useTheme } from '@/components/ThemeProvider';
-import { Search, TrendingUp, Zap, Brain, Rocket, Users } from "lucide-react";
+import { Search, TrendingUp, Zap, Brain, Rocket, ChevronDown, Radio } from "lucide-react";
 import Link from "next/link";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { supabase } from "@/lib/supabase";
-import AnimatedCounter from '@/components/AnimatedCounter';
-import MagneticButton from '@/components/MagneticButton';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -16,35 +14,35 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const formatSparkline = (data: number[]) => data.map((val, i) => ({ x: i, y: val }));
 
 const TOKENS = [
-  { id:'tok_ai_swarm', name:'AI Swarm', ticker:'SWRM', icon:'🤖', price:0.00671, change24h:211.4, marketCap:2300000, holders:4821, riskScore:5, tag:'Trending', category:'ai', color:'#F43F5E', sparkline:formatSparkline([5,8,12,15,14,18,25,32,28,40,55,70,90,85,110]), progress: 85, volume: 1400 },
-  { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', icon:'💎', price:0.00156, change24h:388.2, marketCap:970000, holders:2109, riskScore:9, tag:'Trending', category:'token', color:'#6366F1', sparkline:formatSparkline([2,3,4,5,6,10,15,12,20,30,25,40,60,50,80]), progress: 60, volume: 890 },
-  { id:'tok_nova_flux', name:'NovaFlux', ticker:'NVFX', icon:'⚡', price:0.0445, change24h:67.8, marketCap:8900000, holders:11432, riskScore:3, tag:'AI Pick', category:'ai', color:'#10B981', sparkline:formatSparkline([30,35,38,42,48,52,58,65,70,68,75,80,90,95,100]), progress: 100, volume: 3200 },
-  { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', icon:'🐶', price:0.00234, change24h:142.5, marketCap:1870000, holders:8341, riskScore:3, tag:'New', category:'token', color:'#F59E0B', sparkline:formatSparkline([8,12,19,25,31,44,52,71,65,89,95,120,110,140]), progress: 75, volume: 560 },
-  { id:'tok_rwa_king', name:'RWA King', ticker:'RWAK', icon:'🏦', price:2.3401, change24h:18.9, marketCap:45000000, holders:23450, riskScore:1, tag:'AI Pick', category:'rwa', color:'#6366F1', sparkline:formatSparkline([60,62,65,68,70,72,75,78,80,82,85,88,90,92]), progress: 100, volume: 12500 },
-  { id:'tok_gold_flux', name:'GoldFlux', ticker:'GFLX', icon:'✨', price:0.3341, change24h:52.6, marketCap:18700000, holders:15230, riskScore:2, tag:'Graduating', category:'defi', color:'#F59E0B', sparkline:formatSparkline([55,60,62,65,68,70,72,78,82,85,88,92,95,98]), progress: 99, volume: 4500 },
-  { id:'tok_pixel_cat', name:'PixelCat', ticker:'PCAT', icon:'🐱', price:0.00329, change24h:-5.4, marketCap:1100000, holders:3201, riskScore:6, tag:'New', category:'gaming', color:'#8B5CF6', sparkline:formatSparkline([50,48,45,46,44,42,40,41,39,37,35,33,34,32]), progress: 40, volume: 120 },
-  { id:'tok_void_inu', name:'Void Inu', ticker:'VINU', icon:'🖤', price:0.00045, change24h:-12.7, marketCap:890000, holders:1876, riskScore:7, tag:'New', category:'token', color:'#475569', sparkline:formatSparkline([100,95,88,80,75,70,68,65,72,69,60,55,52,50]), progress: 25, volume: 80 },
-  { id:'tok_sol_eagle', name:'Sol Eagle', ticker:'SEGL', icon:'🦅', price:0.1247, change24h:34.2, marketCap:12500000, holders:9870, riskScore:2, tag:'AI Pick', category:'defi', color:'#10B981', sparkline:formatSparkline([40,42,45,50,55,58,62,70,75,80,85,90,88,95]), progress: 100, volume: 6700 },
-  { id:'tok_storm_cat', name:'StormCat', ticker:'STMC', icon:'⚡', price:0.00082, change24h:-23.1, marketCap:440000, holders:987, riskScore:8, tag:'New', category:'token', color:'#F43F5E', sparkline:formatSparkline([80,75,70,65,60,55,68,72,65,58,50,45,48,42]), progress: 15, volume: 30 },
-  { id:'tok_zen_monk', name:'ZenMonk', ticker:'ZNMK', icon:'🧘', price:0.7823, change24h:9.1, marketCap:22000000, holders:18760, riskScore:2, tag:'Graduating', category:'defi', color:'#10B981', sparkline:formatSparkline([70,72,71,74,76,75,78,80,79,82,84,83,86,88]), progress: 95, volume: 3100 },
-  { id:'tok_cyber_pep', name:'CyberPep', ticker:'CPEP', icon:'🐸', price:0.00891, change24h:78.3, marketCap:3210000, holders:6543, riskScore:4, tag:'Trending', category:'token', color:'#6366F1', sparkline:formatSparkline([20,18,25,30,28,35,42,55,60,58,70,85,90,88]), progress: 80, volume: 1500 },
+  { id:'tok_ai_swarm', name:'AI Swarm', ticker:'SWRM', price:0.00671, change24h:211.4, marketCap:2300000, holders:4821, tag:'🔥 ABOUT TO GRADUATE', category:'ai', color:'#F43F5E', sparkline:formatSparkline([5,8,12,15,14,18,25,32,28,40,55,70,90,85,110]), progress: 95, creator: 'cyberpunk_dev', timeAgo: '2h', isLive: true },
+  { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', price:0.00156, change24h:388.2, marketCap:970000, holders:2109, tag:'⚡ NEW LAUNCHES', category:'token', color:'#6366F1', sparkline:formatSparkline([2,3,4,5,6,10,15,12,20,30,25,40,60,50,80]), progress: 60, creator: 'ape_lord', timeAgo: '15m', isLive: false },
+  { id:'tok_nova_flux', name:'NovaFlux', ticker:'NVFX', price:0.0445, change24h:67.8, marketCap:8900000, holders:11432, tag:'🎓 GRADUATED', category:'ai', color:'#10B981', sparkline:formatSparkline([30,35,38,42,48,52,58,65,70,68,75,80,90,95,100]), progress: 100, creator: 'nova_team', timeAgo: '1d', isLive: false },
+  { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', price:0.00234, change24h:142.5, marketCap:1870000, holders:8341, tag:'⚡ NEW LAUNCHES', category:'token', color:'#F59E0B', sparkline:formatSparkline([8,12,19,25,31,44,52,71,65,89,95,120,110,140]), progress: 75, creator: 'doge_father', timeAgo: '4h', isLive: true },
+  { id:'tok_rwa_king', name:'RWA King', ticker:'RWAK', price:2.3401, change24h:18.9, marketCap:45000000, holders:23450, tag:'🎓 GRADUATED', category:'rwa', color:'#6366F1', sparkline:formatSparkline([60,62,65,68,70,72,75,78,80,82,85,88,90,92]), progress: 100, creator: 'real_world_assets', timeAgo: '1w', isLive: false },
+  { id:'tok_gold_flux', name:'GoldFlux', ticker:'GFLX', price:0.3341, change24h:52.6, marketCap:18700000, holders:15230, tag:'🔥 ABOUT TO GRADUATE', category:'defi', color:'#F59E0B', sparkline:formatSparkline([55,60,62,65,68,70,72,78,82,85,88,92,95,98]), progress: 99, creator: 'gold_digger', timeAgo: '5h', isLive: true },
+  { id:'tok_pixel_cat', name:'PixelCat', ticker:'PCAT', price:0.00329, change24h:-5.4, marketCap:1100000, holders:3201, tag:'⚡ NEW LAUNCHES', category:'gaming', color:'#8B5CF6', sparkline:formatSparkline([50,48,45,46,44,42,40,41,39,37,35,33,34,32]), progress: 40, creator: 'meow_master', timeAgo: '1h', isLive: false },
+  { id:'tok_void_inu', name:'Void Inu', ticker:'VINU', price:0.00045, change24h:-12.7, marketCap:890000, holders:1876, tag:'⚡ NEW LAUNCHES', category:'token', color:'#475569', sparkline:formatSparkline([100,95,88,80,75,70,68,65,72,69,60,55,52,50]), progress: 25, creator: 'void_walker', timeAgo: '30m', isLive: false },
+  { id:'tok_sol_eagle', name:'Sol Eagle', ticker:'SEGL', price:0.1247, change24h:34.2, marketCap:12500000, holders:9870, tag:'🎓 GRADUATED', category:'defi', color:'#10B981', sparkline:formatSparkline([40,42,45,50,55,58,62,70,75,80,85,90,88,95]), progress: 100, creator: 'eagle_eye', timeAgo: '2d', isLive: false },
+  { id:'tok_storm_cat', name:'StormCat', ticker:'STMC', price:0.00082, change24h:-23.1, marketCap:440000, holders:987, tag:'⚡ NEW LAUNCHES', category:'token', color:'#F43F5E', sparkline:formatSparkline([80,75,70,65,60,55,68,72,65,58,50,45,48,42]), progress: 15, creator: 'storm_bringer', timeAgo: '10m', isLive: false },
+  { id:'tok_zen_monk', name:'ZenMonk', ticker:'ZNMK', price:0.7823, change24h:9.1, marketCap:22000000, holders:18760, tag:'🔥 ABOUT TO GRADUATE', category:'defi', color:'#10B981', sparkline:formatSparkline([70,72,71,74,76,75,78,80,79,82,84,83,86,88]), progress: 95, creator: 'zen_master', timeAgo: '8h', isLive: false },
+  { id:'tok_cyber_pep', name:'CyberPep', ticker:'CPEP', price:0.00891, change24h:78.3, marketCap:3210000, holders:6543, tag:'🔥 ABOUT TO GRADUATE', category:'token', color:'#6366F1', sparkline:formatSparkline([20,18,25,30,28,35,42,55,60,58,70,85,90,88]), progress: 80, creator: 'pepe_lord', timeAgo: '6h', isLive: true },
 ];
 
 export default function ExplorePage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('ALL TOKENS');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('Price Change');
-  const [showCount, setShowCount] = useState(12);
+  const [sortBy, setSortBy] = useState('MCAP 🔻');
+  const [showCount, setShowCount] = useState(20);
 
   const filters = [
-    { name: 'All', icon: null },
-    { name: 'Trending', icon: TrendingUp },
-    { name: 'New', icon: Zap },
-    { name: 'AI Pick', icon: Brain },
-    { name: 'Graduating', icon: Rocket },
+    'ALL TOKENS',
+    '🔥 ABOUT TO GRADUATE',
+    '🎓 GRADUATED',
+    '🔴 LIVE STREAMS',
+    '⚡ NEW LAUNCHES'
   ];
 
   const [liveTokens, setLiveTokens] = useState<any[]>([]);
@@ -59,22 +57,22 @@ export default function ExplorePage() {
           
         if (data && data.length > 0) {
           const mapped = data.map((dbToken: any) => ({
-            id: dbToken.mint_address,
+            id: dbToken.mint_address || dbToken.id,
             name: dbToken.name,
             ticker: dbToken.ticker,
             created_at: dbToken.created_at || new Date().toISOString(),
-            icon: dbToken.icon || '🌙',
-            price: 0, // placeholder until we have live price feeds
+            price: 0,
             change24h: 0,
-            marketCap: 0,
-            holders: 0,
-            riskScore: 2,
-            tag: 'New',
+            marketCap: Math.floor(Math.random() * 500000) + 10000,
+            holders: Math.floor(Math.random() * 1000),
+            tag: Number(dbToken.bonding_curve_progress) >= 100 ? '🎓 GRADUATED' : Number(dbToken.bonding_curve_progress) > 80 ? '🔥 ABOUT TO GRADUATE' : '⚡ NEW LAUNCHES',
             category: dbToken.category || 'token',
-            color: '#10B981', // Midnight Indigo success green
+            color: '#10B981',
             sparkline: formatSparkline([10, 15, 12, 18, 22, 25, 20, 30, 35, 40, 38, 45, 50]),
             progress: Number(dbToken.bonding_curve_progress) || 5,
-            volume: 0
+            creator: dbToken.creator_address ? `${dbToken.creator_address.slice(0,4)}...` : 'anon',
+            timeAgo: 'Just now',
+            isLive: Math.random() > 0.8
           }));
           setLiveTokens(mapped);
         }
@@ -87,9 +85,15 @@ export default function ExplorePage() {
 
   const filteredTokens = useMemo(() => {
     let result = [...liveTokens, ...TOKENS];
-    if (activeFilter !== 'All') {
-      result = result.filter(t => t.tag === activeFilter);
+    
+    if (activeFilter !== 'ALL TOKENS') {
+      if (activeFilter === '🔴 LIVE STREAMS') {
+        result = result.filter(t => t.isLive);
+      } else {
+        result = result.filter(t => t.tag === activeFilter);
+      }
     }
+    
     if (searchQuery) {
       const lowerQ = searchQuery.toLowerCase();
       result = result.filter(t => t.name.toLowerCase().includes(lowerQ) || t.ticker.toLowerCase().includes(lowerQ));
@@ -97,13 +101,9 @@ export default function ExplorePage() {
 
     // Sort
     result = [...result].sort((a, b) => {
-      if (sortBy === 'Price Change') return b.change24h - a.change24h;
-      if (sortBy === 'Market Cap') return b.marketCap - a.marketCap;
-      if (sortBy === 'Newest') {
-        const timeA = new Date(a.created_at || 0).getTime();
-        const timeB = new Date(b.created_at || 0).getTime();
-        return timeB - timeA;
-      }
+      if (sortBy === 'MCAP 🔻') return b.marketCap - a.marketCap;
+      if (sortBy === 'AGE ⚡') return 0; // In real app, sort by timestamp
+      if (sortBy === 'VOLUME 📊') return Math.abs(b.change24h) - Math.abs(a.change24h);
       return 0;
     });
 
@@ -112,172 +112,167 @@ export default function ExplorePage() {
 
   const displayedTokens = filteredTokens.slice(0, showCount);
 
+  // Brutalist styling variables
+  const bBorder = isDark ? "border-2 border-[rgba(255,255,255,0.2)]" : "border-3 border-black";
+  const bShadow = isDark ? "shadow-[4px_4px_0px_0px_#10B981]" : "shadow-[4px_4px_0px_0px_#000]";
+  const bHoverShadow = isDark ? "hover:shadow-[2px_2px_0px_0px_#10B981] hover:translate-x-[2px] hover:translate-y-[2px]" : "hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]";
+  const bBg = isDark ? "bg-[#050510]" : "bg-white";
+  const bText = isDark ? "text-white" : "text-black";
+  const bMuted = isDark ? "text-gray-400" : "text-gray-600";
+
+  // Helper to format large numbers
+  const formatCompact = (num: number) => {
+    return new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num);
+  };
+
   return (
-    <div className="flex flex-col gap-8 pb-16 pt-4 w-full max-w-full overflow-x-hidden">
+    <div className="w-full min-h-screen font-mono pb-24">
       
-      {/* ── HEADER ── */}
-      <motion.div 
-        initial={{ opacity: 0, y: 16 }} 
-        whileInView={{ opacity: 1, y: 0 }} 
-        viewport={{ once: true, margin: '-50px' }} 
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-6"
-      >
-        <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display tracking-tight text-text-primary mb-2 display-safe">Explore Tokens</h1>
-          <p className="text-text-muted">Discover the next wave. Filter by what moves you.</p>
-        </div>
-        <div className="relative w-full md:w-auto md:min-w-[320px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
-          <input 
-            type="text" 
-            placeholder="Search by name or ticker..."
-            aria-label="Search tokens"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[color:var(--color-surface-base)] backdrop-blur-2xl border border-[color:var(--color-border-default)] rounded-xl py-3 pl-10 pr-4 text-text-primary placeholder:text-text-muted focus:border-[color:var(--color-border-focus)] focus:ring-1 focus:ring-[#6366F1] transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-          />
-        </div>
-      </motion.div>
-
-      {/* ── FILTERS ── */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {filters.map(filter => {
-          const isActive = activeFilter === filter.name;
-          return (
-            <button
-              key={filter.name}
-              onClick={() => setActiveFilter(filter.name)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full whitespace-nowrap font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
-                isActive 
-                  ? 'bg-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]' 
-                  : 'bg-[color:var(--color-surface-1)] text-text-muted border border-[color:var(--color-border-subtle)] hover:bg-[color:var(--color-surface-hover)] hover:text-text-primary'
-              }`}
-            >
-              {filter.icon && <filter.icon className="w-4 h-4" />}
-              {filter.name}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── SORT ROW ── */}
-      <div className="flex items-center justify-between py-2 border-b border-[color:var(--color-border-subtle)]">
-        <div className="text-sm font-semibold text-[#818CF8]">
-          {filteredTokens.length} tokens
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-text-muted hidden sm:inline">Sort by:</span>
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-[color:var(--color-surface-base)] backdrop-blur-2xl border border-[color:var(--color-border-default)] rounded-lg py-1.5 px-3 text-sm text-text-primary focus:border-[#6366F1] cursor-pointer hover:border-[#6366F1] transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-          >
-            <option>Price Change</option>
-            <option>Market Cap</option>
-            <option>Newest</option>
-          </select>
+      {/* ── LIVE MARQUEE TICKER ──────────────────────────────────────────────── */}
+      <div className={`w-full overflow-hidden border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#10B981]/20 text-[#10B981]" : "border-black bg-[#10B981] text-black"}`}>
+        <div className="flex whitespace-nowrap py-2 animate-marquee text-xs sm:text-sm font-black tracking-widest uppercase">
+           {[...Array(10)].map((_, i) => (
+              <span key={i} className="mx-4">
+                {`> 🚨 LMEOW GRADUATED TO RAYDIUM // 💸 12.4 SOL BUY ON $LDOGE // 🚀 ASTROCAT HIT 85% BONDING CURVE // `}
+              </span>
+           ))}
         </div>
       </div>
 
-      {/* ── GRID ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedTokens.map((token, i) => (
-          <Link href={`/token/${token.id}`} key={token.id} className="focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.4, delay: i * 0.05, ease: EASE }}
-              className="bg-[color:var(--color-surface-base)] backdrop-blur-2xl border border-[color:var(--color-border-default)] transition-all duration-300 ease-out hover:border-[color:var(--color-border-focus)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-5 hover:-translate-y-1 hover:shadow-card cursor-pointer group flex flex-col h-full relative overflow-hidden"
-            >
-              {/* Background Glow */}
-              <div className={`absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)] group-hover:opacity-[0.08] transition-opacity duration-500 ${isDark ? '' : 'hidden'}`} />
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
+        
+        {/* ── COMMAND LINE HEADER & FILTERS ──────────────────────────────────── */}
+        <div className="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+          <div className="w-full xl:max-w-xl">
+            <div className={`flex items-center gap-2 p-3 ${bBorder} ${bShadow} ${bBg}`}>
+              <span className={`font-black ${isDark ? "text-[#10B981]" : "text-[#10B981]"}`}>{">"}</span>
+              <input 
+                type="text" 
+                placeholder="SEARCH_TOKENS.EXE --query='...'"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full bg-transparent outline-none font-bold placeholder:text-gray-500 uppercase ${bText}`}
+              />
+            </div>
+          </div>
 
-              {/* Top */}
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border border-[color:var(--color-border-subtle)] shadow-sm" style={{ backgroundColor: `${token.color}${isDark ? '15' : '20'}` }}>
-                  {token.icon}
-                </div>
-                <div className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${token.change24h >= 0 ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981] border-[rgba(16,185,129,0.3)] shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E] border-[rgba(244,63,94,0.3)] shadow-[0_0_10px_rgba(244,63,94,0.1)]'}`}>
-                  {token.change24h > 0 ? '+' : ''}{token.change24h}%
-                </div>
-              </div>
+          <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap gap-2">
+              {filters.map(f => {
+                const active = activeFilter === f;
+                return (
+                  <button
+                    key={f}
+                    onClick={() => setActiveFilter(f)}
+                    className={`px-3 py-2 text-xs font-black uppercase transition-all ${bBorder} ${
+                      active
+                        ? isDark ? "bg-[#F59E0B] text-black shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]" : "bg-black text-white shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]"
+                        : `${bBg} ${bText} ${bHoverShadow}`
+                    }`}
+                  >
+                    [ {f} ]
+                  </button>
+                );
+              })}
+            </div>
 
-              {/* Middle */}
-              <div className="mb-4 flex-1 relative z-10">
-                <h3 className="text-xl font-bold text-text-primary flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.1)]">
-                  {token.name}
-                  <span className="text-[10px] px-2 py-0.5 rounded-sm bg-[rgba(99,102,241,0.1)] text-[#818CF8] uppercase tracking-wider font-semibold border border-[rgba(99,102,241,0.2)]">{token.category}</span>
-                </h3>
-                <div className="text-text-secondary text-sm font-mono mt-1">${token.ticker}</div>
-              </div>
-
-              {/* Market Data & Sparkline */}
-              <div className="flex justify-between items-end mb-4 relative z-10">
-                <div>
-                  <div className="text-xl font-mono text-text-primary font-bold">{token.price > 0 ? '$'+token.price : '--'}</div>
-                  <div className="text-xs text-text-muted mt-1 font-mono">MCap {token.marketCap > 0 ? '$'+(token.marketCap / 1000000).toFixed(2)+'M' : '--'}</div>
-                  <div className="text-xs text-text-muted font-mono mt-0.5">Vol {token.volume > 0 ? '$'+token.volume : '--'}</div>
-                </div>
-                
-                {/* Recharts Mini Sparkline */}
-                <div className="w-[80px] h-[40px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={token.sparkline}>
-                      <Line 
-                        type="monotone" 
-                        dataKey="y" 
-                        stroke={token.change24h >= 0 ? '#10B981' : '#F43F5E'} 
-                        strokeWidth={2} 
-                        dot={false}
-                        isAnimationActive={true}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Bonding Curve Quick Look */}
-              <div className="mb-4 relative z-10">
-                <div className="flex justify-between text-[10px] font-mono text-text-muted mb-1.5 uppercase">
-                  <span>Curve Progress</span>
-                  <span className="text-[#818CF8] font-bold">{token.progress}%</span>
-                </div>
-                <div className="h-1.5 bg-[color:var(--color-surface-2)] rounded-full overflow-hidden border border-[color:var(--color-border-subtle)]">
-                  <div className="h-full bg-[#6366F1] shadow-[0_0_10px_#6366F1] transition-all duration-700 ease-out" style={{ width: `${token.progress}%` }} />
-                </div>
-              </div>
-
-              <div className="h-px w-full bg-[color:var(--color-border-subtle)] mb-3 relative z-10" />
-
-              {/* Footer info */}
-              <div className="flex justify-between items-center text-xs text-text-muted relative z-10 font-mono">
-                <div className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${token.riskScore <= 3 ? 'bg-[#10B981]' : token.riskScore <= 6 ? 'bg-[#F59E0B]' : 'bg-[#F43F5E]'}`} />
-                  AI Risk: {token.riskScore}/10
-                </div>
-                <div className="flex items-center gap-1">
-                  <Users size={12} />
-                  {token.holders.toLocaleString()}
-                </div>
-              </div>
-            </motion.div>
-          </Link>
-        ))}
-      </div>
-
-      {/* ── LOAD MORE ── */}
-      {showCount < filteredTokens.length && (
-        <div className="flex justify-center mt-8">
-          <MagneticButton
-            onClick={() => setShowCount(c => c + 12)}
-            className="px-8 py-3 bg-[color:var(--color-surface-1)] text-text-primary hover:bg-[color:var(--color-surface-2)] border border-[color:var(--color-border-subtle)] rounded-full font-bold transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-          >
-            Load More
-          </MagneticButton>
+            {/* Sort Dropdown (Mock) */}
+            <div className={`relative flex items-center gap-2 px-3 py-2 text-xs font-black uppercase shrink-0 cursor-pointer ${bBorder} ${bBg} ${bText} ${bHoverShadow}`}>
+              [ SORT: {sortBy} ]
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* ── PUMP.FUN-STYLE TOKEN GRID ──────────────────────────────────────── */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+          {displayedTokens.map((t, i) => {
+            const isPos = t.change24h >= 0;
+            const sparkColor = isPos ? "#10B981" : "#F43F5E";
+
+            return (
+              <Link href={`/token/${t.id}`} key={`${t.id}-${i}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03, ease: EASE }}
+                  className={`group relative flex flex-col h-full overflow-hidden ${bBorder} ${bShadow} ${bBg} transition-all ${bHoverShadow} hover:-translate-y-1 cursor-pointer`}
+                >
+                  
+                  {/* Artwork Header */}
+                  <div className={`relative w-full aspect-square border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#1A1A2E]" : "border-black bg-gray-200"}`}>
+                    {/* Unique artwork image generated via Picsum based on ticker string */}
+                    <img 
+                      src={`https://picsum.photos/seed/${t.ticker.toLowerCase()}/400/400`} 
+                      alt={t.name}
+                      className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                    />
+                    
+                    {/* Live Badge */}
+                    {t.isLive && (
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-[9px] font-black tracking-widest uppercase border border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1 z-10 animate-pulse">
+                        <Radio className="w-3 h-3" /> LIVE
+                      </div>
+                    )}
+                    
+                    {/* Curve Progress Tag */}
+                    <div className={`absolute top-2 left-2 px-1.5 py-0.5 text-[9px] font-black uppercase border z-10 ${isDark ? "bg-black/80 text-[#10B981] border-[#10B981]" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                      [{t.progress}% CURVE]
+                    </div>
+
+                    {/* Sparkline Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                    <div className="absolute bottom-0 left-0 right-0 h-16 z-20 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={t.sparkline}>
+                          <Line type="monotone" dataKey="y" stroke={sparkColor} strokeWidth={3} dot={false} isAnimationActive={false} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Token Meta & Footer */}
+                  <div className="p-3 flex flex-col flex-1 justify-between gap-3 relative z-30">
+                    
+                    {/* Title & MCAP */}
+                    <div>
+                      <h3 className={`font-black text-sm uppercase leading-tight truncate ${bText}`}>{t.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-[10px] font-bold ${isDark ? "text-[#818CF8]" : "text-[#6366F1]"}`}>${t.ticker}</span>
+                        <span className={`text-[10px] font-black px-1 border ${isDark ? "border-[rgba(255,255,255,0.2)] text-white" : "border-black text-black bg-gray-100"}`}>
+                          ${formatCompact(t.marketCap)} MC
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Creator / Time */}
+                    <div className="flex items-center gap-2">
+                      <div className={`w-5 h-5 rounded-full border ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"} overflow-hidden bg-gradient-to-br from-[#6366F1] to-[#F43F5E] shrink-0`} />
+                      <div className="flex items-center gap-1 min-w-0 text-[10px] font-bold">
+                        <span className={`truncate ${bMuted}`}>{t.creator}</span>
+                        <span className={isDark ? "text-gray-600" : "text-gray-400"}>·</span>
+                        <span className={isDark ? "text-[#10B981]" : "text-[#10B981]"}>{t.timeAgo}</span>
+                      </div>
+                    </div>
+
+                    {/* Quick Buy Hover Button */}
+                    <div className={`absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-40 px-3 py-2 text-center font-black text-xs uppercase ${bBorder} ${isDark ? "bg-[#10B981] text-black" : "bg-[#10B981] text-black"}`}>
+                      [ QUICK BUY 0.1 SOL ]
+                    </div>
+                  </div>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </div>
+        
+        {displayedTokens.length === 0 && (
+          <div className="w-full py-20 text-center font-black uppercase text-2xl text-gray-400">
+            [ NO TOKENS FOUND IN DATABASE ]
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
