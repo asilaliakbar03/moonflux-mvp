@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Brain, Bot, SendHorizonal, ArrowUpRight, ArrowDownRight, Settings2, AlertTriangle, TrendingUp, Activity, Volume2, Zap } from "lucide-react";
 import MagneticButton from '@/components/MagneticButton';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import { useMoonWallet } from '@/components/WalletProvider';
+import { useTheme } from '@/components/ThemeProvider';
 
 const TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h", "1D"];
 
@@ -109,12 +111,12 @@ function AreaChart() {
       {/* Crosshair */}
       {hover && (
         <>
-          <line x1={hover.x} x2={hover.x} y1={0} y2={H} stroke="rgba(148,163,184,0.3)" strokeWidth={1} strokeDasharray="3 3" />
-          <line x1={0} x2={W} y1={hover.y} y2={hover.y} stroke="rgba(148,163,184,0.3)" strokeWidth={1} strokeDasharray="3 3" />
+          <line x1={hover.x} x2={hover.x} y1={0} y2={H} stroke="var(--color-border-subtle)" strokeWidth={1} strokeDasharray="3 3" />
+          <line x1={0} x2={W} y1={hover.y} y2={hover.y} stroke="var(--color-border-subtle)" strokeWidth={1} strokeDasharray="3 3" />
           <circle cx={hover.x} cy={hover.y} r={4} fill="none" stroke={accentColor} strokeWidth={1.5} />
           <circle cx={hover.x} cy={hover.y} r={2} fill={accentColor} />
-          <rect x={hover.x - 32} y={hover.y - 20} width={64} height={16} rx={4} fill="rgba(0,0,0,0.85)" stroke="rgba(99,102,241,0.2)" strokeWidth={1} />
-          <text x={hover.x} y={hover.y - 9} textAnchor="middle" fill="#F1F5F9" fontSize={9} fontFamily="monospace">{hover.val.toFixed(6)}</text>
+          <rect x={hover.x - 32} y={hover.y - 20} width={64} height={16} rx={4} fill="var(--color-surface-elevated)" stroke="rgba(99,102,241,0.2)" strokeWidth={1} />
+          <text x={hover.x} y={hover.y - 9} textAnchor="middle" fill="var(--color-text-primary)" fontSize={9} fontFamily="monospace">{hover.val.toFixed(6)}</text>
         </>
       )}
     </svg>
@@ -122,6 +124,9 @@ function AreaChart() {
 }
 
 export default function TerminalPage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const { connected } = useMoonWallet();
   const [activeToken] = useState("LDOGE");
   const [tf, setTf] = useState("15m");
   const [side, setSide] = useState<"BUY" | "SELL">("BUY");
@@ -198,51 +203,51 @@ export default function TerminalPage() {
   const expectedTokens = solAmount > 0 ? (solAmount / MOCK_PRICE) * (1 - parseFloat(slippage) / 100) : 0;
 
   return (
-    <div className="flex flex-col gap-3 pb-16 pt-2 h-[calc(100vh-64px)] overflow-x-hidden w-full max-w-full">
+    <div className="flex flex-col gap-3 pb-24 md:pb-16 pt-2 min-h-[calc(100vh-64px)] md:h-[calc(100vh-64px)] overflow-x-hidden w-full max-w-full px-2 sm:px-4">
       
       {/* ── HEADER BAR ── */}
-      <div className="bg-[rgba(0,0,0,0.6)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 flex-shrink-0">
+      <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0 min-w-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-[rgba(99,102,241,0.08)] border border-[rgba(99,102,241,0.15)] flex items-center justify-center text-xl">
             🐶
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-white display-safe">Luna Doge</h1>
+              <h1 className="text-lg font-bold text-text-primary display-safe">Luna Doge</h1>
               <span className="text-[10px] font-mono text-[#818CF8] bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.15)]">LDOGE / SOL</span>
             </div>
-            <div className="text-xs text-[#475569] font-mono mt-0.5">4k3...9px2</div>
+            <div className="text-xs text-text-muted font-mono mt-0.5">4k3...9px2</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6 min-w-0">
           <div className="text-right">
-            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">Price</div>
+            <div className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mb-0.5">Price</div>
             <div className="text-[#10B981] font-mono font-bold text-lg"><AnimatedCounter value={0.00234} prefix="$" decimals={5} /></div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">24h</div>
+            <div className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mb-0.5">24h</div>
             <div className="text-[#10B981] font-mono font-bold flex items-center gap-1 justify-end">
               <ArrowUpRight className="w-3.5 h-3.5" /><AnimatedCounter value={18.4} suffix="%" decimals={1} />
             </div>
           </div>
           <div className="text-right hidden sm:block">
-            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">MCap</div>
-            <div className="text-white font-mono font-bold"><AnimatedCounter value={2.34} prefix="$" suffix="M" decimals={2} /></div>
+            <div className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mb-0.5">MCap</div>
+            <div className="text-text-primary font-mono font-bold"><AnimatedCounter value={2.34} prefix="$" suffix="M" decimals={2} /></div>
           </div>
           <div className="text-right hidden sm:block">
-            <div className="text-[10px] text-[#475569] uppercase tracking-wider font-semibold mb-0.5">Vol</div>
-            <div className="text-white font-mono font-bold"><AnimatedCounter value={840} prefix="$" suffix="K" decimals={0} /></div>
+            <div className="text-[10px] text-text-muted uppercase tracking-wider font-semibold mb-0.5">Vol</div>
+            <div className="text-text-primary font-mono font-bold"><AnimatedCounter value={840} prefix="$" suffix="K" decimals={0} /></div>
           </div>
         </div>
 
         {/* Timeframe selector */}
-        <div className="flex bg-[rgba(0,0,0,0.5)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.08)]">
+        <div className="flex flex-wrap bg-[var(--glass-panel)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.08)]">
           {TIMEFRAMES.map(t => (
             <button
               key={t}
               onClick={() => setTf(t)}
-              className={`px-2.5 py-1 rounded-md text-xs font-bold font-mono transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${tf === t ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8] shadow-[0_0_8px_rgba(99,102,241,0.15)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
+              className={`px-2.5 py-1 rounded-md text-xs font-bold font-mono transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${tf === t ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8] shadow-[0_0_8px_rgba(99,102,241,0.15)]' : 'text-text-muted hover:text-text-secondary'}`}
             >
               {t}
             </button>
@@ -257,15 +262,15 @@ export default function TerminalPage() {
         <div className="flex-1 flex flex-col gap-3 min-w-0">
           
           {/* Chart */}
-          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl relative flex-1 min-h-[300px] overflow-hidden">
+          <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl relative flex-1 min-h-[300px] overflow-hidden">
             {/* Pair label */}
             <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-              <span className="bg-[rgba(0,0,0,0.7)] backdrop-blur-sm text-[#94A3B8] text-[10px] px-2 py-1 rounded font-mono border border-[rgba(99,102,241,0.08)]">LDOGE/SOL</span>
-              <span className="text-[10px] text-[#334155] font-mono">15m</span>
+              <span className="bg-[var(--color-surface-elevated)] backdrop-blur-sm text-text-secondary text-[10px] px-2 py-1 rounded font-mono border border-[rgba(99,102,241,0.08)]">LDOGE/SOL</span>
+              <span className="text-[10px] text-text-faint font-mono">15m</span>
             </div>
             <AreaChart />
             {/* Y-axis price scale */}
-            <div className="absolute top-0 right-0 h-full w-[52px] bg-[rgba(0,0,0,0.6)] backdrop-blur-sm flex flex-col justify-between py-8 px-1.5 text-[9px] text-[#475569] font-mono z-10 border-l border-[rgba(99,102,241,0.04)]">
+            <div className="absolute top-0 right-0 h-full w-[52px] bg-[var(--glass-panel)] backdrop-blur-sm flex flex-col justify-between py-8 px-1.5 text-[9px] text-text-muted font-mono z-10 border-l border-[rgba(99,102,241,0.04)]">
               <span>0.00242</span>
               <span>0.00238</span>
               <span className="text-[#10B981] bg-[rgba(16,185,129,0.1)] px-1 rounded">--</span>
@@ -275,17 +280,17 @@ export default function TerminalPage() {
           </div>
 
           {/* Bottom panels — Order Book + AI Intel */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             
             {/* Order Book */}
-            <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 h-[220px] flex flex-col w-1/3">
+            <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 h-[220px] flex flex-col w-full sm:w-1/3">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-white font-bold text-xs uppercase tracking-wider">Order Book</h3>
-                <span className="text-[9px] text-[#334155] font-mono">DEMO</span>
+                <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider">Order Book</h3>
+                <span className="text-[9px] text-text-faint font-mono">DEMO</span>
               </div>
               
               <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide text-[11px] font-mono" data-lenis-prevent>
-                <div className="flex justify-between text-[#475569] mb-2 px-1 text-[9px] uppercase tracking-wider">
+                <div className="flex justify-between text-text-muted mb-2 px-1 text-[9px] uppercase tracking-wider">
                   <span>Price</span>
                   <span>Size</span>
                 </div>
@@ -300,7 +305,7 @@ export default function TerminalPage() {
                     <div key={i} className="flex justify-between px-1 py-0.5 hover:bg-[rgba(239,68,68,0.06)] rounded relative cursor-pointer transition-colors">
                       <div className="absolute right-0 top-0 h-full bg-[rgba(239,68,68,0.06)] z-0 rounded-r" style={{ width: `${ask.depth}%` }} />
                       <span className="text-[#EF4444] relative z-10">{ask.price}</span>
-                      <span className="text-[#475569] relative z-10">{ask.size}</span>
+                      <span className="text-text-muted relative z-10">{ask.size}</span>
                     </div>
                   ))}
                 </div>
@@ -320,7 +325,7 @@ export default function TerminalPage() {
                     <div key={i} className="flex justify-between px-1 py-0.5 hover:bg-[rgba(16,185,129,0.06)] rounded relative cursor-pointer transition-colors">
                       <div className="absolute right-0 top-0 h-full bg-[rgba(16,185,129,0.06)] z-0 rounded-r" style={{ width: `${bid.depth}%` }} />
                       <span className="text-[#10B981] relative z-10">{bid.price}</span>
-                      <span className="text-[#475569] relative z-10">{bid.size}</span>
+                      <span className="text-text-muted relative z-10">{bid.size}</span>
                     </div>
                   ))}
                 </div>
@@ -328,41 +333,41 @@ export default function TerminalPage() {
             </div>
 
             {/* AI Intel Panel */}
-            <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex-1 h-[220px] flex flex-col gap-3 relative overflow-hidden fluxx-float-slow">
+            <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex-1 h-[220px] flex flex-col gap-3 relative overflow-hidden fluxx-float-slow">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-6 h-6 rounded-md bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
                   <Brain className="w-3.5 h-3.5 text-[#818CF8]" />
                 </div>
-                <h3 className="text-white font-bold text-xs uppercase tracking-wider">Intel Layer</h3>
+                <h3 className="text-text-primary font-bold text-xs uppercase tracking-wider">Intel Layer</h3>
                 <div className="ml-auto flex items-center gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse fluxx-breathe" />
-                  <span className="text-[9px] text-[#475569] font-mono uppercase">Live</span>
+                  <span className="text-[9px] text-text-muted font-mono uppercase">Live</span>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-2.5 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
                 {/* Pump Forecast */}
                 <div className="bg-[rgba(16,185,129,0.04)] border border-[rgba(16,185,129,0.08)] rounded-lg p-3 flex flex-col justify-between fluxx-hover-shimmer">
                   <div className="flex items-center gap-1.5 mb-1">
                     <TrendingUp className="w-3 h-3 text-[#10B981]" />
-                    <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Pump Forecast</span>
+                    <span className="text-[9px] text-text-muted font-mono uppercase tracking-wider">Pump Forecast</span>
                   </div>
-                  <div className="text-xl font-bold text-white font-mono">
+                  <div className="text-xl font-bold text-text-primary font-mono">
                     {intel?.pump ? intel.pump.probability : "..."}
                   </div>
-                  <div className="text-[10px] text-[#475569] mt-1">{intel?.pump ? intel.pump.target : "Calculating..."}</div>
+                  <div className="text-[10px] text-text-muted mt-1">{intel?.pump ? intel.pump.target : "Calculating..."}</div>
                 </div>
 
                 {/* Flash Crash Risk */}
                 <div className="bg-[rgba(239,68,68,0.04)] border border-[rgba(239,68,68,0.08)] rounded-lg p-3 flex flex-col justify-between fluxx-hover-shimmer">
                   <div className="flex items-center gap-1.5 mb-1">
                     <Activity className="w-3 h-3 text-[#EF4444]" />
-                    <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Crash Risk</span>
+                    <span className="text-[9px] text-text-muted font-mono uppercase tracking-wider">Crash Risk</span>
                   </div>
-                  <div className="text-xl font-bold text-white font-mono">
+                  <div className="text-xl font-bold text-text-primary font-mono">
                     {intel?.crash ? intel.crash.riskLevel : "..."}
                   </div>
-                  <div className="text-[10px] text-[#475569] mt-1">Volatility active</div>
+                  <div className="text-[10px] text-text-muted mt-1">Volatility active</div>
                 </div>
               </div>
 
@@ -371,10 +376,10 @@ export default function TerminalPage() {
                  <div className="flex justify-between items-center mb-1">
                    <div className="flex items-center gap-1.5">
                      <Zap className="w-3 h-3 text-[#818CF8]" />
-                     <span className="text-[9px] text-[#475569] font-mono uppercase tracking-wider">Narrative</span>
+                     <span className="text-[9px] text-text-muted font-mono uppercase tracking-wider">Narrative</span>
                    </div>
                  </div>
-                 <div className="text-[11px] text-[#94A3B8] leading-relaxed">
+                 <div className="text-[11px] text-text-secondary leading-relaxed">
                    {intel?.radar ? intel.radar.summary : "Scanning socials..."}
                  </div>
               </div>
@@ -386,33 +391,33 @@ export default function TerminalPage() {
         <div className="w-full lg:w-[320px] flex flex-col gap-3 flex-shrink-0 min-h-0">
           
           {/* Trade Panel */}
-          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex flex-col gap-3.5">
+          <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl p-4 flex flex-col gap-3.5">
             
             {/* Buy/Sell Toggle */}
-            <div className="flex bg-[rgba(0,0,0,0.5)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.06)]">
+            <div className="flex bg-[var(--glass-panel)] rounded-lg p-0.5 border border-[rgba(99,102,241,0.06)]">
               <button 
                 onClick={() => setSide("BUY")}
-                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-[#FFFFFF] shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'text-text-muted hover:text-text-secondary'}`}
               >BUY</button>
               <button 
                 onClick={() => setSide("SELL")}
-                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "SELL" ? 'bg-[#EF4444] text-white shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'text-[#475569] hover:text-[#94A3B8]'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "SELL" ? 'bg-[#EF4444] text-[#FFFFFF] shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'text-text-muted hover:text-text-secondary'}`}
               >SELL</button>
             </div>
 
             {/* Amount input */}
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs text-[#475569] font-semibold uppercase tracking-wider">Amount (SOL)</label>
-                <span className="text-[10px] text-[#475569] font-mono">Bal: -- SOL</span>
+                <label className="text-xs text-text-muted font-semibold uppercase tracking-wider">Amount (SOL)</label>
+                <span className="text-[10px] text-text-muted font-mono">{connected ? 'Bal: -- SOL' : 'Connect Wallet'}</span>
               </div>
-              <div className="bg-[rgba(0,0,0,0.5)] border border-[rgba(99,102,241,0.08)] rounded-lg p-1 flex items-center focus-within:border-[rgba(99,102,241,0.25)] focus-within:shadow-[0_0_12px_rgba(99,102,241,0.08)] transition-all">
+              <div className="bg-[var(--glass-panel)] border border-[rgba(99,102,241,0.08)] rounded-lg p-1 flex items-center focus-within:border-[rgba(99,102,241,0.25)] focus-within:shadow-[0_0_12px_rgba(99,102,241,0.08)] transition-all">
                 <input 
                   type="number" 
                   value={amount}
                   onChange={e => setAmount(e.target.value)}
                   placeholder="0.0"
-                  className="w-full bg-transparent p-2 text-white font-mono text-sm focus-visible:ring-0 focus-visible:outline-none"
+                  className="w-full bg-transparent p-2 text-text-primary font-mono text-sm focus-visible:ring-0 focus-visible:outline-none"
                 />
                 <div className="flex gap-1 pr-1">
                   {['25%','50%','MAX'].map(pct => (
@@ -424,38 +429,45 @@ export default function TerminalPage() {
 
             {/* Expected output */}
             <div className="bg-[rgba(99,102,241,0.04)] border border-[rgba(99,102,241,0.06)] rounded-lg p-3 text-sm flex justify-between items-center">
-              <span className="text-[#475569] text-xs">You receive</span>
-              <span className="text-white font-mono font-bold text-sm">~{expectedTokens.toLocaleString(undefined, {maximumFractionDigits: 0})} LDOGE</span>
+              <span className="text-text-muted text-xs">You receive</span>
+              <span className="text-text-primary font-mono font-bold text-sm">~{expectedTokens.toLocaleString(undefined, {maximumFractionDigits: 0})} LDOGE</span>
             </div>
 
             {/* Slippage */}
-            <div className="flex justify-between items-center bg-[rgba(0,0,0,0.3)] border border-[rgba(99,102,241,0.04)] rounded-lg px-3 py-2">
-              <span className="text-xs text-[#475569] flex items-center gap-1"><Settings2 className="w-3 h-3"/> Slippage</span>
+            <div className="flex justify-between items-center bg-[var(--color-surface-1)] border border-[rgba(99,102,241,0.04)] rounded-lg px-3 py-2">
+              <span className="text-xs text-text-muted flex items-center gap-1"><Settings2 className="w-3 h-3"/> Slippage</span>
               <div className="flex items-center gap-1.5">
                 <button onClick={() => setSlippage("0.5")} className="w-5 h-5 flex items-center justify-center bg-[rgba(99,102,241,0.08)] text-[#818CF8] rounded text-xs border border-[rgba(99,102,241,0.1)] hover:bg-[rgba(99,102,241,0.15)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">-</button>
-                <span className="text-xs font-mono text-white w-7 text-center">{slippage}%</span>
+                <span className="text-xs font-mono text-text-primary w-7 text-center">{slippage}%</span>
                 <button onClick={() => setSlippage("2.0")} className="w-5 h-5 flex items-center justify-center bg-[rgba(99,102,241,0.08)] text-[#818CF8] rounded text-xs border border-[rgba(99,102,241,0.1)] hover:bg-[rgba(99,102,241,0.15)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">+</button>
               </div>
             </div>
 
             {/* Execute button */}
             <MagneticButton as="div" strength={0.25} className="w-full">
-              <button className={`w-full py-3 rounded-lg font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-[#EF4444] text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]'}`}>
+              <button 
+                onClick={() => {
+                  if (!connected) {
+                    alert('Connect wallet to trade');
+                  }
+                }}
+                className={`w-full py-3 rounded-lg font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${side === "BUY" ? 'bg-[#10B981] text-[#FFFFFF] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-[#EF4444] text-[#FFFFFF] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]'}`}
+              >
                 {side} LDOGE
               </button>
             </MagneticButton>
-            <div className="text-[9px] text-center text-[#334155] flex items-center justify-center gap-1 font-mono">
+            <div className="text-[9px] text-center text-text-faint flex items-center justify-center gap-1 font-mono">
               <AlertTriangle className="w-2.5 h-2.5" /> Demo mode · Trading involves risk
             </div>
           </div>
 
           {/* Trade Copilot Chat */}
-          <div className="bg-[rgba(0,0,0,0.5)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl flex flex-col flex-1 min-h-[200px]">
+          <div className="bg-[var(--glass-panel)] backdrop-blur-xl border border-[rgba(99,102,241,0.06)] rounded-xl flex flex-col flex-1 min-h-[200px]">
             <div className="px-3 py-2.5 border-b border-[rgba(99,102,241,0.06)] flex items-center gap-2 fluxx-hover-shimmer">
               <div className="w-5 h-5 rounded-md bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
                 <Bot className="w-3 h-3 text-[#818CF8]" />
               </div>
-              <span className="font-bold text-xs text-white uppercase tracking-wider">Copilot</span>
+              <span className="font-bold text-xs text-text-primary uppercase tracking-wider">Copilot</span>
               <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
             </div>
             
@@ -464,8 +476,8 @@ export default function TerminalPage() {
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] px-3 py-2 rounded-xl leading-relaxed ${
                     msg.role === 'user' 
-                      ? 'bg-[rgba(99,102,241,0.12)] text-white rounded-tr-sm border border-[rgba(99,102,241,0.15)]' 
-                      : 'bg-[rgba(0,0,0,0.5)] text-[#94A3B8] rounded-tl-sm border border-[rgba(99,102,241,0.06)]'
+                      ? 'bg-[rgba(99,102,241,0.12)] text-[#FFFFFF] rounded-tr-sm border border-[rgba(99,102,241,0.15)]' 
+                      : 'bg-[var(--glass-panel)] text-text-secondary rounded-tl-sm border border-[rgba(99,102,241,0.06)]'
                   }`}>
                     {msg.content}
                   </div>
@@ -473,7 +485,7 @@ export default function TerminalPage() {
               ))}
               {copilotLoading && (
                 <div className="flex justify-start">
-                  <div className="max-w-[85%] px-3 py-2 rounded-xl bg-[rgba(0,0,0,0.5)] text-[#818CF8] rounded-tl-sm flex gap-1.5 items-center border border-[rgba(99,102,241,0.06)]">
+                  <div className="max-w-[85%] px-3 py-2 rounded-xl bg-[var(--glass-panel)] text-[#818CF8] rounded-tl-sm flex gap-1.5 items-center border border-[rgba(99,102,241,0.06)]">
                     <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" />
                     <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
                     <span className="w-1.5 h-1.5 bg-[#818CF8] rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
@@ -483,14 +495,14 @@ export default function TerminalPage() {
             </div>
             
             <div className="p-2 border-t border-[rgba(99,102,241,0.06)]">
-              <div className="bg-[rgba(0,0,0,0.5)] border border-[rgba(99,102,241,0.08)] rounded-lg p-0.5 flex focus-within:border-[rgba(99,102,241,0.2)] transition-all">
+              <div className="bg-[var(--glass-panel)] border border-[rgba(99,102,241,0.08)] rounded-lg p-0.5 flex focus-within:border-[rgba(99,102,241,0.2)] transition-all">
                 <input 
                   type="text"
                   value={copilotInput}
                   onChange={e => setCopilotInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendCopilotMessage(copilotInput)}
                   placeholder="Ask about this trade..."
-                  className="flex-1 bg-transparent px-2.5 py-1.5 text-sm text-white placeholder:text-[#334155] focus-visible:ring-0 focus-visible:outline-none"
+                  className="flex-1 bg-transparent px-2.5 py-1.5 text-sm text-text-primary placeholder:text-text-faint focus-visible:ring-0 focus-visible:outline-none"
                 />
                 <button 
                   onClick={() => sendCopilotMessage(copilotInput)}

@@ -5,6 +5,7 @@ import { Check, X, Clock, Users, Flame, Star, Rocket, Circle } from "lucide-reac
 import { useState, useMemo } from "react";
 import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
+import { useTheme } from '@/components/ThemeProvider';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -22,6 +23,8 @@ const INCUBATOR_PROJECTS = [
 ];
 
 export default function VenturePage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'governance' | 'incubator'>('governance');
   const [votedProps, setVotedProps] = useState<Record<number, 'for' | 'against'>>({});
   const [votedProjects, setVotedProjects] = useState<Record<number, boolean>>({});
@@ -52,35 +55,35 @@ export default function VenturePage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto w-full pt-8 pb-16">
+    <div className="max-w-5xl mx-auto w-full pt-4 sm:pt-6 md:pt-8 pb-24 px-4 sm:px-6 md:px-8">
       
       {/* ── HEADER ── */}
       <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 text-center md:text-left">
         <div>
-          <h1 className="text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-white mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">
             <Rocket className="w-8 h-8 text-[#6366F1]" />
             Venture Mode
           </h1>
           <p className="text-[#94A3B8]">Shape the future of MoonFluxx. Vote on proposals and back early-stage projects.</p>
         </div>
         
-        <div className="flex p-1 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.25)]">
+        <div className={`flex flex-col sm:flex-row w-full md:w-auto p-1 backdrop-blur-2xl border rounded-xl ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)] shadow-[0_0_25px_rgba(99,102,241,0.25)]' : 'bg-surface-1 border-border-subtle'}`}>
           <MagneticButton
             onClick={() => setActiveTab('governance')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            className={`flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
               activeTab === 'governance'
-                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
-                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? (isDark ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-indigo-100 text-indigo-700')
+                : (isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover')
             }`}
           >
             Governance
           </MagneticButton>
           <MagneticButton
             onClick={() => setActiveTab('incubator')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
+            className={`flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${
               activeTab === 'incubator'
-                ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
-                : 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                ? (isDark ? 'bg-[rgba(99,102,241,0.15)] text-[#818CF8] shadow-[0_0_10px_rgba(99,102,241,0.2)]' : 'bg-indigo-100 text-indigo-700')
+                : (isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[rgba(255,255,255,0.05)]' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover')
             }`}
           >
             Incubator
@@ -113,7 +116,7 @@ export default function VenturePage() {
                 onMouseMove={(e) => handleMouseMove(e, prop.id, setPropTilts)}
                 onMouseLeave={() => handleMouseLeave(prop.id, setPropTilts)}
                 style={{ transform: `perspective(800px) rotateX(${propTilts[prop.id]?.x || 0}deg) rotateY(${propTilts[prop.id]?.y || 0}deg)` }}
-                className="p-6 flex flex-col h-full transition-all duration-300 ease-out bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl hover:border-[rgba(99,102,241,0.30)] hover:shadow-[0_0_25px_rgba(99,102,241,0.25)]"
+                className={`p-6 flex flex-col h-full transition-all duration-300 ease-out backdrop-blur-2xl border rounded-2xl ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)] hover:border-[rgba(99,102,241,0.30)] hover:shadow-[0_0_25px_rgba(99,102,241,0.25)]' : 'bg-surface-1 border-border-subtle hover:border-indigo-300'}`}
               >
                 
                 {/* Header */}
@@ -135,7 +138,7 @@ export default function VenturePage() {
                         {prop.category}
                       </span>
                     </div>
-                    <h3 className="display-safe text-xl font-bold text-white leading-snug drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">{prop.title}</h3>
+                    <h3 className={`display-safe text-xl font-bold leading-snug ${isDark ? 'text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]' : 'text-text-primary'}`}>{prop.title}</h3>
                   </div>
                 </div>
 
@@ -173,7 +176,7 @@ export default function VenturePage() {
                         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none disabled:opacity-40 disabled:pointer-events-none border ${
                           votedProps[prop.id] === 'for' 
                             ? 'bg-gradient-to-r from-[#10B981] to-[#059669] text-white border-transparent shadow-[0_0_15px_rgba(16,185,129,0.4)]' 
-                            : 'bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 border-[rgba(16,185,129,0.3)] text-[#10B981]'
+                            : (isDark ? 'bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 border-[rgba(16,185,129,0.3)] text-[#10B981]' : 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200')
                         }`}
                       >
                         <Check className="w-4 h-4" /> Vote For
@@ -186,7 +189,7 @@ export default function VenturePage() {
                         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none disabled:opacity-40 disabled:pointer-events-none border ${
                           votedProps[prop.id] === 'against' 
                             ? 'bg-gradient-to-r from-[#F43F5E] to-[#E11D48] text-white border-transparent shadow-[0_0_15px_rgba(244,63,94,0.4)]' 
-                            : 'bg-gradient-to-r from-[#F43F5E]/10 to-[#E11D48]/10 hover:from-[#F43F5E]/20 hover:to-[#E11D48]/20 border-[rgba(244,63,94,0.3)] text-[#F43F5E]'
+                            : (isDark ? 'bg-gradient-to-r from-[#F43F5E]/10 to-[#E11D48]/10 hover:from-[#F43F5E]/20 hover:to-[#E11D48]/20 border-[rgba(244,63,94,0.3)] text-[#F43F5E]' : 'bg-red-50 text-red-700 hover:bg-red-100 border-red-200')
                         }`}
                       >
                         <X className="w-4 h-4" /> Vote Against
@@ -205,11 +208,11 @@ export default function VenturePage() {
       {activeTab === 'incubator' && (
         <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col gap-6">
           
-          <div className="p-8 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl flex flex-col items-center text-center mb-4 relative overflow-hidden shadow-[0_0_25px_rgba(99,102,241,0.25)]">
+          <div className="p-4 sm:p-6 md:p-8 bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl flex flex-col items-center text-center mb-4 relative overflow-hidden shadow-[0_0_25px_rgba(99,102,241,0.25)]">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.8),transparent_60%)]" />
             <h2 className="text-2xl font-bold text-white mb-2 relative z-10 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">Back Early Stage Projects</h2>
             <p className="text-[#94A3B8] max-w-xl mb-6 relative z-10">Vote for the next big protocol across chains. Projects that reach 100% funding goal receive a MoonFluxx ecosystem grant and automatic listing.</p>
-            <button className="bg-[#6366F1] hover:bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] rounded-lg font-bold px-6 py-2 transition-all relative z-10 hover:shadow-[0_0_25px_rgba(99,102,241,0.6)]">Apply for Incubation</button>
+            <button onClick={() => alert('Applications opening soon')} className="bg-[#6366F1] hover:bg-[#4F46E5] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] rounded-lg font-bold px-6 py-2 transition-all relative z-10 hover:shadow-[0_0_25px_rgba(99,102,241,0.6)]">Apply for Incubation</button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -218,14 +221,14 @@ export default function VenturePage() {
                 onMouseMove={(e) => handleMouseMove(e, proj.id, setIncTilts)}
                 onMouseLeave={() => handleMouseLeave(proj.id, setIncTilts)}
                 style={{ transform: `perspective(800px) rotateX(${incTilts[proj.id]?.x || 0}deg) rotateY(${incTilts[proj.id]?.y || 0}deg)` }}
-                className="p-6 flex flex-col h-full transition-all duration-300 ease-out bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl hover:border-[rgba(99,102,241,0.30)] hover:shadow-[0_0_25px_rgba(99,102,241,0.25)]"
+                className={`p-6 flex flex-col h-full transition-all duration-300 ease-out backdrop-blur-2xl border rounded-2xl ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)] hover:border-[rgba(99,102,241,0.30)] hover:shadow-[0_0_25px_rgba(99,102,241,0.25)]' : 'bg-surface-1 border-border-subtle hover:border-indigo-300'}`}
               >
                 
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="text-4xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">{proj.emoji}</div>
                     <div>
-                      <h3 className="display-safe text-lg font-bold text-white">{proj.name}</h3>
+                      <h3 className={`display-safe text-lg font-bold ${isDark ? 'text-white' : 'text-text-primary'}`}>{proj.name}</h3>
                       <div className="text-[#6366F1] font-mono text-xs">{proj.ticker}</div>
                     </div>
                   </div>

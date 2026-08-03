@@ -5,6 +5,7 @@ import { Activity, Compass, Rocket, TrendingUp, Trophy, Swords, Lightbulb, User,
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
+import { useTheme } from '@/components/ThemeProvider';
 
 type NavItem = { icon: LucideIcon; label: string; href: string; type?: never };
 type DividerItem = { type: "divider"; icon?: never; label?: never; href?: never };
@@ -43,6 +44,8 @@ function DockItem({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const Icon = item.icon;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const onMove = (e: React.PointerEvent) => {
     const el = ref.current;
@@ -67,7 +70,7 @@ function DockItem({
           whileHover={{ scale: 1.18, y: -5 }}
           whileTap={{ scale: 0.92 }}
           className={`group relative p-3 rounded-full transition-colors fluxx-hover-shimmer ${
-            isActive ? "text-[#F1F5F9]" : "text-[#94A3B8] hover:text-[#F1F5F9]"
+            isActive ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
           }`}
         >
           {isActive && (
@@ -88,7 +91,7 @@ function DockItem({
           )}
 
           {/* tooltip — desktop only */}
-          <div className="absolute -top-11 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-[#050510] backdrop-blur-md border border-[rgba(99,102,241,0.18)] rounded-md text-[0.58rem] font-mono tracking-[0.25em] uppercase text-[#F1F5F9] opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all whitespace-nowrap pointer-events-none">
+          <div className={`absolute -top-11 left-1/2 -translate-x-1/2 px-2.5 py-1.5 ${isDark ? 'bg-[#050510]' : 'bg-white shadow-lg'} backdrop-blur-md border border-[rgba(99,102,241,0.18)] rounded-md text-[0.58rem] font-mono tracking-[0.25em] uppercase text-[var(--color-text-primary)] opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all whitespace-nowrap pointer-events-none`}>
             {item.label}
           </div>
         </motion.div>
@@ -113,12 +116,12 @@ function MobileTab({ item, isActive }: { item: NavItem; isActive: boolean }) {
       <Icon
         size={20}
         strokeWidth={isActive ? 2.5 : 1.8}
-        style={{ color: isActive ? "#6366F1" : "#94A3B8" }}
+        style={{ color: isActive ? "#6366F1" : "var(--color-text-secondary)" }}
         className="relative z-10"
       />
       <span
         className="font-mono text-[0.45rem] tracking-widest uppercase relative z-10 transition-colors"
-        style={{ color: isActive ? "#F1F5F9" : "#475569" }}
+        style={{ color: isActive ? "var(--color-text-primary)" : "var(--color-text-faint)" }}
       >
         {item.label}
       </span>
@@ -135,6 +138,8 @@ function MobileTab({ item, isActive }: { item: NavItem; isActive: boolean }) {
 
 export default function Dock() {
   const pathname = usePathname();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
     <>
@@ -156,7 +161,7 @@ export default function Dock() {
             <div
               className="relative rounded-full px-4 py-2.5 flex items-center gap-1.5 backdrop-blur-2xl"
               style={{
-                background: "rgba(0,0,0,0.70)",
+                background: isDark ? "rgba(0,0,0,0.70)" : "rgba(255,255,255,0.80)",
                 border: "1px solid rgba(99,102,241,0.15)",
                 boxShadow: "0 20px 60px -20px rgba(99,102,241,0.25)",
               }}
@@ -164,7 +169,7 @@ export default function Dock() {
               <div className="absolute top-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[rgba(99,102,241,0.5)] to-transparent" />
               {ITEMS.map((item, idx) =>
                 "type" in item && item.type === "divider" ? (
-                  <div key={`div-${idx}`} className="w-[1px] h-7 bg-[rgba(255,255,255,0.1)] mx-1.5" />
+                  <div key={`div-${idx}`} className={`w-[1px] h-7 ${isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(0,0,0,0.1)]'} mx-1.5`} />
                 ) : (
                   <DockItem
                     key={(item as { href: string }).href}
@@ -185,9 +190,9 @@ export default function Dock() {
         transition={{ type: "spring", stiffness: 300, damping: 24, delay: 0.15 }}
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch safe-b"
         style={{
-          background: "rgba(0,0,0,0.70)",
-          borderTop: "1px solid rgba(99,102,241,0.1)",
-          boxShadow: "0 -12px 40px -12px rgba(0,0,0,0.8)",
+          background: isDark ? "rgba(0,0,0,0.70)" : "rgba(255,255,255,0.80)",
+          borderTop: isDark ? "1px solid rgba(99,102,241,0.1)" : "1px solid rgba(99,102,241,0.12)",
+          boxShadow: isDark ? "0 -12px 40px -12px rgba(0,0,0,0.8)" : "0 -12px 40px -12px rgba(0,0,0,0.08)",
           backdropFilter: "blur(24px)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}

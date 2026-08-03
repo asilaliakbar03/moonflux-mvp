@@ -6,7 +6,7 @@ import {
   CheckCheck, Filter
 } from "lucide-react";
 import { useState } from "react";
-
+import { useTheme } from "@/components/ThemeProvider";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 type NotifType = "price" | "launch" | "graduation" | "whale" | "revenue" | "rank" | "social";
@@ -83,7 +83,7 @@ const TYPE_META: Record<NotifType, { icon: React.ElementType; color: string; bg:
   launch:      { icon: Rocket,      color: "#38bdf8", bg: "rgba(56,189,248,0.1)"  },
   revenue:     { icon: DollarSign,  color: "#f59e0b", bg: "rgba(245,158,11,0.1)"  },
   rank:        { icon: Trophy,      color: "#e8b84b", bg: "rgba(232,184,75,0.1)"  },
-  social:      { icon: Users,       color: "#6b6987", bg: "rgba(107,105,135,0.1)" },
+  social:      { icon: Users,       color: "#94A3B8", bg: "rgba(107,105,135,0.1)" },
 };
 
 const FILTERS = ["All", "Price", "Launch", "Whale", "Revenue"] as const;
@@ -109,6 +109,8 @@ interface NotificationPanelProps {
 export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
   const [notifs, setNotifs] = useState<Notification[]>(INITIAL_NOTIFS);
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const unread = notifs.filter(n => !n.read).length;
   const filtered = notifs.filter(n => filterMatch(n, activeFilter));
@@ -139,8 +141,8 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
             transition={{ duration: 0.38, ease: EASE }}
             className="fixed top-[76px] right-4 z-[191] w-[380px] flex flex-col rounded-3xl overflow-hidden"
             style={{
-              background: "rgba(8,6,3,0.98)",
-              border: "1px solid rgba(232,184,75,0.28)",
+              background: isDark ? "rgba(8,6,3,0.98)" : "rgba(255,255,255,0.98)",
+              border: `1px solid ${isDark ? "rgba(232,184,75,0.28)" : "rgba(99,102,241,0.15)"}`,
               boxShadow: "0 32px 80px -16px rgba(0,0,0,0.9), 0 0 40px -20px rgba(232,184,75,0.12)",
               maxHeight: "calc(100vh - 100px)",
             }}
@@ -155,7 +157,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                   <Bell size={15} style={{ color: "#e8b84b" }} />
                 </div>
                 <div>
-                  <h3 className="font-display text-sm font-semibold text-white">Notifications</h3>
+                  <h3 className="font-display text-sm font-semibold text-text-primary">Notifications</h3>
                   {unread > 0 && (
                     <p className="font-mono text-[0.55rem]" style={{ color: "#e8b84b" }}>{unread} unread</p>
                   )}
@@ -169,8 +171,8 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                   </button>
                 )}
                 <button onClick={onClose} className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <X size={13} style={{ color: "#6b6987" }} />
+                  style={{ background: "var(--color-surface-hover)", border: "1px solid var(--color-border-subtle)" }}>
+                  <X size={13} style={{ color: "var(--color-text-muted)" }} />
                 </button>
               </div>
             </div>
@@ -182,7 +184,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                   className="font-mono text-[0.55rem] tracking-widest uppercase px-2.5 py-1 rounded-lg transition-all"
                   style={{
                     background: activeFilter === f ? "rgba(232,184,75,0.15)" : "transparent",
-                    color: activeFilter === f ? "#e8b84b" : "#6b6987",
+                    color: activeFilter === f ? "#e8b84b" : "var(--color-text-muted)",
                     border: activeFilter === f ? "1px solid rgba(232,184,75,0.3)" : "1px solid transparent",
                   }}>
                   {f}
@@ -198,8 +200,8 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
               <AnimatePresence initial={false}>
                 {filtered.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <Bell size={28} style={{ color: "#35334a" }} />
-                    <p className="font-mono text-[0.62rem]" style={{ color: "#35334a" }}>No notifications</p>
+                    <Bell size={28} style={{ color: "var(--color-text-secondary)" }} />
+                    <p className="font-mono text-[0.62rem]" style={{ color: "var(--color-text-secondary)" }}>No notifications</p>
                   </div>
                 ) : (
                   filtered.map((n, i) => {
@@ -219,7 +221,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                           background: n.read ? "transparent" : "rgba(232,184,75,0.04)",
                           border: `1px solid ${n.read ? "transparent" : "rgba(232,184,75,0.12)"}`,
                         }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)"; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = n.read ? "transparent" : "rgba(232,184,75,0.04)"; }}
                       >
                         {/* Unread dot */}
@@ -236,7 +238,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-0.5">
-                            <p className="font-display text-[0.72rem] font-semibold text-white leading-snug">{n.title}</p>
+                            <p className="font-display text-[0.72rem] font-semibold text-text-primary leading-snug">{n.title}</p>
                             <div className="flex items-center gap-1.5 flex-shrink-0">
                               {n.urgent && (
                                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#ef4444" }} />
@@ -245,13 +247,13 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                                 onClick={e => { e.stopPropagation(); dismiss(n.id); }}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                               >
-                                <X size={11} style={{ color: "#6b6987" }} />
+                                <X size={11} style={{ color: "var(--color-text-muted)" }} />
                               </button>
                             </div>
                           </div>
-                          <p className="font-mono text-[0.58rem] leading-relaxed mb-1.5" style={{ color: "#6b6987" }}>{n.body}</p>
+                          <p className="font-mono text-[0.58rem] leading-relaxed mb-1.5" style={{ color: "var(--color-text-muted)" }}>{n.body}</p>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[0.52rem]" style={{ color: "#35334a" }}>{n.time}</span>
+                            <span className="font-mono text-[0.52rem]" style={{ color: "var(--color-text-secondary)" }}>{n.time}</span>
                             {n.token && (
                               <span className="font-mono text-[0.5rem] px-1.5 py-0.5 rounded-full" style={{ color: meta.color, background: meta.bg, border: `1px solid ${meta.color}30` }}>
                                 ${n.token}
@@ -277,7 +279,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
               <button
                 onClick={() => window.location.href = '/profile'}
                 className="w-full font-mono text-[0.6rem] tracking-widest uppercase py-2 rounded-xl transition-all"
-                style={{ color: "#6b6987", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                style={{ color: "var(--color-text-muted)", background: "var(--color-surface-hover)", border: "1px solid var(--color-border-subtle)" }}>
                 View All Activity
               </button>
             </div>

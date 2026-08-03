@@ -32,13 +32,13 @@ function getMockToken(prompt: string) {
   if (seed.includes('dog') || seed.includes('doge') || seed.includes('shib')) {
     return {
       name: 'MoonBark', ticker: 'BARK',
-      description: 'The most loyal dog on the Multi-Chain ecosystem. $BARK was forged in the fires of meme culture by a community of degens who believe that good boys deserve good gains. Diamond paws only.',
+      description: 'The most loyal dog on the Multi-Chain ecosystem. $BARK was forged in the fires of token culture by a community of degens who believe that good boys deserve good gains. Diamond paws only.',
       website: 'moonbark.xyz', twitter: '@MoonBarkSol', telegram: 't.me/moonbarksol',
       suggestedCurve: 'fast', suggestedLiquidity: 'fair',
       loreArc: { origin: 'A stray dog found a Multi-Chain wallet on the streets of Tokyo.', conflict: 'The bears tried to put him down. He just wagged his tail.', resolution: 'Every sell becomes a buy. $BARK cannot be stopped.' },
-      aiNarrativeTags: ['Dog Meta', 'Meme Season', 'Community'],
-      riskTier: 'meme',
-      whitepaper: 'MoonBark ($BARK) is the first community-driven canine token across chains, born from the belief that loyalty should be rewarded on-chain. Our mission is to create the most engaged dog-meta community in crypto, powered by meme culture and diamond paws.\n\nThe $BARK ecosystem features auto-staking bone rewards, a community-governed treat treasury, and partnerships with real-world dog shelters. Every transaction contributes to the Bark Fund, ensuring that both digital and real dogs eat well.',
+      aiNarrativeTags: ['Dog Meta', 'Alt Season', 'Community'],
+      riskTier: 'token',
+      whitepaper: 'MoonBark ($BARK) is the first community-driven canine token across chains, born from the belief that loyalty should be rewarded on-chain. Our mission is to create the most engaged dog-meta community in crypto, powered by token culture and diamond paws.\n\nThe $BARK ecosystem features auto-staking bone rewards, a community-governed treat treasury, and partnerships with real-world dog shelters. Every transaction contributes to the Bark Fund, ensuring that both digital and real dogs eat well.',
       roadmap: { q1: 'Fair launch on pump.fun, community building, 10K holder milestone', q2: 'Bark Staking v1, partnerships with dog shelter DAOs, CEX listings', q3: 'BarkSwap DEX launch, NFT collar collection, cross-chain bridge', q4: 'Bark DAO governance, real-world dog rescue fund, 100K holders' },
       tokenomics: { community: 50, liquidity: 25, team: 10, marketing: 10, treasury: 5 },
       websiteCopy: { heroTitle: 'Diamond Paws Only 🐾', heroSubtitle: 'The most loyal dog across chains. $BARK rewards holders who never let go.' },
@@ -48,7 +48,7 @@ function getMockToken(prompt: string) {
         'They said dog coins are dead. $BARK said hold my bone. 📈🦴',
         'POV: You aped into $BARK at launch and now you\'re buying your dog a diamond collar 💎🐕',
         'The $BARK community just hit 5K holders in 24 hours. This is what loyalty looks like on-chain. 🐾',
-        'New partnership dropping tomorrow. $BARK isn\'t just a meme — it\'s a movement. Stay tuned. 👀🐕',
+        'New partnership dropping tomorrow. $BARK isn\'t just a token — it\'s a movement. Stay tuned. 👀🐕',
       ],
     };
   }
@@ -81,10 +81,10 @@ function getMockToken(prompt: string) {
     website: 'neonbrew.xyz', twitter: '@NeonBrewFrog', telegram: 't.me/neonbrew',
     suggestedCurve: 'fast', suggestedLiquidity: 'fair',
     loreArc: { origin: 'Born in a 24-hour café in Shibuya. Accidentally sent its life savings to the wrong address.', conflict: 'The coffee machine is sentient and it is angry.', resolution: 'Community rallies. The frog hops to the moon. The café is now a DAO.' },
-    aiNarrativeTags: ['Meme Season', 'Dog Meta', 'Community'],
-    riskTier: 'meme',
+    aiNarrativeTags: ['Alt Season', 'Dog Meta', 'Community'],
+    riskTier: 'token',
     whitepaper: 'NeonBrew ($ESPR) is the first caffeinated DeFi token across chains, built by a community of sleepless degens who believe that the best trades happen after midnight. The project centers around a cyberpunk frog who runs a neon-lit underground café where the only accepted currency is $ESPR.\n\nThe NeonBrew ecosystem includes Brew Staking (stake your $ESPR to earn freshly brewed rewards), the Café DAO (community governance over project direction), and the Neon NFT collection featuring unique cyberpunk frog baristas. A portion of all transaction fees funds the Caffeine Treasury, which powers community initiatives and buybacks.',
-    roadmap: { q1: 'Fair launch, community café Discord, first 5K holders, meme contest', q2: 'Brew Staking launch, Neon Frog NFT collection, DEX listings', q3: 'Café DAO governance, cross-chain brewing, merch store', q4: 'Real-world café pop-ups, 50K holders, animated series pilot' },
+    roadmap: { q1: 'Fair launch, community café Discord, first 5K holders, token contest', q2: 'Brew Staking launch, Neon Frog NFT collection, DEX listings', q3: 'Café DAO governance, cross-chain brewing, merch store', q4: 'Real-world café pop-ups, 50K holders, animated series pilot' },
     tokenomics: { community: 50, liquidity: 25, team: 10, marketing: 10, treasury: 5 },
     websiteCopy: { heroTitle: 'Brewed in the Neon Underground ☕', heroSubtitle: 'A cyberpunk frog. A DeFi café. $ESPR is the currency of the caffeinated underground.' },
     xBio: '🐸☕ Cyberpunk frog running a neon DeFi café | $ESPR | Caffeinated gains only | The underground is brewing',
@@ -99,7 +99,7 @@ function getMockToken(prompt: string) {
 }
 
 // ── System prompt for AI generation ───────────────────────────────────────────
-const SYSTEM_PROMPT = `You are the MoonFluxx AI Token Architect — a creative director for viral Multi-Chain meme tokens. You have deep knowledge of crypto culture, DeFi, pump.fun dynamics, and what makes tokens culturally sticky.
+const SYSTEM_PROMPT = `You are the MoonFluxx AI Token Architect — a creative director for viral Multi-Chain token tokens. You have deep knowledge of crypto culture, DeFi, pump.fun dynamics, and what makes tokens culturally sticky.
 
 You MUST return a single JSON object with ALL of the following fields. No extra text, no markdown.
 
@@ -112,15 +112,15 @@ JSON fields:
 - "tokenomics" (object): Token distribution with keys "community", "liquidity", "team", "marketing", "treasury". Values are integers (percentages) that MUST sum to 100.
 - "websiteCopy" (object): Keys "heroTitle" (string, punchy 3-7 word headline with 1 emoji) and "heroSubtitle" (string, 1-2 sentence tagline that makes people want to buy).
 - "xBio" (string): Twitter/X bio, max 160 characters, includes ticker with $, uses 2-3 emojis, captures the token's vibe.
-- "xPosts" (array of 5 strings): Five ready-to-post tweets. Mix of: launch announcement, community hype, alpha tease, meme/humor, milestone celebration. Each 180-280 characters. Use emojis sparingly but effectively.
+- "xPosts" (array of 5 strings): Five ready-to-post tweets. Mix of: launch announcement, community hype, alpha tease, token/humor, milestone celebration. Each 180-280 characters. Use emojis sparingly but effectively.
 - "website" (string): A realistic .xyz or .io domain, e.g. moonbark.xyz
 - "twitter" (string): Twitter handle starting with @
 - "telegram" (string): Telegram link e.g. t.me/projectname
-- "suggestedCurve" (string): One of "fast", "balanced", "community", "premium". fast=pure meme/viral, balanced=utility+hype, community=DAO/governance, premium=serious project with roadmap.
+- "suggestedCurve" (string): One of "fast", "balanced", "community", "premium". fast=pure token/viral, balanced=utility+hype, community=DAO/governance, premium=serious project with roadmap.
 - "suggestedLiquidity" (string): One of "fair", "standard", "growth". fair=equal access launch, standard=moderate, growth=larger initial pool.
 - "loreArc" (object): A 3-act narrative arc with keys "origin" (1 sentence: how/where the token was born, be creative and specific), "conflict" (1 sentence: the central tension or enemy the community faces), "resolution" (1 sentence: the triumphant future state if hodlers prevail).
-- "aiNarrativeTags" (array of 2-3 strings): Current crypto meta narratives this token belongs to. Choose from: Dog Meta, AI Agents, Meme Season, Gaming, RWA, DePIN, SocialFi, L2s, Community, Utility.
-- "riskTier" (string): One of "meme", "utility", "community". meme=pure speculation, utility=real use case, community=DAO-driven.`;
+- "aiNarrativeTags" (array of 2-3 strings): Current crypto meta narratives this token belongs to. Choose from: Dog Meta, AI Agents, Alt Season, Gaming, RWA, DePIN, SocialFi, L2s, Community, Utility.
+- "riskTier" (string): One of "token", "utility", "community". token=pure speculation, utility=real use case, community=DAO-driven.`;
 
 export async function POST(req: Request) {
   try {

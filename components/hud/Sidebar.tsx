@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { useTheme } from '@/components/ThemeProvider';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 type NavItem = { icon: LucideIcon; label: string; href: string };
@@ -50,6 +51,8 @@ function NavLink({
   isActive: boolean;
   expanded: boolean;
 }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const Icon = item.icon;
 
   return (
@@ -61,18 +64,18 @@ function NavLink({
         style={{
           background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
           borderLeft: isActive ? '2px solid #6366F1' : '2px solid transparent',
-          color: isActive ? '#F1F5F9' : '#94A3B8',
+          color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
         }}
         onMouseEnter={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-            e.currentTarget.style.color = '#F1F5F9';
+            e.currentTarget.style.color = 'var(--color-text-primary)';
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = '#94A3B8';
+            e.currentTarget.style.color = 'var(--color-text-secondary)';
           }
         }}
       >
@@ -91,7 +94,7 @@ function NavLink({
           className={`whitespace-nowrap font-medium transition-opacity duration-200 ${expanded ? 'text-hover-slide' : ''}`}
           style={{
             fontSize: '13px',
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: "'Outfit', sans-serif",
             opacity: expanded ? 1 : 0,
             pointerEvents: expanded ? 'auto' : 'none',
           }}
@@ -112,11 +115,11 @@ function NavLink({
             pointer-events-none z-50
           "
           style={{
-            background: '#050510',
-            color: '#F1F5F9',
+            background: isDark ? '#050510' : '#FFFFFF',
+            color: 'var(--color-text-primary)',
             border: '1px solid rgba(99,102,241,0.18)',
             boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: "'Outfit', sans-serif",
           }}
         >
           {item.label}
@@ -128,6 +131,8 @@ function NavLink({
 
 /* ─── Sidebar ────────────────────────────────────────────────── */
 export default function Sidebar() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -153,10 +158,10 @@ export default function Sidebar() {
       <aside
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden"
+        className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden transition-colors"
         style={{
           width: expanded ? 220 : 72,
-          backgroundColor: 'rgba(0,0,0,0.70)',
+          backgroundColor: isDark ? 'rgba(0,0,0,0.70)' : 'rgba(255,255,255,0.80)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           borderRight: '1px solid rgba(99,102,241,0.08)',
@@ -199,7 +204,10 @@ export default function Sidebar() {
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[rgba(0,0,0,0.70)] backdrop-blur-2xl border-t border-[rgba(99,102,241,0.08)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav 
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[100] backdrop-blur-2xl border-t border-[rgba(99,102,241,0.08)] flex justify-around items-center h-16 px-2 pb-[env(safe-area-inset-bottom)] transition-colors"
+        style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.70)' : 'rgba(255,255,255,0.80)' }}
+      >
         {[
           MAIN_ITEMS[0], // Dashboard
           MAIN_ITEMS[1], // Explore
@@ -214,9 +222,9 @@ export default function Sidebar() {
             return (
               <button key="more" onClick={() => setShowMobileMenu(true)} className="flex flex-col items-center justify-center w-full h-full gap-1">
                 <div className={`flex items-center justify-center p-1 rounded-md transition-shadow duration-300 ${showMobileMenu ? 'shadow-[0_0_12px_rgba(99,102,241,0.4)]' : ''}`}>
-                  <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#6366F1]" : "text-[#475569]"} />
+                  <Icon size={22} strokeWidth={showMobileMenu ? 2.5 : 2} className={showMobileMenu ? "text-[#6366F1]" : "text-text-faint"} />
                 </div>
-                <span className="text-[10px] font-medium" style={{ color: showMobileMenu ? "#F1F5F9" : "#475569" }}>More</span>
+                <span className="text-[10px] font-medium" style={{ color: showMobileMenu ? "var(--color-text-primary)" : "var(--color-text-faint)" }}>More</span>
               </button>
             );
           }
@@ -227,12 +235,12 @@ export default function Sidebar() {
                 <Icon 
                   size={22} 
                   strokeWidth={isActive ? 2.5 : 2} 
-                  className={isActive ? "text-[#6366F1]" : "text-[#475569]"} 
+                  className={isActive ? "text-[#6366F1]" : "text-text-faint"} 
                 />
               </div>
               <span 
                 className="text-[10px] font-medium" 
-                style={{ color: isActive ? "#F1F5F9" : "#475569" }}
+                style={{ color: isActive ? "var(--color-text-primary)" : "var(--color-text-faint)" }}
               >
                 {item.label}
               </span>
@@ -248,11 +256,12 @@ export default function Sidebar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="md:hidden fixed inset-0 z-[90] bg-[#000000] overflow-y-auto pb-24 pt-6 px-6 flex flex-col"
+            className="md:hidden fixed inset-0 z-[110] overflow-y-auto pb-24 pt-6 px-6 flex flex-col transition-colors"
+            style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.97)' }}
           >
             <div className="flex items-center justify-between mb-8 mt-2">
-              <h2 className="text-3xl font-bold font-display text-white">Menu</h2>
-              <button onClick={() => setShowMobileMenu(false)} className="p-2 bg-[rgba(255,255,255,0.05)] rounded-full text-[#F1F5F9] hover:text-[#6366F1] hover:bg-[rgba(99,102,241,0.1)] transition-colors">
+              <h2 className={`text-3xl font-bold font-display ${isDark ? 'text-white' : 'text-text-primary'}`}>Menu</h2>
+              <button onClick={() => setShowMobileMenu(false)} className={`p-2 ${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[#F1F5F9]' : 'bg-black/5 text-text-primary'} rounded-full hover:text-[#6366F1] hover:bg-[rgba(99,102,241,0.1)] transition-colors`}>
                 <X size={24} />
               </button>
             </div>
@@ -266,9 +275,9 @@ export default function Sidebar() {
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? 'bg-[rgba(99,102,241,0.15)] text-white border border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0.15)] fluxx-active-bar' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? `bg-[rgba(99,102,241,0.15)] ${isDark ? 'text-white' : 'text-text-primary'} border border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0.15)] fluxx-active-bar` : `${isDark ? 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white' : 'text-text-secondary hover:bg-black/5 hover:text-text-primary'} border border-transparent`}`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#6366F1]" : "text-[#475569]"} />
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#6366F1]" : "text-text-faint"} />
                       <span className="font-bold text-base">{item.label}</span>
                     </Link>
                   ))}
@@ -283,9 +292,9 @@ export default function Sidebar() {
                       key={item.href} 
                       href={item.href}
                       onClick={() => setShowMobileMenu(false)}
-                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? 'bg-[rgba(167,139,250,0.15)] text-white border border-[rgba(167,139,250,0.3)] shadow-[0_0_15px_rgba(167,139,250,0.15)] fluxx-active-bar' : 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white border border-transparent'}`}
+                      className={`flex items-center gap-4 p-3.5 rounded-xl transition-all active:scale-95 fluxx-hover-shimmer ${pathname === item.href ? `bg-[rgba(167,139,250,0.15)] ${isDark ? 'text-white' : 'text-text-primary'} border border-[rgba(167,139,250,0.3)] shadow-[0_0_15px_rgba(167,139,250,0.15)] fluxx-active-bar` : `${isDark ? 'text-[#94A3B8] hover:bg-[rgba(255,255,255,0.05)] hover:text-white' : 'text-text-secondary hover:bg-black/5 hover:text-text-primary'} border border-transparent`}`}
                     >
-                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#A78BFA]" : "text-[#475569]"} />
+                      <item.icon size={22} strokeWidth={pathname === item.href ? 2.5 : 2} className={pathname === item.href ? "text-[#A78BFA]" : "text-text-faint"} />
                       <span className="font-bold text-base">{item.label}</span>
                     </Link>
                   ))}

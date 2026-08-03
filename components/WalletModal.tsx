@@ -6,6 +6,7 @@ import type { WalletName } from "@solana/wallet-adapter-base";
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import { useTheme } from "@/components/ThemeProvider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -76,6 +77,8 @@ interface WalletModalProps {
 export function WalletModal({ open, onClose }: WalletModalProps) {
   const { wallets, select, connect, connecting, connected, wallet } = useWallet();
   const { address, balance, wallet: connectedWalletName, disconnect } = useMoonWallet();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [step, setStep] = useState<"select" | "connecting" | "done" | "error">("select");
   const [selectedName, setSelectedName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -165,7 +168,7 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
           >
             <div
               className="pointer-events-auto w-full max-w-sm rounded-3xl p-6 relative overflow-hidden mx-4"
-              style={{ background: "rgba(8,6,3,0.98)", border: "1px solid rgba(232,184,75,0.3)", boxShadow: "0 40px 100px -20px rgba(0,0,0,0.9), 0 0 60px -20px rgba(232,184,75,0.15)" }}
+              style={{ background: isDark ? "rgba(8,6,3,0.98)" : "rgba(255,255,255,0.98)", border: "1px solid rgba(232,184,75,0.3)", boxShadow: isDark ? "0 40px 100px -20px rgba(0,0,0,0.9), 0 0 60px -20px rgba(232,184,75,0.15)" : "0 20px 40px -10px rgba(0,0,0,0.1), 0 0 40px -10px rgba(232,184,75,0.15)" }}
               onClick={e => e.stopPropagation()}
             >
               {/* Gold top line */}
@@ -177,15 +180,15 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="font-mono text-[0.55rem] tracking-[0.3em] uppercase mb-0.5" style={{ color: "#a9791f" }}>MoonFluxx</p>
-                  <h2 className="font-display text-lg text-white font-semibold">
+                  <h2 className="font-display text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
                     {step === "done" ? "Wallet Connected" : step === "connecting" ? "Connecting…" : step === "error" ? "Connection Failed" : "Connect Wallet"}
                   </h2>
                 </div>
                 <button onClick={handleClose} className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                  style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)" }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(232,184,75,0.4)")}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}>
-                  <X size={14} style={{ color: "#6b6987" }} />
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)")}>
+                  <X size={14} style={{ color: "var(--color-text-secondary)" }} />
                 </button>
               </div>
 
@@ -204,16 +207,16 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                             </div>
                             <div>
                               <p className="font-mono text-xs font-semibold" style={{ color: "#10b981" }}>Connected via {connectedWalletName}</p>
-                              <p className="font-mono text-[0.6rem]" style={{ color: "#6b6987" }}>{shortenAddr(address)}</p>
+                              <p className="font-mono text-[0.6rem]" style={{ color: "var(--color-text-secondary)" }}>{shortenAddr(address)}</p>
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <div className="flex-1 rounded-xl p-2.5 text-center" style={{ background: "rgba(5,4,3,0.8)", border: "1px solid rgba(232,184,75,0.12)" }}>
-                              <p className="font-mono text-[0.5rem] uppercase tracking-widest mb-0.5" style={{ color: "#6b6987" }}>Balance</p>
+                            <div className="flex-1 rounded-xl p-2.5 text-center" style={{ background: isDark ? "rgba(5,4,3,0.8)" : "rgba(240,240,240,0.8)", border: "1px solid rgba(232,184,75,0.12)" }}>
+                              <p className="font-mono text-[0.5rem] uppercase tracking-widest mb-0.5" style={{ color: "var(--color-text-secondary)" }}>Balance</p>
                               <p className="font-mono text-sm font-bold" style={{ color: "#e8b84b" }}>{balance.toFixed(3)} SOL</p>
                             </div>
-                            <div className="flex-1 rounded-xl p-2.5 text-center" style={{ background: "rgba(5,4,3,0.8)", border: "1px solid rgba(232,184,75,0.12)" }}>
-                              <p className="font-mono text-[0.5rem] uppercase tracking-widest mb-0.5" style={{ color: "#6b6987" }}>Network</p>
+                            <div className="flex-1 rounded-xl p-2.5 text-center" style={{ background: isDark ? "rgba(5,4,3,0.8)" : "rgba(240,240,240,0.8)", border: "1px solid rgba(232,184,75,0.12)" }}>
+                              <p className="font-mono text-[0.5rem] uppercase tracking-widest mb-0.5" style={{ color: "var(--color-text-secondary)" }}>Network</p>
                               <p className="font-mono text-sm font-bold" style={{ color: "#10b981" }}>Mainnet</p>
                             </div>
                           </div>
@@ -232,7 +235,7 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                     ) : (
                       // Pick wallet
                       <div className="flex flex-col gap-2">
-                        <p className="font-mono text-[0.6rem] tracking-widest uppercase mb-2" style={{ color: "#6b6987" }}>Choose your wallet</p>
+                        <p className="font-mono text-[0.6rem] tracking-widest uppercase mb-2" style={{ color: "var(--color-text-secondary)" }}>Choose your wallet</p>
                         {allWalletNames.map((name, i) => {
                           const meta = WALLET_META[name] ?? FALLBACK_META;
                           const isDetected = detected.has(name as WalletName<string>);
@@ -244,16 +247,16 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                               transition={{ delay: i * 0.06, duration: 0.35, ease: EASE }}
                               onClick={() => handleSelect(name)}
                               className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all group"
-                              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: isDetected ? 1 : 0.55 }}
+                              style={{ background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", border: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.07)", opacity: isDetected ? 1 : 0.55 }}
                               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = `${meta.color}10`; (e.currentTarget as HTMLElement).style.borderColor = `${meta.color}40`; }}
-                              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
+                              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"; (e.currentTarget as HTMLElement).style.borderColor = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)"; }}
                             >
                               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                                 {meta.icon}
                               </div>
                               <div className="flex-1">
-                                <p className="font-display text-sm font-semibold text-white">{name}</p>
-                                <p className="font-mono text-[0.6rem]" style={{ color: "#6b6987" }}>
+                                <p className="font-display text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</p>
+                                <p className="font-mono text-[0.6rem]" style={{ color: "var(--color-text-secondary)" }}>
                                   {isDetected ? meta.desc : "Not installed — click to install"}
                                 </p>
                               </div>
@@ -262,11 +265,11 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                                   Detected
                                 </span>
                               )}
-                              <ChevronRight size={16} style={{ color: "#6b6987" }} className="group-hover:translate-x-0.5 transition-transform" />
+                              <ChevronRight size={16} style={{ color: "var(--color-text-secondary)" }} className="group-hover:translate-x-0.5 transition-transform" />
                             </motion.button>
                           );
                         })}
-                        <p className="font-mono text-center text-[0.55rem] mt-3" style={{ color: "#35334a" }}>
+                        <p className="font-mono text-center text-[0.55rem] mt-3" style={{ color: "var(--color-text-muted)" }}>
                           By connecting you agree to our Terms of Service
                         </p>
                       </div>
@@ -287,8 +290,8 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                       {selectedMeta.icon}
                     </motion.div>
                     <div className="text-center">
-                      <p className="font-display text-base text-white mb-1">Connecting to {selectedName}</p>
-                      <p className="font-mono text-[0.62rem]" style={{ color: "#6b6987" }}>Approve the connection in your wallet…</p>
+                      <p className="font-display text-base mb-1" style={{ color: "var(--color-text-primary)" }}>Connecting to {selectedName}</p>
+                      <p className="font-mono text-[0.62rem]" style={{ color: "var(--color-text-secondary)" }}>Approve the connection in your wallet…</p>
                     </div>
                     <div className="flex gap-1.5">
                       {[0, 1, 2].map(i => (
@@ -307,8 +310,8 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                       <AlertCircle size={28} style={{ color: "#ef4444" }} />
                     </div>
                     <div className="text-center">
-                      <p className="font-display text-base text-white mb-1">Connection Failed</p>
-                      <p className="font-mono text-[0.6rem] px-4" style={{ color: "#6b6987" }}>{errorMsg}</p>
+                      <p className="font-display text-base mb-1" style={{ color: "var(--color-text-primary)" }}>Connection Failed</p>
+                      <p className="font-mono text-[0.6rem] px-4" style={{ color: "var(--color-text-secondary)" }}>{errorMsg}</p>
                     </div>
                     <button onClick={() => setStep("select")} className="px-6 py-2.5 rounded-xl font-mono text-[0.65rem] uppercase tracking-widest transition-all"
                       style={{ background: "rgba(232,184,75,0.1)", border: "1px solid rgba(232,184,75,0.3)", color: "#e8b84b" }}>
@@ -327,9 +330,9 @@ export function WalletModal({ open, onClose }: WalletModalProps) {
                       <CheckCircle size={32} style={{ color: "#10b981" }} />
                     </motion.div>
                     <div className="text-center">
-                      <p className="font-display text-base text-white mb-1">Wallet Connected!</p>
+                      <p className="font-display text-base mb-1" style={{ color: "var(--color-text-primary)" }}>Wallet Connected!</p>
                       <p className="font-mono text-[0.62rem]" style={{ color: "#10b981" }}>Welcome to MoonFluxx</p>
-                      {address && <p className="font-mono text-[0.55rem] mt-1" style={{ color: "#6b6987" }}>{shortenAddr(address)} · {balance.toFixed(3)} SOL</p>}
+                      {address && <p className="font-mono text-[0.55rem] mt-1" style={{ color: "var(--color-text-secondary)" }}>{shortenAddr(address)} · {balance.toFixed(3)} SOL</p>}
                     </div>
                   </motion.div>
                 )}

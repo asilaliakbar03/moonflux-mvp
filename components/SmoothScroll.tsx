@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
 export default function SmoothScroll() {
+  const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -13,6 +17,8 @@ export default function SmoothScroll() {
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
     });
+    
+    lenisRef.current = lenis;
 
     let rafId: number;
     function raf(time: number) {
@@ -27,6 +33,16 @@ export default function SmoothScroll() {
       lenis.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      if (pathname === '/feed') {
+        lenisRef.current.stop();
+      } else {
+        lenisRef.current.start();
+      }
+    }
+  }, [pathname]);
 
   return null;
 }

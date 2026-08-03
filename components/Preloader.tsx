@@ -7,7 +7,7 @@ export default function Preloader() {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 1800);
+    const timer = setTimeout(() => setShow(false), 400);
     return () => clearTimeout(timer);
   }, []);
 
@@ -59,8 +59,8 @@ export default function Preloader() {
             <span
               className="text-sm font-medium tracking-[0.2em] uppercase"
               style={{
-                color: '#475569',
-                fontFamily: "'Space Grotesk', sans-serif",
+                color: '#94A3B8',
+                fontFamily: "'Clash Display', 'Outfit', sans-serif",
               }}
             >
               MoonFluxx

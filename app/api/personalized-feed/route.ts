@@ -24,8 +24,8 @@ export interface PersonalizedFeedResponse {
 const TOKEN_UNIVERSE = [
   { id: 'tok_luna_doge', ticker: 'LDOGE', name: 'Luna Doge',   category: 'Dog Meta',  change: '+142%', status: 'graduated',    risk: 'medium' },
   { id: 'tok_ai_swarm',  ticker: 'SWRM',  name: 'AI Swarm',    category: 'AI Agents', change: '+211%', status: 'bonding_curve', risk: 'high'   },
-  { id: 'tok_degen_ape', ticker: 'DAPE',  name: 'DegenApe',    category: 'Meme',      change: '+388%', status: 'bonding_curve', risk: 'very_high' },
-  { id: 'tok_cyber_pep', ticker: 'CPEP',  name: 'CyberPep',    category: 'Meme',      change: '+78%',  status: 'bonding_curve', risk: 'medium' },
+  { id: 'tok_degen_ape', ticker: 'DAPE',  name: 'DegenApe',    category: 'Token',      change: '+388%', status: 'bonding_curve', risk: 'very_high' },
+  { id: 'tok_cyber_pep', ticker: 'CPEP',  name: 'CyberPep',    category: 'Token',      change: '+78%',  status: 'bonding_curve', risk: 'medium' },
   { id: 'tok_nova_flux', ticker: 'NVFX',  name: 'NovaFlux',    category: 'AI Agents', change: '+67%',  status: 'graduated',    risk: 'low'    },
   { id: 'tok_gold_flux', ticker: 'GFLX',  name: 'GoldFlux',    category: 'RWA',       change: '+52%',  status: 'graduated',    risk: 'low'    },
   { id: 'tok_moon_bark', ticker: 'BARK',  name: 'MoonBark',    category: 'Dog Meta',  change: '+89%',  status: 'bonding_curve', risk: 'medium' },
@@ -56,7 +56,7 @@ function getMockFeed(preferences: Record<string, unknown> = {}): PersonalizedFee
     },
     {
       id: 'tok_cyber_pep', matchScore: 71, urgencySignal: 'Watch',
-      matchReasons: ['Meme momentum matching tokens you viewed', 'Similar holder pattern to LDOGE early days', 'Bonding curve at 31% — early entry'],
+      matchReasons: ['Token momentum matching tokens you viewed', 'Similar holder pattern to LDOGE early days', 'Bonding curve at 31% — early entry'],
       explanation: 'CPEP follows a similar holder growth pattern to LDOGE 48h before it broke out. Early but not confirmed.',
     },
     {
@@ -66,7 +66,7 @@ function getMockFeed(preferences: Record<string, unknown> = {}): PersonalizedFee
     },
     {
       id: 'tok_sol_depin', matchScore: 58, urgencySignal: 'Watch',
-      matchReasons: ['DePIN narrative showing unusual velocity spike', 'Diversifies your meme-heavy portfolio', 'Real utility backing the price'],
+      matchReasons: ['DePIN narrative showing unusual velocity spike', 'Diversifies your token-heavy portfolio', 'Real utility backing the price'],
       explanation: 'WIFI is showing pre-breakout signals in the DePIN narrative — unusual volume spike detected. Monitoring for entry confirmation.',
     },
   ];
@@ -74,7 +74,7 @@ function getMockFeed(preferences: Record<string, unknown> = {}): PersonalizedFee
   return {
     tokens,
     profileTag: hasDogPreference ? 'Dog Meta Degen' : hasAIPreference ? 'AI-First Trader' : 'Balanced Degen',
-    insight: 'Your portfolio skews heavy toward meme tokens — the AI Agents narrative offers both momentum and a narrative hedge if meme season cools.',
+    insight: 'Your portfolio skews heavy toward token tokens — the AI Agents narrative offers both momentum and a narrative hedge if token season cools.',
   };
 }
 

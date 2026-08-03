@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface TickerItem {
   symbol: string;
@@ -22,6 +23,8 @@ const MOCK_TICKERS: TickerItem[] = [
 
 export default function TickerBar() {
   const [mounted, setMounted] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
@@ -32,11 +35,11 @@ export default function TickerBar() {
     <div
       className="relative w-full overflow-hidden whitespace-nowrap"
       style={{
-        background: 'rgba(12, 10, 20, 0.95)',
+        background: isDark ? 'rgba(12, 10, 20, 0.95)' : 'rgba(248, 250, 252, 0.95)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        borderTop: '1px solid rgba(248, 211, 103, 0.06)',
-        borderBottom: '1px solid rgba(248, 211, 103, 0.06)',
+        borderTop: isDark ? '1px solid rgba(248, 211, 103, 0.06)' : '1px solid rgba(99,102,241,0.08)',
+        borderBottom: isDark ? '1px solid rgba(248, 211, 103, 0.06)' : '1px solid rgba(99,102,241,0.08)',
         maskImage:
           'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
         WebkitMaskImage:
@@ -58,7 +61,7 @@ export default function TickerBar() {
               {i > 0 && (
                 <span
                   className="mx-4 select-none"
-                  style={{ color: '#44403C', fontSize: '14px' }}
+                  style={{ color: isDark ? '#44403C' : '#CBD5E1', fontSize: '14px' }}
                   aria-hidden="true"
                 >
                   ·
@@ -68,7 +71,7 @@ export default function TickerBar() {
               {/* Symbol */}
               <span
                 style={{
-                  color: '#A8A29E',
+                  color: isDark ? '#A8A29E' : '#64748B',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: '12px',
                   fontWeight: 500,

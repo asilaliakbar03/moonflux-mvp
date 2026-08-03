@@ -7,11 +7,12 @@ import MagneticButton from '@/components/MagneticButton';
 import Link from 'next/link';
 import {
   Copy, Check, Activity, BarChart3,
-  ArrowUpRight, Globe, AtSign,
+  ArrowUpRight, ArrowDownRight, Globe, AtSign,
   MessageCircle, PieChart as PieChartIcon
 } from 'lucide-react';
 import { useMoonWallet } from '@/components/WalletProvider';
 import { useSOLPrice } from '@/lib/useSOLPrice';
+import { useTheme } from '@/components/ThemeProvider';
 import { 
   LineChart, Line, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -133,6 +134,8 @@ function genTrade(mint: string, idx: number): Trade {
 export default function TokenPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const mintAddress = unwrappedParams.id;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const { connected } = useMoonWallet();
   const { price: solUsd } = useSOLPrice();
 
@@ -140,6 +143,14 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const [trades, setTrades] = useState<Trade[]>([]);
   const [chartData, setChartData] = useState<number[]>([]);
   const [copied, setCopied] = useState(false);
+
+  // Dynamic 24h change seeded from mint address
+  const change24h = (() => {
+    const rng = seededRng(mintAddress + '24h');
+    const val = (rng() - 0.35) * 60; // slightly biased positive, range roughly -21 to +39
+    return parseFloat(val.toFixed(1));
+  })();
+  const isPositive24h = change24h >= 0;
   
   // Trade Panel State
   const [tab, setTab] = useState<'buy' | 'sell'>('buy');
@@ -237,17 +248,20 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const rechartsData = chartData.map((val, i) => ({ time: i, price: val }));
 
   return (
-    <div className="max-w-[1400px] mx-auto w-full pt-4 pb-16 px-4">
+    <div className="max-w-[1400px] mx-auto w-full pt-2 sm:pt-4 pb-24 md:pb-16 px-2 sm:px-4">
       
       {/* ── HEADER CARD ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="surface-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-full bg-[rgba(99,102,241,0.15)] flex items-center justify-center text-3xl font-bold text-[#818CF8]">
-            {mintAddress[0].toUpperCase()}
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="surface-panel p-4 sm:p-6 mb-4 sm:mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+          <div className="relative shrink-0">
+            <div className="absolute inset-0 rounded-full bg-[#818CF8] blur-xl opacity-20 animate-pulse" />
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[rgba(99,102,241,0.15)] flex items-center justify-center text-4xl sm:text-6xl font-bold text-[#818CF8] shadow-[0_0_30px_rgba(99,102,241,0.3)] border-2 border-[rgba(99,102,241,0.5)]">
+              {mintAddress[0].toUpperCase()}
+            </div>
           </div>
           <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold text-white">{tokenName}</h1>
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold text-text-primary">{tokenName}</h1>
               <span className="bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-2 py-0.5 rounded font-mono text-sm">{ticker}</span>
               {isComplete ? (
                 <span className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded font-mono text-xs uppercase font-bold tracking-wider">🎓 Graduated</span>
@@ -257,9 +271,9 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-4 text-sm text-[#94A3B8] font-mono">
+            <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-text-secondary font-mono flex-wrap">
               <div className="flex items-center gap-2">
-                CA: <span className="text-white">{shortAddr(mintAddress, 6, 6)}</span>
+                CA: <span className="text-text-primary">{shortAddr(mintAddress, 6, 6)}</span>
                 <button onClick={handleCopy} className="text-[#818CF8] hover:text-white transition-colors">
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
@@ -270,9 +284,9 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
         </div>
         
         <div className="flex flex-col items-end gap-1">
-          <div className="text-3xl font-bold font-mono text-white">{fmtPrice(basePrice)}</div>
-          <div className="text-[#10B981] font-mono text-sm flex items-center gap-1">
-            <ArrowUpRight className="w-4 h-4" /> +14.2% (24h)
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-text-primary">{fmtPrice(basePrice)}</div>
+          <div className={`${isPositive24h ? 'text-[#10B981]' : 'text-[#F43F5E]'} font-mono text-sm flex items-center gap-1`}>
+            {isPositive24h ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />} {isPositive24h ? '+' : ''}{change24h}% (24h)
           </div>
         </div>
       </motion.div>
@@ -283,7 +297,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
         <div className="flex flex-col gap-6">
           
           {/* Interactive Recharts Price Chart */}
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="surface-card p-6 h-[400px] flex flex-col">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="surface-card p-3 sm:p-6 h-[280px] sm:h-[400px] flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2 text-[#818CF8] font-bold uppercase tracking-wider text-sm">
                 <BarChart3 className="w-4 h-4" /> Price Chart
@@ -291,7 +305,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
               <div className="flex gap-2">
                 {['15M', '1H', '4H', '1D'].map(tf => (
                   <MagneticButton key={tf}>
-                    <button className="px-3 py-1 bg-[#161B27] text-[#94A3B8] hover:text-white rounded text-xs font-bold font-mono transition-colors">
+                    <button className="px-3 py-1 bg-[var(--color-surface-1)] text-text-secondary hover:text-text-primary rounded text-xs font-bold font-mono transition-colors">
                       {tf}
                     </button>
                   </MagneticButton>
@@ -299,14 +313,14 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
               </div>
             </div>
             
-            <div className="flex-1 border border-[rgba(99,102,241,0.1)] rounded-xl flex items-center justify-center bg-[#0D1117] relative overflow-hidden p-2 group">
+            <div className="flex-1 border border-[rgba(99,102,241,0.1)] rounded-xl flex items-center justify-center bg-[var(--color-surface-2)] relative overflow-hidden p-2 group">
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(99,102,241,0.05)] to-transparent pointer-events-none" />
               
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={rechartsData}>
                   <YAxis domain={['auto', 'auto']} hide />
                   <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#161B27', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: isDark ? '#161B27' : '#ffffff', border: isDark ? '1px solid rgba(99,102,241,0.2)' : '1px solid rgba(99,102,241,0.1)', borderRadius: '8px' }}
                     itemStyle={{ color: '#818CF8', fontWeight: 'bold' }}
                     labelStyle={{ display: 'none' }}
                     formatter={(value: any) => [`$${Number(value).toFixed(6)}`, 'Price']}
@@ -323,20 +337,20 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 </LineChart>
               </ResponsiveContainer>
               
-              <span className="absolute bottom-4 left-4 text-[#475569] font-mono text-xs z-10 group-hover:text-white transition-colors pointer-events-none">Live Recharts Render</span>
+              <span className="absolute bottom-4 left-4 text-text-muted font-mono text-xs z-10 group-hover:text-text-primary transition-colors pointer-events-none">Live Recharts Render</span>
             </div>
           </motion.div>
 
           {/* Trade History */}
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="surface-card overflow-hidden">
-            <div className="p-4 border-b border-[rgba(99,102,241,0.1)] bg-[#161B27] flex items-center gap-2">
+            <div className="p-4 border-b border-[rgba(99,102,241,0.1)] bg-[var(--color-surface-1)] flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#818CF8]" />
-              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Recent Trades</h3>
+              <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider">Recent Trades</h3>
             </div>
             <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
               <table className="w-full text-left">
-                <thead className="sticky top-0 bg-[#0D1117] border-b border-[rgba(99,102,241,0.1)] shadow-sm z-10">
-                  <tr className="text-[#475569] font-mono text-xs uppercase">
+                <thead className="sticky top-0 bg-[var(--color-surface-2)] border-b border-[rgba(99,102,241,0.1)] shadow-sm z-10">
+                  <tr className="text-text-muted font-mono text-xs uppercase">
                     <th className="p-3 font-semibold">Type</th>
                     <th className="p-3 font-semibold">Wallet</th>
                     <th className="p-3 font-semibold">Tokens</th>
@@ -351,17 +365,17 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                         key={trade.id} 
                         initial={{ opacity: 0, y: -10 }} 
                         animate={{ opacity: 1, y: 0 }} 
-                        className="border-b border-[rgba(99,102,241,0.03)] hover:bg-[rgba(99,102,241,0.02)]"
+                        className="border-b border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)]"
                       >
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded font-mono text-[10px] uppercase font-bold ${trade.type === 'buy' ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981]' : 'bg-[rgba(244,63,94,0.1)] text-[#F43F5E]'}`}>
                             {trade.type}
                           </span>
                         </td>
-                        <td className="p-3 font-mono text-sm text-[#94A3B8]">{trade.wallet}</td>
-                        <td className="p-3 font-mono text-sm text-white">{fmtNum(trade.tokens, 0)}</td>
+                        <td className="p-3 font-mono text-sm text-text-secondary">{trade.wallet}</td>
+                        <td className="p-3 font-mono text-sm text-text-primary">{fmtNum(trade.tokens, 0)}</td>
                         <td className="p-3 font-mono text-sm text-[#818CF8]">{trade.sol.toFixed(2)}</td>
-                        <td className="p-3 font-mono text-xs text-[#475569] text-right">{timeAgo(trade.ts)}</td>
+                        <td className="p-3 font-mono text-xs text-text-muted text-right">{timeAgo(trade.ts)}</td>
                       </motion.tr>
                     ))}
                   </AnimatePresence>
@@ -374,7 +388,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.3 }} className="surface-card overflow-hidden p-6 mt-2 mb-8 md:mb-0">
             <div className="flex items-center gap-2 mb-6">
               <PieChartIcon className="w-4 h-4 text-[#F59E0B]" />
-              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Tokenomics Breakdown</h3>
+              <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider">Tokenomics Breakdown</h3>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="w-[180px] h-[180px]">
@@ -403,7 +417,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                       }
                     </Pie>
                     <RechartsTooltip 
-                      contentStyle={{ backgroundColor: '#161B27', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                      contentStyle={{ backgroundColor: isDark ? '#161B27' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)', borderRadius: '8px' }}
                       itemStyle={{ fontWeight: 'bold' }}
                       formatter={(value: any) => [`${value}%`, 'Allocation']}
                     />
@@ -411,17 +425,17 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 </ResponsiveContainer>
               </div>
               <div className="flex-1 w-full space-y-3">
-                <div className="flex justify-between items-center bg-[#0D1117] p-4 rounded-lg border border-[rgba(99,102,241,0.1)]">
+                <div className="flex justify-between items-center bg-[var(--color-surface-2)] p-4 rounded-lg border border-[rgba(99,102,241,0.1)]">
                   <div className="flex items-center gap-3">
                     <span className="w-3 h-3 rounded-full bg-[#6366F1] shadow-[0_0_8px_#6366F1]" />
-                    <span className="text-sm font-bold text-white">Bonding Curve Pool</span>
+                    <span className="text-sm font-bold text-text-primary">Bonding Curve Pool</span>
                   </div>
                   <span className="font-mono text-[#818CF8] font-bold">80%</span>
                 </div>
-                <div className="flex justify-between items-center bg-[#0D1117] p-4 rounded-lg border border-[rgba(16,185,129,0.1)]">
+                <div className="flex justify-between items-center bg-[var(--color-surface-2)] p-4 rounded-lg border border-[rgba(16,185,129,0.1)]">
                   <div className="flex items-center gap-3">
                     <span className="w-3 h-3 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
-                    <span className="text-sm font-bold text-white">Dev Allocation</span>
+                    <span className="text-sm font-bold text-text-primary">Dev Allocation</span>
                   </div>
                   <span className="font-mono text-[#10B981] font-bold">20%</span>
                 </div>
@@ -437,16 +451,16 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           {/* Buy/Sell Panel */}
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="surface-panel p-5 border border-[rgba(99,102,241,0.2)] shadow-[0_8px_32px_rgba(99,102,241,0.1)]">
             
-            <div className="flex bg-[#0D1117] p-1 rounded-lg mb-6 border border-[rgba(99,102,241,0.1)]">
+            <div className="flex bg-[var(--color-surface-2)] p-1 rounded-lg mb-6 border border-[rgba(99,102,241,0.1)]">
               <button 
                 onClick={() => { setTab('buy'); setInputVal(''); }}
-                className={`flex-1 py-2 rounded-md font-bold text-sm uppercase tracking-wider transition-colors ${tab === 'buy' ? 'bg-[rgba(16,185,129,0.15)] text-[#10B981] shadow-[0_0_10px_rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]' : 'text-[#475569] hover:text-white border border-transparent'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm uppercase tracking-wider transition-colors ${tab === 'buy' ? 'bg-[rgba(16,185,129,0.15)] text-[#10B981] shadow-[0_0_10px_rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]' : 'text-text-muted hover:text-text-primary border border-transparent'}`}
               >
                 Buy
               </button>
               <button 
                 onClick={() => { setTab('sell'); setInputVal(''); }}
-                className={`flex-1 py-2 rounded-md font-bold text-sm uppercase tracking-wider transition-colors ${tab === 'sell' ? 'bg-[rgba(244,63,94,0.15)] text-[#F43F5E] shadow-[0_0_10px_rgba(244,63,94,0.1)] border border-[rgba(244,63,94,0.2)]' : 'text-[#475569] hover:text-white border border-transparent'}`}
+                className={`flex-1 py-2 rounded-md font-bold text-sm uppercase tracking-wider transition-colors ${tab === 'sell' ? 'bg-[rgba(244,63,94,0.15)] text-[#F43F5E] shadow-[0_0_10px_rgba(244,63,94,0.1)] border border-[rgba(244,63,94,0.2)]' : 'text-text-muted hover:text-text-primary border border-transparent'}`}
               >
                 Sell
               </button>
@@ -458,7 +472,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 placeholder="0.00" 
                 value={inputVal}
                 onChange={e => setInputVal(e.target.value)}
-                className="w-full bg-[#080B12] border border-[rgba(99,102,241,0.2)] focus:border-[#6366F1] rounded-xl p-4 text-2xl font-mono text-white outline-none transition-all shadow-inner focus:shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                className="w-full bg-[var(--color-surface-base)] border border-[rgba(99,102,241,0.2)] focus:border-[#6366F1] rounded-xl p-4 text-2xl font-mono text-text-primary outline-none transition-all shadow-inner focus:shadow-[0_0_15px_rgba(99,102,241,0.15)]"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-[#818CF8]">
                 {tab === 'buy' ? 'SOL' : ticker}
@@ -470,7 +484,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 <button 
                   key={s}
                   onClick={() => setSlippage(s)}
-                  className={`flex-1 py-1.5 rounded font-mono text-xs border transition-colors ${slippage === s ? 'bg-[rgba(99,102,241,0.1)] border-[#6366F1] text-[#818CF8]' : 'bg-[#161B27] border-transparent text-[#94A3B8] hover:border-[rgba(99,102,241,0.3)]'}`}
+                  className={`flex-1 py-1.5 rounded font-mono text-xs border transition-colors ${slippage === s ? 'bg-[rgba(99,102,241,0.1)] border-[#6366F1] text-[#818CF8]' : 'bg-[var(--color-surface-1)] border-transparent text-text-secondary hover:border-[rgba(99,102,241,0.3)]'}`}
                 >
                   {s}%
                 </button>
@@ -478,9 +492,9 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
             </div>
 
             {amountNum > 0 && (
-              <div className="bg-[#0D1117] border border-[rgba(99,102,241,0.1)] rounded-lg p-3 mb-6">
+              <div className="bg-[var(--color-surface-2)] border border-[rgba(99,102,241,0.1)] rounded-lg p-3 mb-6">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs text-[#94A3B8]">You Receive</span>
+                  <span className="text-xs text-text-secondary">You Receive</span>
                   <span className={`font-mono font-bold ${tab === 'buy' ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
                     {tab === 'buy' ? `${fmtNum(outputPreview, 0)} ${ticker}` : `${outputPreview.toFixed(4)} SOL`}
                   </span>
@@ -494,7 +508,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                 disabled={!connected || isExecuting || amountNum <= 0}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
                   !connected || amountNum <= 0 
-                    ? 'bg-[#1E2433] text-[#475569] cursor-not-allowed border border-[#252D3D]' 
+                    ? 'bg-[var(--color-surface-1)] text-text-muted cursor-not-allowed border border-[var(--color-border-subtle)]' 
                     : tab === 'buy' 
                       ? 'bg-[#10B981] hover:bg-[#059669] text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] border border-[#34D399]' 
                       : 'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[0_0_20px_rgba(244,63,94,0.3)] border border-[#FB7185]'
@@ -508,7 +522,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
 
           {/* Bonding Curve Progress */}
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.15 }} className="surface-card p-5">
-            <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Bonding Curve</h3>
+            <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-4">Bonding Curve</h3>
             {isComplete ? (
               <div className="text-center p-4 bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] rounded-lg">
                 <span className="text-2xl mb-2 block">🎓</span>
@@ -518,13 +532,13 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
             ) : (
               <div>
                 <div className="flex justify-between items-end mb-2">
-                  <span className="text-xs text-[#94A3B8]">Progress to Raydium</span>
+                  <span className="text-xs text-text-secondary">Progress to Raydium</span>
                   <span className="text-lg font-mono font-bold text-[#818CF8]">{progress.toFixed(1)}%</span>
                 </div>
-                <div className="h-2.5 bg-[#0D1117] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)] mb-3 relative">
+                <div className="h-2.5 bg-[var(--color-surface-2)] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)] mb-3 relative">
                   <div className="absolute inset-0 bg-[#6366F1] shadow-[0_0_15px_#6366F1] transition-all duration-700 ease-out" style={{ width: `${progress}%` }} />
                 </div>
-                <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
+                <div className="flex justify-between text-[10px] font-mono text-text-secondary">
                   <span>{curveData.realSolReserves.toFixed(2)} SOL</span>
                   <span>{GRAD_SOL} SOL</span>
                 </div>
@@ -534,33 +548,25 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
 
           {/* Token Info */}
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="surface-card p-5">
-            <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Stats & Info</h3>
+            <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-4">Stats & Info</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[#94A3B8]">Holders</span>
-                <span className="font-mono text-sm text-white">{curveData.holders}</span>
+                <span className="text-xs text-text-secondary">Holders</span>
+                <span className="font-mono text-sm text-text-primary">{curveData.holders}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[#94A3B8]">24h Volume</span>
+                <span className="text-xs text-text-secondary">24h Volume</span>
                 <span className="font-mono text-sm text-[#818CF8]">{curveData.volume24h.toFixed(1)} SOL</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[#94A3B8]">Liquidity</span>
-                <span className="font-mono text-sm text-white">{curveData.realSolReserves.toFixed(2)} SOL</span>
+                <span className="text-xs text-text-secondary">Liquidity</span>
+                <span className="font-mono text-sm text-text-primary">{curveData.realSolReserves.toFixed(2)} SOL</span>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-[rgba(99,102,241,0.1)]">
-              <div className="flex gap-2">
-                <a href="#" className="flex-1 py-2 bg-[#0D1117] hover:bg-[#161B27] rounded-lg border border-[rgba(99,102,241,0.2)] flex items-center justify-center text-[#818CF8] hover:text-white transition-colors">
-                  <Globe className="w-4 h-4" />
-                </a>
-                <a href="#" className="flex-1 py-2 bg-[#0D1117] hover:bg-[#161B27] rounded-lg border border-[rgba(99,102,241,0.2)] flex items-center justify-center text-[#818CF8] hover:text-white transition-colors">
-                  <AtSign className="w-4 h-4" />
-                </a>
-                <a href="#" className="flex-1 py-2 bg-[#0D1117] hover:bg-[#161B27] rounded-lg border border-[rgba(99,102,241,0.2)] flex items-center justify-center text-[#818CF8] hover:text-white transition-colors">
-                  <MessageCircle className="w-4 h-4" />
-                </a>
+            <div className="mt-6 pt-6 border-t border-[var(--color-border-subtle)]">
+              <div className="text-center text-sm text-text-muted">
+                No links available
               </div>
             </div>
           </motion.div>

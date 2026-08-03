@@ -3,9 +3,10 @@
    Tailwind CSS v4 · globals.css · Hallmark-locked
    ══════════════════════════════════════════════════════════════ */
 
-/* ── GOOGLE FONTS ── */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* ── ULTRA-EXECUTIVE HIGH-TECH FONTS (Clash Display + Outfit + Inter + JetBrains Mono) ── */
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 
 @import "tailwindcss";
 
@@ -20,11 +21,10 @@
   --color-surface-hover:    #1C2244;
   --color-surface-elevated: #0A0E27;
 
-  /* ── TEXT ── */
   --color-text-primary:   #F1F5F9;
   --color-text-secondary: #94A3B8;
-  --color-text-muted:     #475569;
-  --color-text-faint:     #334155;
+  --color-text-muted:     #94A3B8;
+  --color-text-faint:     #64748B;
 
   /* ── BRAND INDIGO ── */
   --color-indigo-50:  #EEF2FF;
@@ -93,32 +93,12 @@
   --color-mf-line-gold:   rgba(99, 102, 241, 0.15);
   --color-mf-glass:       rgba(0, 0, 0, 0.85);
 
-  /* ── CT TOKENS ── */
-  --color-ct-surface:                   #000000;
-  --color-ct-surface-dim:               #000000;
-  --color-ct-surface-container-lowest:  #020208;
-  --color-ct-surface-container-low:     #050510;
-  --color-ct-surface-container:         #0A0E27;
-  --color-ct-surface-container-high:    #0F1330;
-  --color-ct-surface-container-highest: #161B3A;
-  --color-ct-on-surface:                #F1F5F9;
-  --color-ct-on-surface-variant:        #94A3B8;
-  --color-ct-outline:                   #475569;
-  --color-ct-outline-variant:           rgba(99, 102, 241, 0.15);
-  --color-ct-primary:                   #818CF8;
-  --color-ct-primary-container:         #6366F1;
-  --color-ct-secondary:                 #06B6D4;
-  --color-ct-secondary-container:       #06B6D4;
-  --color-ct-secondary-fixed-dim:       #0891B2;
-  --color-ct-surface-glass:            rgba(0, 0, 0, 0.80);
-  --color-ct-border-low:               rgba(99, 102, 241, 0.08);
-
-  /* ── FONTS ── */
-  --font-display:    'Space Grotesk', sans-serif;
-  --font-body:       'Plus Jakarta Sans', -apple-system, sans-serif;
+  /* ── FONTS (Ultra-Executive High-Tech Stack) ── */
+  --font-display:    'Clash Display', 'Outfit', sans-serif;
+  --font-heading:    'Clash Display', 'Outfit', sans-serif;
+  --font-body:       'Outfit', 'Inter', -apple-system, sans-serif;
+  --font-body-inter: 'Inter', sans-serif;
   --font-mono:       'JetBrains Mono', monospace;
-  --font-heading:    'Space Grotesk', sans-serif;
-  --font-body-inter: 'Plus Jakarta Sans', sans-serif;
 
   /* ── MOTION ── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -147,6 +127,105 @@
   --shadow-glow-cyan:    0 0 20px rgba(6, 182, 212, 0.15);
   --shadow-glow-galaxy:  0 0 30px rgba(167, 139, 250, 0.20);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   LIGHT MODE — Pearl Slate / Clean Glass Design System
+   Applied when <html class="light">
+   ══════════════════════════════════════════════════════════════ */
+html.light {
+  /* ── SURFACES ── */
+  --color-surface-base:     #F8FAFC;
+  --color-surface-1:        #FFFFFF;
+  --color-surface-2:        #F1F5F9;
+  --color-surface-3:        #E2E8F0;
+  --color-surface-4:        #CBD5E1;
+  --color-surface-hover:    #E2E8F0;
+  --color-surface-elevated: #FFFFFF;
+
+  /* ── TEXT ── */
+  --color-text-primary:   #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted:     #64748B;
+  --color-text-faint:     #94A3B8;
+
+  /* ── BORDERS ── */
+  --color-border-default: rgba(99, 102, 241, 0.10);
+  --color-border-subtle:  rgba(99, 102, 241, 0.18);
+  --color-border-strong:  rgba(99, 102, 241, 0.30);
+  --color-border-focus:   rgba(99, 102, 241, 0.55);
+
+  /* ── GLASS PANELS ── */
+  --glass-void:   rgba(255, 255, 255, 0.95);
+  --glass-space:  rgba(248, 250, 252, 0.90);
+  --glass-nebula: rgba(241, 245, 249, 0.80);
+  --glass-panel:  rgba(255, 255, 255, 0.70);
+
+  /* ── LEGACY TOKENS (Light mode mapping) ── */
+  --color-mf-bg-primary:  #F8FAFC;
+  --color-mf-bg-surface:  #FFFFFF;
+  --color-mf-bg-elevated: #FFFFFF;
+  --color-mf-bg-hover:    #F1F5F9;
+  --color-mf-ink:         #0F172A;
+  --color-mf-dim:         #475569;
+  --color-mf-dimmer:      #94A3B8;
+  --color-mf-glass:       rgba(255, 255, 255, 0.90);
+  --color-mf-line:        rgba(99, 102, 241, 0.10);
+  --color-mf-line-gold:   rgba(99, 102, 241, 0.15);
+
+  /* ── SHADOWS (Softer for light mode) ── */
+  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:           0 12px 40px rgba(0, 0, 0, 0.10);
+  --shadow-card:         0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(99, 102, 241, 0.08);
+  --shadow-elevated:     0 8px 32px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(99, 102, 241, 0.10);
+  --shadow-glow-indigo:  0 0 25px rgba(99, 102, 241, 0.15);
+  --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.12);
+  --shadow-glow-gold:    0 0 20px rgba(245, 158, 11, 0.10);
+  --shadow-glow-cyan:    0 0 20px rgba(6, 182, 212, 0.10);
+  --shadow-glow-galaxy:  0 0 30px rgba(167, 139, 250, 0.12);
+}
+
+/* Light mode — brand mark adjustments */
+html.light .bmark .b-flow { mix-blend-mode: multiply; }
+html.light .bmark .b-fh { mix-blend-mode: multiply; }
+html.light .bmark .b-fhl { mix-blend-mode: multiply; }
+html.light .bmark .b-fv { mix-blend-mode: multiply; }
+
+/* Light mode — selection */
+html.light ::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: #0F172A;
+}
+
+/* Light mode — scrollbar */
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.25);
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.45);
+}
+
+/* Light mode — FluidBackground fades out */
+html.light .fluid-bg-container {
+  opacity: 0.03 !important;
+}
+
+/* Light mode — grain overlay */
+html.light .grain-overlay {
+  opacity: 0.008 !important;
+}
+
+/* ── BRAND MARK (from landing page) ── */
+.bmark{position:relative;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bmark .b-ring{position:absolute;inset:-2px;border-radius:50%;border:1.5px solid #a855f7;opacity:.8;-webkit-mask:linear-gradient(90deg,#000 30%,transparent 70%);mask:linear-gradient(90deg,#000 30%,transparent 70%);box-shadow:inset 0 0 10px rgba(168,85,247,.3)}
+.bmark .b-ring2{position:absolute;inset:-2px;border-radius:50%;border:1.5px solid #3b82f6;opacity:.5;-webkit-mask:linear-gradient(180deg,transparent 20%,#000 80%);mask:linear-gradient(180deg,transparent 20%,#000 80%)}
+.bmark .b-flow{position:absolute;left:40%;top:50%;transform:translateY(-50%);width:250%;height:40%;background:radial-gradient(ellipse at left,rgba(168,85,247,.8) 0%,rgba(59,130,246,.6) 50%,transparent 100%);border-radius:0 50px 50px 0;mix-blend-mode:screen;transform-origin:left center;animation:b-flux-scale 2.5s ease-in-out infinite;opacity:.8}
+.bmark .b-fh{position:absolute;left:40%;top:50%;transform:translateY(-50%);width:300%;height:2px;background:linear-gradient(90deg,#fff 0%,#a855f7 30%,rgba(59,130,246,.8) 70%,transparent 100%);border-radius:0 50px 50px 0;mix-blend-mode:screen;transform-origin:left center;animation:b-flux-x 1.5s ease-in-out infinite;box-shadow:0 0 12px 2px rgba(59,130,246,.8)}
+.bmark .b-fhl{position:absolute;right:50%;top:50%;transform:translateY(-50%);width:60%;height:2px;background:linear-gradient(270deg,#fff 0%,rgba(168,85,247,.5) 100%);border-radius:50px 0 0 50px;mix-blend-mode:screen;box-shadow:0 0 8px rgba(168,85,247,.6)}
+.bmark .b-fv{position:absolute;width:2px;height:180%;background:linear-gradient(180deg,transparent 0%,rgba(168,85,247,.9) 30%,#fff 50%,rgba(168,85,247,.9) 70%,transparent 100%);border-radius:50px;mix-blend-mode:screen;box-shadow:0 0 12px 2px rgba(168,85,247,.8)}
+.bmark .b-core{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;box-shadow:0 0 20px 6px #a855f7,0 0 40px 10px rgba(59,130,246,.8)}
+@keyframes b-flux-scale { 0%, 100% { transform: translateY(-50%) scaleX(0.9); opacity: 0.5; } 50% { transform: translateY(-50%) scaleX(1.15); opacity: 1; } }
+@keyframes b-flux-x { 0%, 100% { transform: translate(0, -50%); opacity: 0.7; } 50% { transform: translate(6px, -50%); opacity: 1; } }
 
 html {
   font-size: 16px;
@@ -208,10 +287,7 @@ h1, h2, h3, h4, h5, h6,
 @keyframes mf-border-spin {
   to { --mf-angle: 360deg; }
 }
-@keyframes mf-pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.25); }
-  50% { box-shadow: 0 0 44px rgba(99, 102, 241, 0.55); }
-}
+
 @keyframes fluxx-shimmer-text {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -245,26 +321,8 @@ h1, h2, h3, h4, h5, h6,
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
-@keyframes mf-ripple {
-  to { box-shadow: 0 0 0 16px rgba(168, 85, 247, 0); }
-}
-@keyframes mf-gold-flow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-@keyframes mf-gold-glow {
-  0%, 100% { box-shadow: 0 0 22px rgba(232, 184, 75, 0.22), inset 0 0 12px rgba(232,184,75,0.06); }
-  50% { box-shadow: 0 0 52px rgba(232, 184, 75, 0.5), inset 0 0 18px rgba(232,184,75,0.12); }
-}
-@keyframes mf-aurora-drift {
-  0% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
-  50% { transform: translate3d(4%, 3%, 0) rotate(4deg); }
-  100% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
-}
-@keyframes mf-count-shine {
-  0% { background-position: -140% 0; }
-  100% { background-position: 240% 0; }
-}
+
+
 @keyframes mf-scan {
   0% { transform: translateY(-120%); opacity: 0; }
   10% { opacity: 1; }
@@ -274,11 +332,7 @@ h1, h2, h3, h4, h5, h6,
 @keyframes mf-mesh-a { 0%,100% { transform: translate3d(-8%,-6%,0) scale(1.1); } 50% { transform: translate3d(10%,8%,0) scale(1.35); } }
 @keyframes mf-mesh-b { 0%,100% { transform: translate3d(12%,10%,0) scale(1.2); } 50% { transform: translate3d(-10%,-8%,0) scale(0.95); } }
 @keyframes mf-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.06); } 100% { transform: scale(1); opacity: 1; } }
-@keyframes mf-tick { 0%,100% { opacity: 0.25; } 50% { opacity: 1; } }
-@keyframes ct-ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+
 
 @property --mf-angle {
   syntax: '<angle>';
@@ -359,9 +413,6 @@ h1, h2, h3, h4, h5, h6,
 @layer utilities {
   .text-glow { text-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
 
-  .glass-panel {
-    @apply bg-mf-bg-surface/80 backdrop-blur-xl border border-mf-line shadow-2xl;
-  }
 
   /* liquid gradient text — brand signature */
   .text-liquid {
@@ -402,7 +453,7 @@ h1, h2, h3, h4, h5, h6,
   }
   .sheen:hover::after { animation: mf-shimmer 0.9s ease-in-out; }
 
-  .pulse-glow { animation: mf-pulse-glow 3.2s ease-in-out infinite; }
+
   .animate-float { animation: mf-float 5s ease-in-out infinite; }
   .animate-blink { animation: mf-blink 1.8s infinite; }
   .animate-mf-marquee { animation: mf-marquee 28s linear infinite; }
@@ -540,15 +591,6 @@ h1, h2, h3, h4, h5, h6,
 
   /* ── OBSIDIAN-GOLD SIGNATURE UTILITIES ── */
 
-  /* molten liquid-gold gradient text — flagship headline treatment */
-  .text-gold-liquid {
-    background: linear-gradient(100deg, #7a5c1e, #e8b84b 22%, #ffe6a3 42%, #fffef6 50%, #ffe6a3 58%, #e8b84b 78%, #7a5c1e);
-    background-size: 260% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: mf-gold-flow 7s ease-in-out infinite;
-  }
 
   /* flat brushed-gold fill (no animation) for smaller labels */
   .text-gold {
@@ -560,13 +602,6 @@ h1, h2, h3, h4, h5, h6,
 
   .text-gold-glow { text-shadow: 0 0 16px rgba(232, 184, 75, 0.45); }
 
-  /* obsidian glass with a warm gilded rim */
-  .glass-gold {
-    background: linear-gradient(180deg, rgba(12,10,7,0.72), rgba(5,4,3,0.82));
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--color-mf-line-gold);
-    box-shadow: 0 24px 70px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,230,163,0.06);
-  }
 
   /* animated gilded conic border — wrap content in a relative child */
   .border-gold-flow {
@@ -578,7 +613,7 @@ h1, h2, h3, h4, h5, h6,
     animation: mf-border-spin 6s linear infinite;
   }
 
-  .pulse-gold { animation: mf-gold-glow 3.4s ease-in-out infinite; }
+
 
   /* gold sheen sweep on hover */
   .sheen-gold { position: relative; overflow: hidden; }
@@ -666,102 +701,7 @@ h1, h2, h3, h4, h5, h6,
     color: var(--color-mf-dim);
   }
 
-  /* ── STITCH CYBER-TERMINAL UTILITIES ── */
-  .ct-glass-panel {
-    background: rgba(20, 20, 22, 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .ct-flux-glow-primary {
-    box-shadow: 0 0 15px 0px rgba(236, 193, 89, 0.2);
-  }
-  .ct-flux-glow-secondary {
-    box-shadow: 0 0 15px 0px rgba(0, 220, 229, 0.2);
-  }
-  .ct-hide-scrollbar::-webkit-scrollbar { display: none; }
-  .ct-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  .animate-ct-ticker {
-    display: flex;
-    width: fit-content;
-    animation: ct-ticker 30s linear infinite;
-  }
-
-  /* ══════════════════════════════════════════════════════════════
-     PRO MAX UTILITIES — Fintech/Crypto Profile
-     ══════════════════════════════════════════════════════════════ */
-
-  .pm-surface {
-    background: var(--color-bg-raised);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
-  }
-  .pm-surface-glass {
-    background: rgba(18, 16, 30, 0.75);
-    backdrop-filter: blur(16px) saturate(1.2);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-  }
-  .pm-surface-elevated {
-    background: var(--color-bg-overlay);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-  }
-  .pm-glow-gold {
-    box-shadow: var(--shadow-glow-gold);
-  }
-  .pm-glow-cyan {
-    box-shadow: var(--shadow-glow-cyan);
-  }
-  .pm-text-gradient-gold {
-    background: linear-gradient(135deg, #FDE68A, #F59E0B, #D97706);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .pm-text-gradient-cyan {
-    background: linear-gradient(135deg, #67E8F9, #06B6D4, #0891B2);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .pm-border-glow {
-    position: relative;
-  }
-  .pm-border-glow::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(6,182,212,0.3));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  .pm-data-glow {
-    text-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
-  }
-  .pm-interactive {
-    transition: all var(--duration-normal) var(--ease-out-expo);
-    cursor: pointer;
-  }
-  .pm-interactive:hover {
-    background: var(--color-bg-hover);
-    border-color: var(--color-border-strong);
-  }
-
-  .ct-launch-pulse {
-    animation: ct-gold-pulse 2.5s ease-in-out infinite;
-  }
-}
-
-@keyframes ct-gold-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.15); }
-  50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.4), 0 0 44px rgba(245, 158, 11, 0.15); }
 }
 
 /* visible keyboard focus */
@@ -947,5 +887,81 @@ html.lenis, html.lenis body { height: auto; }
   *, *::before, *::after {
     animation-duration: 0.001s !important;
     transition-duration: 0.001s !important;
+  }
+}
+
+/* ── MOBILE RESPONSIVE UTILITIES ── */
+
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable custom cursor on touch devices */
+  .custom-cursor,
+  .custom-cursor-dot {
+    display: none !important;
+  }
+  
+  /* Larger touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Disable hover effects that cause "sticky hover" on mobile */
+  .fluxx-hover-shimmer:hover::before {
+    display: none;
+  }
+}
+
+/* Safe area insets for notched/island phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent text overflow on small screens */
+@media (max-width: 639px) {
+  .display-safe {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Reduce Three.js background intensity on mobile for performance */
+  canvas {
+    opacity: 0.5 !important;
+  }
+}
+
+/* ── LIVE ACTIVITY TICKER ── */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.live-ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+  will-change: transform;
+}
+
+.live-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@media (max-width: 639px) {
+  .live-ticker-track {
+    animation-duration: 25s;
   }
 }

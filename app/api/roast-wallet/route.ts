@@ -36,7 +36,7 @@ function buildMockRoast(address: string): WalletRoast {
   const roasts: WalletRoast[] = [
     {
       persona:        'Exit Liquidity Provider',
-      roast:          'You have an uncanny talent for buying the exact top of every meme cycle and selling the exact bottom. Your wallet is essentially a charity — donating your SOL to early buyers since 2021. You\'ve been rugged 14 times and you\'re somehow surprised every single time. Your portfolio is a graveyard with a Buy More button.',
+      roast:          'You have an uncanny talent for buying the exact top of every token cycle and selling the exact bottom. Your wallet is essentially a charity — donating your SOL to early buyers since 2021. You\'ve been rugged 14 times and you\'re somehow surprised every single time. Your portfolio is a graveyard with a Buy More button.',
       portfolioScore: 11,
       winRate:        '9%',
       rugCount:       14,
@@ -133,7 +133,7 @@ Respond with a JSON object containing these fields:
 - "portfolioScore" (integer 0-100): Overall portfolio quality score. 0=complete disaster, 100=sigma trading god. Most wallets score 15-45.
 - "winRate" (string): Realistic (usually low) win rate percentage, e.g. "12%". Rarely above 35%.
 - "rugCount" (integer 0-30): How many rug pulls they've experienced. Random between 3-20 for a normal degen.
-- "biggestBag" (string): The name of a dead, embarrassing, or funny meme coin they probably still hold. Be specific.
+- "biggestBag" (string): The name of a dead, embarrassing, or funny token they probably still hold. Be specific.
 - "tradingStyle" (string): One of: "Diamond Hands", "Paper Hands", "Ape Brain", "Contrarian", "Sniper", "Bot Fodder", "Exit Liquidity Provider", "Accidental Genius"
 - "advice" (string): 1 sentence of genuinely useful trading advice delivered in a funny, crypto-native way. Actually helpful, just wrapped in roast energy.
 - "nftEquivalent" (string): Complete the sentence: "You are the [famous NFT collection] of traders because [funny comparison]."`,

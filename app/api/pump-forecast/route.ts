@@ -46,9 +46,9 @@ const MOCK: PumpForecastResponse = {
   narratives: [
     { id: 'dog_meta',   name: 'Dog Meta',   emoji: '🐕', confidence: 87, momentumScore: 91, trend: 'PEAK',       timeframe: 'Next 24h', tag: 'AI Pick',   color: '#e8b84b', volumeChange24h: +312, mentionVelocity: 94,  keyDrivers: ['LDOGE', 'BARK', 'BONK2'],   aiInsight: 'Dog narrative entering euphoria phase — historically precedes a 20-40% correction within 48h.' },
     { id: 'ai_agents',  name: 'AI Agents',  emoji: '🤖', confidence: 79, momentumScore: 74, trend: 'Heating Up', timeframe: 'Next 3d',  tag: 'AI Pick',   color: '#a855f7', volumeChange24h: +187, mentionVelocity: 71,  keyDrivers: ['GOAT', 'SWRM', 'AIVM'],     aiInsight: 'AI agent tokens showing organic accumulation by known smart wallets — not bot-driven.' },
-    { id: 'meme_season',name: 'Meme Season', emoji: '🔥', confidence: 91, momentumScore: 88, trend: 'PEAK',       timeframe: 'Next 24h', tag: 'AI Pick',   color: '#f97316', volumeChange24h: +445, mentionVelocity: 100, keyDrivers: ['Multiple'],                  aiInsight: 'Broad meme season indicators at cycle highs — monitor for exhaustion signals after this candle.' },
+    { id: 'alt_season',name: 'Alt Season', emoji: '🔥', confidence: 91, momentumScore: 88, trend: 'PEAK',       timeframe: 'Next 24h', tag: 'AI Pick',   color: '#f97316', volumeChange24h: +445, mentionVelocity: 100, keyDrivers: ['Multiple'],                  aiInsight: 'Broad token season indicators at cycle highs — monitor for exhaustion signals after this candle.' },
     { id: 'gaming',     name: 'Gaming',     emoji: '🎮', confidence: 64, momentumScore: 58, trend: 'Stable',     timeframe: 'Next 3d',  tag: 'Watch',     color: '#38bdf8', volumeChange24h:  +42, mentionVelocity: 44,  keyDrivers: ['GAMER', 'PXVLT'],           aiInsight: 'Gaming narrative consolidating after the June run — watching for Q3 catalyst.' },
-    { id: 'rwa',        name: 'RWA',        emoji: '🏦', confidence: 41, momentumScore: 33, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'Fading',    color: '#ef4444', volumeChange24h:  -28, mentionVelocity: 18,  keyDrivers: ['ONDO', 'BUIDL'],            aiInsight: 'RWA narrative losing meme market share to dog meta — institutional buyers absent this week.' },
+    { id: 'rwa',        name: 'RWA',        emoji: '🏦', confidence: 41, momentumScore: 33, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'Fading',    color: '#ef4444', volumeChange24h:  -28, mentionVelocity: 18,  keyDrivers: ['ONDO', 'BUIDL'],            aiInsight: 'RWA narrative losing token market share to dog meta — institutional buyers absent this week.' },
     { id: 'depin',      name: 'DePIN',      emoji: '📡', confidence: 55, momentumScore: 61, trend: 'Awakening',  timeframe: 'Next 3d',  tag: 'Watch',     color: '#14b8a6', volumeChange24h:  +89, mentionVelocity: 52,  keyDrivers: ['HNT', 'IOTX', 'WIFI'],      aiInsight: 'DePIN showing unusual early accumulation — possible next narrative rotation target.' },
     { id: 'socialfi',   name: 'SocialFi',   emoji: '💬', confidence: 47, momentumScore: 44, trend: 'Stable',     timeframe: 'Next 7d',  tag: 'Watch',     color: '#6366f1', volumeChange24h:  +15, mentionVelocity: 31,  keyDrivers: ['SOCIAL', 'BFREN'],          aiInsight: 'SocialFi tokens in accumulation phase — watch for a Friends.tech-style catalyst to ignite.' },
     { id: 'l2s',        name: 'L2 Tokens',  emoji: '⚡', confidence: 38, momentumScore: 29, trend: 'Cooling',    timeframe: 'Next 7d',  tag: 'High Risk', color: '#94a3b8', volumeChange24h:  -41, mentionVelocity: 22,  keyDrivers: ['ARB', 'OP'],                aiInsight: 'L2 tokens losing ground to Multi-Chain-native assets — funds rotating on-chain.' },
@@ -59,7 +59,7 @@ const MOCK: PumpForecastResponse = {
     overallSignal:     'BUY',
     signalStrength:    74,
     fearGreedIndex:    79,
-    dominantNarrative: 'Meme Season',
+    dominantNarrative: 'Alt Season',
   },
   breakoutAlert: {
     narrativeId: 'depin',
@@ -104,7 +104,7 @@ Respond with a JSON object containing these fields:
         prompt: `Analyze these 8 narratives for the current Crypto meta:
 1. dog_meta — Dog Meta (BARK, BONK derivatives, LDOGE)
 2. ai_agents — AI Agents (autonomous on-chain AI tokens)
-3. meme_season — Meme Season (broad meme market health)
+3. alt_season — Alt Season (broad token market health)
 4. gaming — Gaming (GameFi, gaming guild tokens)
 5. rwa — RWA (Real World Assets tokenization)
 6. depin — DePIN (Decentralized Physical Infrastructure)

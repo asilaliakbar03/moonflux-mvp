@@ -120,7 +120,7 @@ export async function fetchSOLPrice(): Promise<SOLPrice> {
 // ── DEXSCREENER — trending Solana tokens ─────────────────────────────────────
 export async function fetchTrendingSolana(): Promise<DexSearchResult[]> {
   try {
-    // Search for high-volume meme/new tokens on Solana
+    // Search for high-volume token/new tokens on Solana
     const res = await fetch(
       "https://api.dexscreener.com/latest/dex/search?q=solana",
       { next: { revalidate: 120 } }

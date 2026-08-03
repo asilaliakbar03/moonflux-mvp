@@ -6,6 +6,9 @@ import { User, Wallet, Activity, Shield, Award, Zap, TrendingUp, Users, Flame, S
 import { useToast } from "@/components/ToastProvider";
 import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
+import { useMoonWallet } from '@/components/WalletProvider';
+import { useWalletModal } from '@/components/SolanaProvider';
+import { useTheme } from '@/components/ThemeProvider';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -34,7 +37,11 @@ const CREATOR_ECONOMY = {
 };
 
 export default function ProfilePage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const { showToast } = useToast();
+  const { connected, address } = useMoonWallet();
+  const { setModalOpen } = useWalletModal();
   const [activeTab, setActiveTab] = useState<'portfolio' | 'creator'>('portfolio');
   const [isFollowing, setIsFollowing] = useState(false);
 
@@ -60,13 +67,13 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto w-full pt-8 pb-16 w-full max-w-full overflow-x-hidden">
+    <div className="max-w-6xl mx-auto w-full pt-4 sm:pt-6 md:pt-8 pb-24 px-4 sm:px-6 md:px-8 max-w-full overflow-x-hidden">
       
       {/* ── TOP SECTION ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         
         {/* IDENTITY CARD */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 flex flex-col justify-between border-t-4 border-t-[#6366F1] shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className={`backdrop-blur-2xl transition-all duration-300 ease-out p-6 flex flex-col justify-between border-t-4 border-t-[#6366F1] shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden ${isDark ? 'bg-[rgba(5,5,16,0.80)] border border-[rgba(99,102,241,0.08)] hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' : 'bg-surface-1 border border-border-subtle hover:border-indigo-300'}`}>
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_50%)]" />
           
           <div className="flex justify-between items-start mb-4 relative z-10">
@@ -75,13 +82,22 @@ export default function ProfilePage() {
                 <User className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">
-                  DegenDave
+                <h2 className={`text-2xl font-bold mb-1 flex items-center gap-2 display-safe ${isDark ? 'text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]' : 'text-text-primary'}`}>
+                  {connected && address ? `${address.slice(0, 4)}...${address.slice(-4)}` : 'Connect Wallet'}
                   <span className="bg-[#6366F1] text-[10px] text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-bold shadow-[0_0_10px_rgba(99,102,241,0.5)]">Pro</span>
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-[#818CF8] font-mono text-sm">@degendave</span>
-                  <button className="text-[#475569] hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none" title="Copy Address">
+                  <span className="text-[#818CF8] font-mono text-sm">
+                    {connected && address ? `@${address.slice(0, 4)}...` : '@degendave'}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      if (connected && address) {
+                        navigator.clipboard.writeText(address);
+                        showToast('Address copied to clipboard', 'success');
+                      }
+                    }}
+                    className={`transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isDark ? 'text-[#475569] hover:text-white' : 'text-text-muted hover:text-text-primary'}`} title="Copy Address">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -91,7 +107,7 @@ export default function ProfilePage() {
             <MagneticButton as="div" strength={0.25}>
               <button 
                 onClick={() => setIsFollowing(!isFollowing)}
-                className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isFollowing ? 'bg-transparent border-[rgba(255,255,255,0.2)] text-white hover:border-[rgba(244,63,94,0.5)] hover:text-[#F43F5E]' : 'bg-[#6366F1] border-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5]'}`}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isFollowing ? (isDark ? 'bg-transparent border-[rgba(255,255,255,0.2)] text-white hover:border-[rgba(244,63,94,0.5)] hover:text-[#F43F5E]' : 'bg-transparent border-border-strong text-text-primary hover:border-red-500 hover:text-red-500') : 'bg-[#6366F1] border-[#6366F1] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5]'}`}
               >
                 {isFollowing ? (
                   <>Following</>
@@ -104,18 +120,18 @@ export default function ProfilePage() {
 
           <div className="flex items-center gap-6 mb-6 relative z-10 text-sm">
             <div className="flex flex-col">
-              <span className="text-white font-bold text-lg">{CREATOR_ECONOMY.followers > 0 ? <AnimatedCounter value={CREATOR_ECONOMY.followers} /> : "--"}</span>
-              <span className="text-[#94A3B8]">Followers</span>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-text-primary'}`}>{CREATOR_ECONOMY.followers > 0 ? <AnimatedCounter value={CREATOR_ECONOMY.followers} /> : "--"}</span>
+              <span className="text-text-secondary">Followers</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-bold text-lg"><AnimatedCounter value={CREATOR_ECONOMY.following} /></span>
-              <span className="text-[#94A3B8]">Following</span>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-text-primary'}`}><AnimatedCounter value={CREATOR_ECONOMY.following} /></span>
+              <span className="text-text-secondary">Following</span>
             </div>
           </div>
 
-          <div className="relative z-10 border-t border-[rgba(255,255,255,0.05)] pt-4">
+          <div className={`relative z-10 border-t pt-4 ${isDark ? 'border-[rgba(255,255,255,0.05)]' : 'border-border-subtle'}`}>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-[#94A3B8] text-sm flex items-center gap-1.5"><Crown className="w-4 h-4 text-[#F59E0B]" /> Level 42</span>
+              <span className="text-text-secondary text-sm flex items-center gap-1.5"><Crown className="w-4 h-4 text-[#F59E0B]" /> Level 42</span>
               <span className="text-[#818CF8] font-mono font-bold"><AnimatedCounter value={94200} /> XP</span>
             </div>
             <div className="h-2 w-full bg-[rgba(99,102,241,0.1)] rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]">
@@ -125,22 +141,22 @@ export default function ProfilePage() {
         </motion.div>
 
         {/* PORTFOLIO SUMMARY */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 flex flex-col justify-center border border-[rgba(16,185,129,0.2)] shadow-[0_0_20px_rgba(16,185,129,0.05)] relative overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={`backdrop-blur-2xl transition-all duration-300 ease-out p-6 flex flex-col justify-center border shadow-[0_0_20px_rgba(16,185,129,0.05)] relative overflow-hidden ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(16,185,129,0.2)] hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' : 'bg-surface-1 border-border-subtle hover:border-indigo-300'}`}>
           <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_bottom,rgba(16,185,129,0.8),transparent_70%)]" />
-          <div className="flex items-center gap-2 text-[#94A3B8] mb-2 font-semibold relative z-10">
+          <div className="flex items-center gap-2 text-text-secondary mb-2 font-semibold relative z-10">
             <Wallet className="w-4 h-4" /> Total Balance
           </div>
-          <div className="text-4xl font-mono font-bold text-white mb-2 relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">$--</div>
+          <div className={`text-lg sm:text-xl md:text-2xl font-mono font-bold mb-2 relative z-10 ${isDark ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]' : 'text-text-primary'}`}>Connect wallet to view</div>
           <div className="flex items-center gap-2 relative z-10">
             <span className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-1 rounded text-sm font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)] border border-[rgba(16,185,129,0.3)]">
-              <TrendingUp className="w-3.5 h-3.5" /> --%
+              <TrendingUp className="w-3.5 h-3.5" /> Connect wallet to view
             </span>
-            <span className="text-[#475569] text-sm">Past 30 days</span>
+            <span className="text-text-muted text-sm">Past 30 days</span>
           </div>
         </motion.div>
 
         {/* AI WALLET ROAST */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-6 border border-[rgba(244,63,94,0.3)] bg-[rgba(244,63,94,0.02)] relative overflow-hidden flex flex-col">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={`backdrop-blur-2xl transition-all duration-300 ease-out p-6 border relative overflow-hidden flex flex-col ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(244,63,94,0.3)] hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' : 'bg-red-50 border-red-200 hover:border-red-300'}`}>
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,rgba(244,63,94,0.8),transparent_60%)]" />
           <div className="flex justify-between items-center mb-4 relative z-10">
             <div className="flex items-center gap-2 text-[#F43F5E] font-bold text-sm uppercase tracking-wider drop-shadow-[0_0_5px_currentColor]">
@@ -151,7 +167,7 @@ export default function ProfilePage() {
                 <button 
                   onClick={handleRoast} 
                   disabled={isRoasting}
-                  className="bg-[rgba(244,63,94,0.15)] hover:bg-[rgba(244,63,94,0.25)] text-[#F43F5E] text-xs font-bold px-3 py-1.5 rounded transition-all border border-[rgba(244,63,94,0.3)] disabled:opacity-50 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-all border disabled:opacity-50 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isDark ? 'bg-[rgba(244,63,94,0.15)] hover:bg-[rgba(244,63,94,0.25)] text-[#F43F5E] border-[rgba(244,63,94,0.3)]' : 'bg-red-100 hover:bg-red-200 text-red-700 border-red-200'}`}
                 >
                   {isRoasting ? 'Roasting...' : 'Roast Me'}
                 </button>
@@ -163,22 +179,22 @@ export default function ProfilePage() {
             {roastData ? (
               <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex justify-between items-end">
-                  <h3 className="text-xl font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{roastData.persona}</h3>
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]' : 'text-text-primary'}`}>{roastData.persona}</h3>
                   <div className="text-right">
                     <div className="text-[#F43F5E] font-mono text-xl font-bold">{roastData.portfolioScore}/100</div>
-                    <div className="text-[10px] uppercase text-[#94A3B8]">Score</div>
+                    <div className="text-[10px] uppercase text-text-muted">Score</div>
                   </div>
                 </div>
-                <p className="text-[#F1F5F9] text-sm leading-relaxed border-l-2 border-[#F43F5E] pl-3">
+                <p className={`text-sm leading-relaxed border-l-2 border-[#F43F5E] pl-3 ${isDark ? 'text-[#F1F5F9]' : 'text-text-primary'}`}>
                   "{roastData.roast}"
                 </p>
                 <div className="flex justify-between text-xs pt-2 font-mono">
-                   <div className="text-[#94A3B8]">Win Rate: <span className="text-[#10B981]">{roastData.winRate}</span></div>
-                   <div className="text-[#94A3B8]">Rugged: <span className="text-[#F43F5E]">{roastData.rugCount}x</span></div>
+                   <div className="text-text-secondary">Win Rate: <span className="text-[#10B981]">{roastData.winRate}</span></div>
+                   <div className="text-text-secondary">Rugged: <span className="text-[#F43F5E]">{roastData.rugCount}x</span></div>
                 </div>
               </div>
             ) : (
-              <div className="text-center text-[#94A3B8] text-sm">
+              <div className="text-center text-text-muted text-sm">
                 <div className="text-3xl mb-2 opacity-50 grayscale">🤖</div>
                 Dare the AI to analyze your on-chain history? Warning: It will be brutal.
               </div>
@@ -209,14 +225,14 @@ export default function ProfilePage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
           
           {/* Holdings Table */}
-          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] overflow-hidden">
-            <div className="p-5 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)]">
-              <h3 className="text-lg font-bold text-white">Current Holdings</h3>
+          <div className={`backdrop-blur-2xl transition-all duration-300 ease-out border overflow-hidden ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)] hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)]' : 'bg-surface-1 border-border-subtle'}`}>
+            <div className={`p-5 border-b backdrop-blur-2xl ${isDark ? 'border-[rgba(255,255,255,0.05)] bg-[rgba(5,5,16,0.80)]' : 'border-border-subtle bg-surface-base'}`}>
+              <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-text-primary'}`}>Current Holdings</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-[rgba(255,255,255,0.05)] text-[#94A3B8] font-mono text-xs uppercase bg-[var(--color-surface-1)]">
+                  <tr className={`border-b font-mono text-xs uppercase bg-[var(--color-surface-2)] ${isDark ? 'border-[rgba(255,255,255,0.05)] text-[#94A3B8]' : 'border-border-subtle text-text-muted'}`}>
                     <th className="p-4 font-semibold">Asset</th>
                     <th className="p-4 font-semibold">Balance</th>
                     <th className="p-4 font-semibold">Value</th>
@@ -226,19 +242,19 @@ export default function ProfilePage() {
                 </thead>
                 <tbody>
                   {HOLDINGS.map((h, i) => (
-                    <tr key={i} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                    <tr key={i} className={`border-b transition-colors ${isDark ? 'border-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.02)]' : 'border-border-subtle hover:bg-surface-hover'}`}>
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="text-2xl drop-shadow-[0_0_5px_currentColor]">{h.icon}</div>
                           <div>
-                            <div className="font-bold text-white">{h.name}</div>
-                            <div className="text-[#94A3B8] font-mono text-xs">{h.ticker}</div>
+                            <div className={`font-bold ${isDark ? 'text-white' : 'text-text-primary'}`}>{h.name}</div>
+                            <div className="text-text-secondary font-mono text-xs">{h.ticker}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 font-mono text-white">{h.qty}</td>
-                      <td className="p-4 font-mono text-white">{h.value}</td>
-                      <td className="p-4 font-mono text-[#94A3B8]">{h.avgBuy}</td>
+                      <td className={`p-4 font-mono ${isDark ? 'text-white' : 'text-text-primary'}`}>{h.qty}</td>
+                      <td className={`p-4 font-mono ${isDark ? 'text-white' : 'text-text-primary'}`}>{h.value}</td>
+                      <td className="p-4 font-mono text-text-secondary">{h.avgBuy}</td>
                       <td className="p-4">
                         <div className={`font-mono font-bold ${h.pos ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
                           {h.pnl} <span className="text-[10px] ml-1 bg-current bg-opacity-10 px-1.5 py-0.5 rounded opacity-80 border border-current">{h.pnlPct}</span>
@@ -280,7 +296,7 @@ export default function ProfilePage() {
       {activeTab === 'creator' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
           
-          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-8 border border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.02)] flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+          <div className="bg-[rgba(5,5,16,0.80)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] transition-all duration-300 ease-out hover:border-[rgba(99,102,241,0.20)] hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] p-4 sm:p-6 md:p-8 border border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.02)] flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.05)]">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_left,rgba(16,185,129,0.8),transparent_50%)]" />
             <div className="relative z-10">
               <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">

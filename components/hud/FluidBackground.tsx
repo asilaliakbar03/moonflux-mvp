@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
 /**
@@ -186,16 +186,25 @@ function AccentStars({ count = 80 }) {
 }
 
 export default function FluidBackground() {
+  const [isHidden, setIsHidden] = useState(false);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => setIsHidden(document.hidden);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-[-1]" style={{ background: '#000000' }}>
+    <div className="fluid-bg-container fixed inset-0 z-[-1] transition-opacity duration-500" style={{ background: '#000000' }}>
       <Canvas
+        frameloop={isHidden ? "never" : "always"}
         camera={{ fov: 60, position: [0, 0, 5] }}
         gl={{ antialias: false, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
       >
         <NebulaPlane />
-        <GalaxyStars />
-        <AccentStars />
+        <GalaxyStars count={300} />
+        <AccentStars count={20} />
       </Canvas>
     </div>
   );

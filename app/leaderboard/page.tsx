@@ -5,6 +5,7 @@ import { Trophy, Flame, Target, Star } from "lucide-react";
 import { useState } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import MagneticButton from "@/components/MagneticButton";
+import { useTheme } from '@/components/ThemeProvider';
 
 const ALL_TRADERS = {
   "top-traders": [
@@ -43,6 +44,8 @@ const CATEGORIES = [
 ];
 
 export default function LeaderboardPage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeCat, setActiveCat] = useState<CategoryKey>("top-traders");
   const traders = ALL_TRADERS[activeCat];
 
@@ -51,13 +54,20 @@ export default function LeaderboardPage() {
   const rest = traders.slice(3);
 
   return (
-    <div className="max-w-5xl mx-auto w-full pt-8 pb-16 px-4">
+    <div className="max-w-5xl mx-auto w-full pt-8 pb-24 md:pb-16 px-4">
       
+      {/* DEMO BANNER */}
+      <div className="mb-6 bg-[rgba(99,102,241,0.1)] border border-[rgba(99,102,241,0.2)] rounded-lg p-3 text-center">
+        <p className="text-sm text-[#818CF8] font-medium flex items-center justify-center gap-2">
+          <Flame className="w-4 h-4" /> Demo Data — Rankings will update with live trading
+        </p>
+      </div>
+
       {/* HEADER */}
       <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 text-center md:text-left">
         <div>
           <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-            <h1 className="text-3xl font-semibold text-[#F1F5F9] flex items-center gap-3 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-text-primary flex items-center gap-3 tracking-tight">
               <Trophy className="w-7 h-7 text-[#F59E0B]" />
               Leaderboard
             </h1>
@@ -65,10 +75,10 @@ export default function LeaderboardPage() {
               Season 1
             </span>
           </div>
-          <p className="text-[#94A3B8] text-sm">The highest ranked traders on MoonFluxx. Updated in real-time.</p>
+          <p className="text-text-secondary text-sm">The highest ranked traders on MoonFluxx. Updated in real-time.</p>
         </div>
         
-        <div className="flex p-1 flex-nowrap overflow-x-auto max-w-full rounded-xl bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)]" role="tablist">
+        <div className={`flex p-1 flex-nowrap overflow-x-auto max-w-full rounded-xl border ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`} role="tablist">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon;
             const active = activeCat === cat.id;
@@ -80,8 +90,8 @@ export default function LeaderboardPage() {
                 onClick={() => setActiveCat(cat.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap font-medium text-sm transition-all duration-200 focus-visible:outline-none ${
                   active 
-                    ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8]' 
-                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[rgba(99,102,241,0.04)]'
+                    ? (isDark ? 'bg-[rgba(99,102,241,0.12)] text-[#818CF8]' : 'bg-indigo-100 text-indigo-700')
+                    : (isDark ? 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[rgba(99,102,241,0.04)]' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover')
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -103,29 +113,29 @@ export default function LeaderboardPage() {
           };
           
           return (
-            <div key={trader.name} className={`flex items-center p-5 rounded-xl bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] border-l-2 ${borderColors[rankNum as keyof typeof borderColors]}`}>
+            <div key={trader.name} className={`flex items-center p-5 rounded-xl border border-l-2 ${borderColors[rankNum as keyof typeof borderColors]} ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
               <div className="flex-1 flex flex-col">
                 <div className="flex items-center gap-4 mb-3">
-                  <span className="text-4xl font-light text-[#F1F5F9] font-mono leading-none">#{rankNum}</span>
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-light text-text-primary font-mono leading-none">#{rankNum}</span>
                   <div>
-                    <div className="font-semibold text-[#F1F5F9] truncate">{trader.name}</div>
-                    <div className="text-xs text-[#94A3B8] font-mono">{trader.handle}</div>
+                    <div className="font-semibold text-text-primary truncate">{trader.name}</div>
+                    <div className="text-xs text-text-secondary font-mono">{trader.handle}</div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 text-sm mt-1">
                   <div>
-                    <div className="text-[#475569] text-xs mb-0.5">XP</div>
-                    <AnimatedCounter value={trader.xp} className="text-[#F1F5F9] font-mono" />
+                    <div className="text-text-muted text-xs mb-0.5">XP</div>
+                    <AnimatedCounter value={trader.xp} className="text-text-primary font-mono" />
                   </div>
                   <div>
-                    <div className="text-[#475569] text-xs mb-0.5">Win Rate</div>
-                    <div className={`font-mono ${trader.win >= 80 ? 'text-[#10B981]' : 'text-[#F1F5F9]'}`}>
+                    <div className="text-text-muted text-xs mb-0.5">Win Rate</div>
+                    <div className={`font-mono ${trader.win >= 80 ? 'text-[#10B981]' : 'text-text-primary'}`}>
                       <AnimatedCounter value={trader.win} suffix="%" decimals={1} className="font-mono" />
                     </div>
                   </div>
                   <div>
-                    <div className="text-[#475569] text-xs mb-0.5">PNL</div>
+                    <div className="text-text-muted text-xs mb-0.5">PNL</div>
                     <div className="text-[#10B981] font-mono">{trader.pnl}</div>
                   </div>
                 </div>
@@ -137,9 +147,9 @@ export default function LeaderboardPage() {
 
       {/* LEADERBOARD LIST */}
       <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="w-full overflow-x-auto pb-4">
-        <div className="flex flex-col gap-1 min-w-[700px] bg-[rgba(0,0,0,0.4)] border border-[rgba(99,102,241,0.06)] rounded-xl p-2">
+        <div className={`flex flex-col gap-1 min-w-[700px] border rounded-xl p-2 ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
           {/* Header Row */}
-          <div className="flex items-center px-4 py-3 text-[#475569] font-mono text-xs uppercase tracking-wider">
+          <div className="flex items-center px-4 py-3 text-text-muted font-mono text-xs uppercase tracking-wider">
             <div className="w-12 text-center">Rank</div>
             <div className="flex-1 pl-4">Trader</div>
             <div className="w-28 text-right">XP</div>
@@ -149,8 +159,8 @@ export default function LeaderboardPage() {
           </div>
 
           {rest.map((trader) => (
-            <div key={trader.rank} className="group flex items-center px-4 py-3 rounded-lg hover:bg-[rgba(99,102,241,0.04)] transition-colors">
-              <div className="w-12 text-center font-mono text-[#94A3B8] text-sm">
+            <div key={trader.rank} className={`group flex items-center px-4 py-3 rounded-lg transition-colors ${isDark ? 'hover:bg-[rgba(99,102,241,0.04)]' : 'hover:bg-surface-hover'}`}>
+              <div className="w-12 text-center font-mono text-text-secondary text-sm">
                 {trader.rank}
               </div>
               
@@ -159,16 +169,16 @@ export default function LeaderboardPage() {
                   {trader.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-medium text-[#F1F5F9] truncate text-sm">{trader.name}</div>
-                  <div className="text-xs font-mono text-[#475569] truncate">{trader.handle}</div>
+                  <div className="font-medium text-text-primary truncate text-sm">{trader.name}</div>
+                  <div className="text-xs font-mono text-text-muted truncate">{trader.handle}</div>
                 </div>
               </div>
 
-              <div className="w-28 text-right font-mono text-sm text-[#F1F5F9]">
+              <div className="w-28 text-right font-mono text-sm text-text-primary">
                 {trader.xp.toLocaleString()}
               </div>
               
-              <div className={`w-24 text-right font-mono text-sm ${trader.win >= 80 ? 'text-[#10B981]' : 'text-[#F1F5F9]'}`}>
+              <div className={`w-24 text-right font-mono text-sm ${trader.win >= 80 ? 'text-[#10B981]' : 'text-text-primary'}`}>
                 {trader.win}%
               </div>
 
@@ -180,11 +190,11 @@ export default function LeaderboardPage() {
                 {trader.streak > 3 ? (
                   <>
                     <Flame className="w-3.5 h-3.5 text-[#F59E0B]" />
-                    <span className="text-[#F1F5F9]">{trader.streak}</span>
+                    <span className="text-text-primary">{trader.streak}</span>
                   </>
                 ) : (
                   <>
-                    <span className="text-[#475569]">{trader.streak}</span>
+                    <span className="text-text-muted">{trader.streak}</span>
                   </>
                 )}
               </div>
