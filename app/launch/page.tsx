@@ -2,125 +2,42 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo, useRef, useCallback } from "react";
-import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown, CheckCircle2, ShieldAlert, Zap, Shield, TrendingUp, Flame } from "lucide-react";
+import { Sparkles, Settings, Check, Loader2, Upload, Rocket, ChevronDown, CheckCircle2, ShieldAlert, Zap, Shield, TrendingUp, Flame, Terminal, ArrowLeft } from "lucide-react";
 import { useTheme } from '@/components/ThemeProvider';
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useTokenDeploy, TokenDeployFormData } from "@/hooks/useTokenDeploy";
 import BondingCurveChart from "@/components/BondingCurveChart";
-import MagneticButton from '@/components/MagneticButton';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 type LaunchMode = 'none' | 'ai' | 'custom';
 type Step = 1 | 2 | 3;
 
-/* ── 3D Tilt Card Component ── */
-function TiltCard({ children, className, onClick, intensity = 8 }: {
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  intensity?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    setTilt({
-      x: ((y - cy) / cy) * -intensity,
-      y: ((x - cx) / cx) * intensity,
-    });
-    setGlare({
-      x: (x / rect.width) * 100,
-      y: (y / rect.height) * 100,
-      opacity: 0.15,
-    });
-  }, [intensity]);
-
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 });
-    setGlare({ x: 50, y: 50, opacity: 0 });
-  }, []);
-
+/* ── Step Indicator ── */
+function StepIndicator({ labels, currentStep, isDark }: { labels: string[]; currentStep: number; isDark: boolean }) {
   return (
-    <div
-      ref={ref}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={className}
-      style={{
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(0)`,
-        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
-      {/* Glare overlay */}
-      <div
-        className="absolute inset-0 rounded-2xl pointer-events-none z-10"
-        style={{
-          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(99,102,241,${glare.opacity}), transparent 60%)`,
-          transition: 'opacity 0.4s',
-        }}
-      />
-      {children}
-    </div>
-  );
-}
-
-/* ── Animated Step Indicator ── */
-function StepIndicator({ labels, currentStep }: { labels: string[]; currentStep: number }) {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-10">
+    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8 font-mono">
       {labels.map((label, i) => {
         const stepNum = i + 1;
         const isActive = currentStep === stepNum;
         const isDone = currentStep > stepNum;
         return (
-          <div key={label} className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2">
-              <motion.div
-                animate={{
-                  scale: isActive ? 1.15 : 1,
-                  boxShadow: isActive
-                    ? '0 0 20px rgba(99,102,241,0.6), 0 0 40px rgba(99,102,241,0.2)'
-                    : isDone
-                    ? '0 0 15px rgba(16,185,129,0.5)'
-                    : '0 0 0px transparent',
-                }}
-                transition={{ duration: 0.4 }}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                  isActive
-                    ? 'bg-gradient-to-br from-[#6366F1] to-[#4F46E5] text-white'
-                    : isDone
-                    ? 'bg-gradient-to-br from-[#10B981] to-[#059669] text-white'
-                    : 'bg-[rgba(99,102,241,0.08)] text-text-muted border border-[rgba(99,102,241,0.15)]'
-                }`}
-              >
-                {isDone ? <Check className="w-4 h-4" /> : stepNum}
-              </motion.div>
-              <span className={`text-sm font-semibold hidden sm:inline transition-all duration-300 ${
-                isActive ? 'text-text-primary' : isDone ? 'text-text-secondary' : 'text-text-muted'
-              }`}>
-                {label}
-              </span>
+          <div key={label} className="flex items-center gap-2">
+            <div
+              className={`px-3 py-1.5 text-xs font-black uppercase border transition-all ${
+                isActive
+                  ? isDark 
+                    ? 'bg-[#10B981] text-black border-[#10B981] shadow-[3px_3px_0px_0px_#FFF]' 
+                    : 'bg-black text-white border-black shadow-[3px_3px_0px_0px_#10B981]'
+                  : isDone
+                  ? isDark ? 'bg-black text-[#10B981] border-[#10B981]' : 'bg-gray-200 text-black border-black'
+                  : isDark ? 'bg-black text-gray-600 border-gray-800' : 'bg-white text-gray-400 border-gray-300'
+              }`}
+            >
+              [ 0{stepNum}: {label} ]
             </div>
-            {stepNum < labels.length && (
-              <div className="relative w-8 sm:w-12 h-px">
-                <div className="absolute inset-0 bg-[rgba(99,102,241,0.1)]" />
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#10B981] to-[#6366F1]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: isDone ? '100%' : '0%' }}
-                  transition={{ duration: 0.6, ease: EASE }}
-                  style={{ boxShadow: isDone ? '0 0 8px rgba(16,185,129,0.5)' : 'none' }}
-                />
-              </div>
+            {i < labels.length - 1 && (
+              <span className={`text-xs font-bold ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>➔</span>
             )}
           </div>
         );
@@ -137,10 +54,8 @@ export default function LaunchPage() {
 
   const [mode, setMode] = useState<LaunchMode>('none');
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [generatingStep, setGeneratingStep] = useState(0);
 
+  // Form State
   const [formData, setFormData] = useState<TokenDeployFormData>({
     name: "",
     ticker: "",
@@ -149,55 +64,41 @@ export default function LaunchPage() {
     twitter: "",
     telegram: "",
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  
-  // Curve Settings
-  const [selectedCurve, setSelectedCurve] = useState<"fast" | "balanced" | "stable" | "aggressive">("balanced");
-  
-  // Liquidity Settings
-  const [selectedLiquidity, setSelectedLiquidity] = useState("fair");
-  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
-  const [devAllocation, setDevAllocation] = useState(10);
 
-  // Validation
+  const [selectedCurve, setSelectedCurve] = useState<"fast" | "balanced" | "stable" | "aggressive">("balanced");
+  const [selectedLiquidity, setSelectedLiquidity] = useState<string>("fair");
+  const [devAllocation, setDevAllocation] = useState<number>(0);
+  const [isAdvancedMode, setIsAdvancedMode] = useState<boolean>(false);
+
+  // AI Prompt State
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [generatingStep, setGeneratingStep] = useState<number>(0);
+
   const isTickerValid = useMemo(() => {
     return formData.ticker.length >= 2 && formData.ticker.length <= 10 && /^[A-Z0-9]+$/.test(formData.ticker);
   }, [formData.ticker]);
 
-  const handleDeploy = () => {
-    deployToken(formData, imageFile);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const handleDeploy = async () => {
+    try {
+      await deployToken(formData, imageFile);
+    } catch (e) {
+      console.error("Deploy failed", e);
+    }
   };
 
   const simulateAIGeneration = async () => {
+    if (!aiPrompt) return;
     setGeneratingStep(1);
-    
-    setTimeout(() => setGeneratingStep(2), 1500);
-    setTimeout(() => setGeneratingStep(3), 3000);
-    
+    await new Promise((r) => setTimeout(r, 1200));
+    setGeneratingStep(2);
+    await new Promise((r) => setTimeout(r, 1400));
+    setGeneratingStep(3);
+    await new Promise((r) => setTimeout(r, 1000));
+
     try {
-      const res = await fetch("/api/generate-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setFormData({
-          ...formData,
-          name: data.name || "",
-          ticker: data.ticker || "",
-          description: data.description || "",
-        });
-        if (data.suggestedCurve) setSelectedCurve(data.suggestedCurve);
-        if (data.suggestedLiquidity) setSelectedLiquidity(data.suggestedLiquidity);
-      } else {
-        throw new Error("API error");
-      }
-    } catch(e) {
-      await new Promise(r => setTimeout(r, 4500));
-      const prefixes = ["Neon", "Cyber", "Quantum", "Aero", "Luna", "Astro", "Nova", "Plasma"];
-      const suffixes = ["Doge", "Inu", "Flux", "Sync", "Pulse", "Node", "Byte", "Chain"];
-      
+      const prefixes = ["NEO", "CYBER", "QUANTUM", "SOL", "FLUX", "LUNA", "HYPER", "ASTRO"];
       const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
       const words = aiPrompt.split(' ');
       const userWord = words.find(w => w.length > 3) || "Token";
@@ -209,7 +110,7 @@ export default function LaunchPage() {
         ...formData,
         name: mockName,
         ticker: mockTicker,
-        description: `Forged in the digital ether. Inspired by: ${aiPrompt}. This token harnesses the power of the MoonFluxx protocol to deliver blazing fast community growth.`,
+        description: `Forged in the digital ether. Inspired by: ${aiPrompt}. This token harnesses the power of the MoonFluxx protocol to deliver community growth.`,
       });
       setSelectedCurve(Math.random() > 0.5 ? "fast" : "balanced");
     } finally {
@@ -237,527 +138,381 @@ export default function LaunchPage() {
   };
 
   const CURVES: CurveOption[] = [
-    { id: 'fast', name: 'Fast Launch', desc: 'High velocity. Great for tokens.', risk: 'High', color: '#F43F5E', svg: 'M0,25 L10,22 L20,15 L30,5 L40,0', icon: <Flame className="w-4 h-4" /> },
-    { id: 'balanced', name: 'Balanced', desc: 'Steady growth for early believers.', risk: 'Medium', color: '#F59E0B', recommended: true, svg: 'M0,25 L10,22 L20,18 L30,12 L40,0', icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'stable', name: 'Stable', desc: 'Slow and steady for long-term.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0', icon: <Shield className="w-4 h-4" /> },
-    { id: 'aggressive', name: 'Aggressive', desc: 'Max degenerate mode.', risk: 'Very High', color: '#8B5CF6', svg: 'M0,25 L10,20 L20,10 L30,2 L40,0', icon: <Zap className="w-4 h-4" /> }
+    { id: 'fast', name: 'Fast Launch', desc: 'High velocity momentum.', risk: 'High', color: '#F43F5E', svg: 'M0,25 L10,22 L20,15 L30,5 L40,0', icon: <Flame className="w-4 h-4" /> },
+    { id: 'balanced', name: 'Balanced', desc: 'Steady growth curve.', risk: 'Medium', color: '#F59E0B', recommended: true, svg: 'M0,25 L10,22 L20,18 L30,12 L40,0', icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'stable', name: 'Stable', desc: 'Low volatility growth.', risk: 'Low', color: '#10B981', svg: 'M0,25 L10,23 L20,20 L30,15 L40,0', icon: <Shield className="w-4 h-4" /> },
+    { id: 'aggressive', name: 'Aggressive', desc: 'Max Degen mode.', risk: 'Very High', color: '#8B5CF6', svg: 'M0,25 L10,20 L20,10 L30,2 L40,0', icon: <Zap className="w-4 h-4" /> }
   ];
 
   const devSolCost = ((devAllocation / 100) * 85).toFixed(2);
 
+  // Brutalist style helpers
+  const bBorder = isDark ? "border-2 border-[rgba(255,255,255,0.2)]" : "border-3 border-black";
+  const bShadow = isDark ? "shadow-[6px_6px_0px_0px_#10B981]" : "shadow-[6px_6px_0px_0px_#000]";
+  const bBg = isDark ? "bg-[#050510]" : "bg-white";
+  const bText = isDark ? "text-white" : "text-black";
+  const bMuted = isDark ? "text-gray-400" : "text-gray-600";
+
   return (
-    <div className="max-w-3xl mx-auto w-full pt-4 pb-24 sm:pb-16 overflow-x-hidden">
+    <div className="max-w-4xl mx-auto w-full pt-4 pb-24 font-mono overflow-x-hidden">
       
       {/* ── INIT MODE SELECTION ── */}
       {mode === 'none' && (
-        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ duration: 0.6, ease: EASE }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
           
-          {/* Hero header with galaxy glow */}
-          <div className="text-center mb-12 relative">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] pointer-events-none opacity-[0.08] bg-[#6366F1] fluxx-nebula" />
-            <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full blur-[80px] pointer-events-none opacity-[0.05] bg-[#A78BFA] fluxx-drift-2" />
+          {/* Header Banner */}
+          <div className={`p-8 sm:p-12 mb-10 text-center relative overflow-hidden ${bBorder} ${bShadow} ${bBg}`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-black uppercase border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-black text-white border-black"}`}>
+              <Terminal className="w-4 h-4" /> TOKEN LAUNCHPAD FORGE
+            </div>
             
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-[rgba(99,102,241,0.08)] border border-[rgba(99,102,241,0.2)] rounded-full px-4 py-1.5 mb-6"
-            >
-              <Rocket className="w-3.5 h-3.5 text-[#818CF8]" />
-              <span className="text-xs font-bold text-[#A5B4FC] uppercase tracking-widest">Token Launchpad</span>
-            </motion.div>
-            
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-text-primary mb-4 display-safe relative z-10">
-              Launch Your{' '}
-              <span className="fluxx-text-flow">
-                Token
-              </span>
+            <h1 className={`text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight mb-4 ${bText}`}>
+              LAUNCH YOUR <span className="text-[#6366F1]">TOKEN</span>
             </h1>
-            <p className="text-text-secondary text-base sm:text-lg max-w-md mx-auto relative z-10">
-              Two ways to bring your token to life across chains.
+            <p className={`text-sm sm:text-base font-bold uppercase tracking-wider max-w-lg mx-auto ${bMuted}`}>
+              {">"} TWO WAYS TO FORGE YOUR TOKEN ON-CHAIN IN MINUTES.
             </p>
           </div>
           
-          {/* Mode Selection — 3D Cards */}
+          {/* Mode Selection Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* AI Launch Card */}
-            <MagneticButton as="div" strength={0.2} className="h-full">
-              <TiltCard
-                onClick={() => { setMode('ai'); setCurrentStep(1); }}
-                className="relative rounded-2xl overflow-hidden cursor-pointer group h-full"
-                intensity={6}
-              >
-                <div className="bg-[var(--color-surface-base)] backdrop-blur-2xl border border-[rgba(99,102,241,0.12)] rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-start gap-5 relative z-0 h-full transition-all duration-500 group-hover:border-[rgba(99,102,241,0.35)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.15)] fluxx-hover-shimmer">
-                  {/* Accent glow */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#6366F1] opacity-[0.06] blur-[60px] pointer-events-none rounded-full group-hover:opacity-[0.12] transition-opacity duration-500" />
-                  
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[rgba(99,102,241,0.2)] to-[rgba(167,139,250,0.1)] text-[#818CF8] flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.2)] border border-[rgba(99,102,241,0.2)] fluxx-float-slow">
-                    <Sparkles className="w-7 h-7" />
+            <div 
+              onClick={() => { setMode('ai'); setCurrentStep(1); }}
+              className={`p-6 sm:p-8 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-1 hover:translate-x-0.5 group`}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-6">
+                  <div className={`w-14 h-14 border-2 flex items-center justify-center ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
+                    <Sparkles className="w-8 h-8" />
                   </div>
-                  
-                  <div>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary display-safe mb-2">AI Launch</h2>
-                    <p className="text-text-secondary text-sm leading-relaxed">
-                      Describe your idea. Our AI creates the perfect token narrative, name, and settings for you.
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 mt-auto">
-                    <span className="text-[10px] uppercase font-bold tracking-widest bg-[rgba(16,185,129,0.1)] text-[#10B981] px-3 py-1 rounded-full border border-[rgba(16,185,129,0.2)]">
-                      Recommended
-                    </span>
-                    <span className="text-xs text-text-muted font-mono">~2 min</span>
-                  </div>
-                  
-                  <div className="w-full h-12 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#4F46E5] flex items-center justify-center text-white font-bold text-sm shadow-[0_0_25px_rgba(99,102,241,0.35)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] transition-shadow duration-500">
-                    Start with AI
-                  </div>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 border ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#10B981] text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
+                    RECOMMENDED
+                  </span>
                 </div>
-              </TiltCard>
-            </MagneticButton>
+                
+                <h2 className={`text-2xl font-black uppercase mb-3 ${bText}`}>[ AI LAUNCH FORGE ]</h2>
+                <p className={`text-xs font-bold leading-relaxed mb-6 ${bMuted}`}>
+                  Describe your idea in plain text. Our AI generates the token narrative, name, ticker, and optimal launch settings automatically.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <span className={`text-[10px] font-black uppercase ${isDark ? "text-[#10B981]" : "text-black"}`}>ESTIMATED TIME: ~2 MINS</span>
+                <div className={`w-full py-3.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-[#6366F1] text-white border-white group-hover:bg-[#10B981] group-hover:text-black" : "bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
+                  [ START WITH AI ]
+                </div>
+              </div>
+            </div>
             
             {/* Custom Launch Card */}
-            <MagneticButton as="div" strength={0.2} className="h-full">
-              <TiltCard
-                onClick={() => { setMode('custom'); setCurrentStep(1); }}
-                className="relative rounded-2xl overflow-hidden cursor-pointer group h-full"
-                intensity={6}
-              >
-                <div className="bg-[var(--color-surface-base)] backdrop-blur-2xl border border-[rgba(99,102,241,0.08)] rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-start gap-5 relative z-0 h-full transition-all duration-500 group-hover:border-[rgba(99,102,241,0.25)] group-hover:shadow-[0_0_30px_rgba(99,102,241,0.1)] fluxx-hover-shimmer">
-                  <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface-1)] text-text-secondary flex items-center justify-center border border-border-subtle group-hover:text-[#818CF8] group-hover:border-[rgba(99,102,241,0.2)] transition-all duration-500">
-                    <Settings className="w-7 h-7" />
+            <div 
+              onClick={() => { setMode('custom'); setCurrentStep(1); }}
+              className={`p-6 sm:p-8 flex flex-col justify-between cursor-pointer transition-all ${bBorder} ${bShadow} ${bBg} hover:-translate-y-1 hover:translate-x-0.5 group`}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-6">
+                  <div className={`w-14 h-14 border-2 flex items-center justify-center ${isDark ? "border-white bg-white/10 text-white" : "border-black bg-gray-100 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
+                    <Settings className="w-8 h-8" />
                   </div>
-                  
-                  <div>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary display-safe mb-2">Custom Launch</h2>
-                    <p className="text-text-secondary text-sm leading-relaxed">
-                      Full control. Set your own name, ticker, curve, and liquidity options.
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 mt-auto">
-                    <span className="text-[10px] uppercase font-bold tracking-widest bg-[var(--color-surface-1)] text-text-muted px-3 py-1 rounded-full border border-border-subtle">
-                      For experienced creators
-                    </span>
-                    <span className="text-xs text-text-muted font-mono">~5 min</span>
-                  </div>
-                  
-                  <div className="w-full h-12 rounded-xl bg-[var(--color-surface-1)] border border-[rgba(99,102,241,0.15)] flex items-center justify-center text-text-secondary font-bold text-sm group-hover:text-text-primary group-hover:border-[rgba(99,102,241,0.3)] group-hover:bg-[rgba(99,102,241,0.08)] transition-all duration-500">
-                    Start Custom
-                  </div>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 border ${isDark ? "bg-black text-gray-300 border-gray-600" : "bg-gray-200 text-black border-black"}`}>
+                    MANUAL CONTROL
+                  </span>
                 </div>
-              </TiltCard>
-            </MagneticButton>
+                
+                <h2 className={`text-2xl font-black uppercase mb-3 ${bText}`}>[ CUSTOM LAUNCH ]</h2>
+                <p className={`text-xs font-bold leading-relaxed mb-6 ${bMuted}`}>
+                  Full manual control. Define your token name, symbol, description, bonding curve parameters, and initial liquidity.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <span className={`text-[10px] font-black uppercase ${bMuted}`}>ESTIMATED TIME: ~5 MINS</span>
+                <div className={`w-full py-3.5 text-center text-xs font-black uppercase border-2 transition-all ${isDark ? "bg-black text-white border-white hover:border-[#10B981]" : "bg-white text-black border-black shadow-[4px_4px_0px_0px_#000] group-hover:bg-black group-hover:text-white"}`}>
+                  [ START CUSTOM ]
+                </div>
+              </div>
+            </div>
+
           </div>
-          
-          {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-6 mt-10 text-text-muted text-xs">
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5" />
-              <span>Audited Contracts</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-[rgba(99,102,241,0.3)]" />
-            <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Instant Deployment</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-[rgba(99,102,241,0.3)]" />
-            <div className="flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Multi-Chain</span>
-            </div>
+
+          {/* Trust Indicators */}
+          <div className={`flex flex-wrap items-center justify-center gap-6 mt-12 p-4 border ${isDark ? "border-[rgba(255,255,255,0.1)] bg-black/40 text-gray-400" : "border-black bg-gray-50 text-black"} text-xs font-black uppercase`}>
+            <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#10B981]" /> AUDITED CONTRACTS</div>
+            <span>//</span>
+            <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-[#F59E0B]" /> INSTANT DEPLOYMENT</div>
+            <span>//</span>
+            <div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#6366F1]" /> MULTI-CHAIN</div>
           </div>
         </motion.div>
       )}
 
-      {/* ── SHARED LAYOUT FOR AI/CUSTOM ── */}
+      {/* ── SHARED FORM FOR AI & CUSTOM MODE ── */}
       {mode !== 'none' && (
-        <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-50px' }}>
-          <button onClick={resetLaunch} className="text-text-muted hover:text-text-primary text-sm flex items-center gap-1.5 mb-8 transition-colors group focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
-            <span className="group-hover:-translate-x-1 transition-transform">←</span> Cancel Launch
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          
+          {/* Back Button */}
+          <button 
+            onClick={resetLaunch} 
+            className={`flex items-center gap-2 mb-6 px-3 py-1.5 text-xs font-black uppercase border transition-all ${isDark ? "bg-black text-gray-300 border-gray-700 hover:text-white hover:border-white" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}
+          >
+            <ArrowLeft size={14} /> [ CANCEL & RETURN ]
           </button>
           
           <StepIndicator
-            labels={mode === 'ai' ? ['Describe', 'Review', 'Deploy'] : ['Details', 'Settings', 'Deploy']}
+            labels={mode === 'ai' ? ['DESCRIBE', 'REVIEW', 'DEPLOY'] : ['DETAILS', 'SETTINGS', 'DEPLOY']}
             currentStep={currentStep}
+            isDark={isDark}
           />
 
-          {/* Main form panel — 3D glassmorphic */}
-          <TiltCard className="relative rounded-2xl overflow-hidden" intensity={3}>
-            <div className="bg-[var(--color-surface-base)] backdrop-blur-2xl border border-[rgba(99,102,241,0.10)] rounded-2xl p-4 sm:p-6 md:p-10 relative overflow-hidden">
-              {/* Nebula background glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#6366F1] opacity-[0.025] blur-[120px] pointer-events-none rounded-full" />
-              <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[#A78BFA] opacity-[0.02] blur-[80px] pointer-events-none rounded-full" />
+          {/* Main Form Box */}
+          <div className={`p-6 sm:p-10 ${bBorder} ${bShadow} ${bBg}`}>
+            
+            <AnimatePresence mode="wait">
+              
+              {/* AI STEP 1: Describe */}
+              {mode === 'ai' && currentStep === 1 && (
+                <motion.div key="ai-step-1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center text-center">
+                  <div className={`w-16 h-16 border-2 flex items-center justify-center mb-4 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]"}`}>
+                    <Sparkles className="w-8 h-8" />
+                  </div>
+                  <h2 className={`text-2xl sm:text-3xl font-black uppercase mb-2 ${bText}`}>[ WHAT IS YOUR TOKEN ABOUT? ]</h2>
+                  <p className={`text-xs sm:text-sm font-bold uppercase mb-6 max-w-md ${bMuted}`}>
+                    DESCRIBE YOUR TOKEN IDEA AND AI WILL FORGE NAME, TICKER & PARAMETERS.
+                  </p>
+                  
+                  <textarea 
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    disabled={generatingStep > 0}
+                    placeholder="E.g. 'A meme coin for cat lovers on Solana with community rewards and 100% fair launch...'"
+                    className={`w-full max-w-xl h-36 border-2 p-4 text-xs sm:text-sm font-bold uppercase outline-none resize-none mb-2 ${
+                      isDark 
+                        ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' 
+                        : 'bg-gray-50 text-black border-black focus:bg-white shadow-[4px_4px_0px_0px_#000]'
+                    }`}
+                  />
+                  <div className={`text-[10px] font-mono mb-6 ${bMuted}`}>{aiPrompt.length} / 280 CHARS</div>
+                  
+                  <button 
+                    onClick={simulateAIGeneration}
+                    disabled={aiPrompt.length < 5 || generatingStep > 0}
+                    className={`w-full max-w-sm py-4 text-xs font-black uppercase border-2 transition-all flex items-center justify-center gap-2 ${
+                      isDark 
+                        ? 'bg-[#10B981] text-black border-[#10B981] hover:bg-[#059669] disabled:opacity-40' 
+                        : 'bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40'
+                    }`}
+                  >
+                    {generatingStep > 0 ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {generatingStep === 0 && "[ GENERATE TOKEN IDENTITY ]"}
+                    {generatingStep === 1 && "ANALYZING PROMPT..."}
+                    {generatingStep === 2 && "FORGING TOKENOMICS..."}
+                    {generatingStep === 3 && "FINALIZING DETAILS..."}
+                  </button>
+                </motion.div>
+              )}
 
-              <AnimatePresence mode="wait">
-                {/* AI STEP 1: Describe */}
-                {mode === 'ai' && currentStep === 1 && (
-                  <motion.div key="ai-step-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center text-center relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[rgba(99,102,241,0.15)] to-[rgba(167,139,250,0.08)] text-[#818CF8] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.15)]">
-                      <Sparkles className="w-8 h-8" />
+              {/* DETAILS / REVIEW STEP */}
+              {((mode === 'custom' && currentStep === 1) || (mode === 'ai' && currentStep === 2)) && (
+                <motion.div key="details-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
+                  <div className="border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <h2 className={`text-xl sm:text-2xl font-black uppercase ${bText}`}>
+                      {mode === 'ai' ? "[ REVIEW AI CREATION ]" : "[ TOKEN DETAILS ]"}
+                    </h2>
+                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>
+                      {mode === 'ai' ? 'EDIT ANY GENERATED DETAILS BEFORE CONTINUING.' : 'ENTER YOUR TOKEN IDENTITY.'}
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div>
+                      <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>TOKEN NAME *</label>
+                      <input 
+                        type="text" 
+                        value={formData.name} 
+                        onChange={e => setFormData({...formData, name: e.target.value})} 
+                        className={`w-full border-2 p-3 text-xs font-bold uppercase outline-none ${
+                          isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
+                        }`} 
+                        placeholder="E.G. MOON FLUX"
+                      />
                     </div>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary mb-2 display-safe">What's your token about?</h2>
-                    <p className="text-text-muted text-sm mb-8 max-w-md">Describe your idea and our AI will forge the perfect token identity, narrative, and launch parameters.</p>
-                    
+                    {/* Ticker */}
+                    <div>
+                      <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>TICKER SYMBOL *</label>
+                      <div className="relative">
+                        <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black ${bMuted}`}>$</span>
+                        <input 
+                          type="text" 
+                          value={formData.ticker} 
+                          onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} 
+                          maxLength={10} 
+                          className={`w-full border-2 p-3 pl-7 text-xs font-bold uppercase outline-none ${
+                            isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
+                          }`} 
+                          placeholder="FLUX"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Description */}
+                  <div>
+                    <label className={`block text-xs font-black uppercase mb-2 ${bText}`}>DESCRIPTION *</label>
                     <textarea 
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      disabled={generatingStep > 0}
-                      placeholder="E.g. 'A token token for dog lovers with auto-burn and community rewards'"
-                      className="w-full max-w-xl h-36 bg-[var(--color-surface-2)] border border-[rgba(99,102,241,0.15)] hover:border-[rgba(99,102,241,0.3)] rounded-2xl p-5 text-text-primary placeholder:text-text-faint focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] focus:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all resize-none mb-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-relaxed"
+                      value={formData.description} 
+                      onChange={e => setFormData({...formData, description: e.target.value})} 
+                      className={`w-full h-24 border-2 p-3 text-xs font-bold uppercase outline-none resize-none ${
+                        isDark ? 'bg-black text-white border-[rgba(255,255,255,0.2)] focus:border-[#10B981]' : 'bg-gray-50 text-black border-black focus:bg-white'
+                      }`} 
                     />
-                    <div className="text-xs text-text-faint font-mono mb-8">{aiPrompt.length} / 280</div>
-                    
-                    <button 
-                      onClick={simulateAIGeneration}
-                      disabled={aiPrompt.length < 10 || generatingStep > 0}
-                      className="flex items-center gap-3 px-10 py-4 w-full max-w-xs justify-center rounded-xl font-bold text-white bg-gradient-to-r from-[#6366F1] to-[#4F46E5] shadow-[0_0_25px_rgba(99,102,241,0.35)] hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] disabled:opacity-40 disabled:shadow-none transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none relative overflow-hidden"
-                    >
-                      {generatingStep > 0 && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />}
-                      {generatingStep > 0 ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                      {generatingStep === 0 && "Generate Token"}
-                      {generatingStep === 1 && "Analyzing prompt..."}
-                      {generatingStep === 2 && "Forging tokenomics..."}
-                      {generatingStep === 3 && "Finalizing contract..."}
-                    </button>
-                    <p className="text-xs text-text-faint mt-5 max-w-sm">AI generates name, ticker, description, and recommended curve settings</p>
-                  </motion.div>
-                )}
+                  </div>
 
-                {/* CUSTOM STEP 1: Details OR AI STEP 2: Review */}
-                {((mode === 'custom' && currentStep === 1) || (mode === 'ai' && currentStep === 2)) && (
-                  <motion.div key="details-step" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col gap-6 relative z-10">
-                    <div className="mb-2">
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary display-safe">{mode === 'ai' ? "Review AI's Creation" : "Token Details"}</h2>
-                      <p className="text-text-muted text-sm mt-1">{mode === 'ai' ? 'Edit anything before continuing.' : 'Fill in your token identity.'}</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      {/* Name field */}
-                      <div>
-                        <label className="block text-sm font-semibold text-text-secondary mb-2 flex justify-between items-center">
-                          <span>Name {mode==='custom' && <span className="text-[#F43F5E]">*</span>}</span>
-                          {formData.name.length > 0 ? (
-                            <span className="text-[#10B981] flex items-center gap-1 text-xs"><CheckCircle2 className="w-3.5 h-3.5" /></span>
-                          ) : (
-                            <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> Required</span>
-                          )}
-                        </label>
-                        <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className={`w-full bg-[var(--color-surface-2)] rounded-xl p-3.5 text-text-primary focus:outline-none transition-all text-sm border ${formData.name.length > 0 ? 'border-[rgba(16,185,129,0.3)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] focus:shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-[rgba(99,102,241,0.12)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]'}`} />
-                      </div>
-                      {/* Ticker field */}
-                      <div>
-                        <label className="block text-sm font-semibold text-text-secondary mb-2 flex justify-between items-center">
-                          <span>Ticker {mode==='custom' && <span className="text-[#F43F5E]">*</span>}</span>
-                          {formData.ticker.length > 0 && (
-                            isTickerValid 
-                              ? <span className="text-[#10B981] flex items-center gap-1 text-xs"><CheckCircle2 className="w-3.5 h-3.5" /> Valid</span>
-                              : <span className="text-[#F43F5E] flex items-center gap-1 text-xs"><ShieldAlert className="w-3.5 h-3.5" /> 2-10 chars</span>
-                          )}
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted font-mono text-sm">$</span>
-                          <input type="text" value={formData.ticker} onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})} maxLength={10} className={`w-full bg-[var(--color-surface-2)] rounded-xl p-3.5 pl-8 text-text-primary focus:outline-none font-mono text-sm transition-all border ${formData.ticker.length > 0 ? (isTickerValid ? 'border-[rgba(16,185,129,0.3)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]' : 'border-[rgba(244,63,94,0.3)] focus:border-[#F43F5E] focus:ring-1 focus:ring-[#F43F5E]') : 'border-[rgba(99,102,241,0.12)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1]'}`} />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Description */}
+                  {/* Curve Options */}
+                  {mode === 'ai' && (
                     <div>
-                      <label className="block text-sm font-semibold text-text-secondary mb-2">Description {mode==='custom' && <span className="text-[#F43F5E]">*</span>}</label>
-                      <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className={`w-full h-28 bg-[var(--color-surface-2)] rounded-xl p-3.5 text-text-primary focus:outline-none resize-none text-sm leading-relaxed transition-all border ${formData.description.length > 0 ? 'border-[rgba(16,185,129,0.3)] focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]' : 'border-[rgba(99,102,241,0.12)] focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1]'}`} />
-                    </div>
-
-                    {/* AI Mode: Show Curve Selection */}
-                    {mode === 'ai' && (
-                      <div className="mt-2">
-                        <label className="block text-sm font-semibold text-text-secondary mb-4 flex items-center gap-2">
-                          Launch Settings
-                          <span className="text-[10px] bg-[rgba(99,102,241,0.1)] text-[#818CF8] px-2.5 py-0.5 rounded-full uppercase font-bold tracking-widest border border-[rgba(99,102,241,0.2)]">AI Rec</span>
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {CURVES.slice(0, 2).map(curve => (
-                            <div 
-                              key={curve.id} 
-                              onClick={() => setSelectedCurve(curve.id)}
-                              className={`p-5 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.06)] shadow-[0_0_20px_rgba(99,102,241,0.12)]' : 'border-[rgba(99,102,241,0.08)] bg-[var(--color-surface-1)] hover:border-[rgba(99,102,241,0.2)]'}`}
-                            >
-                              <div className="flex items-center gap-2 mb-2">
-                                <span style={{ color: curve.color }}>{curve.icon}</span>
-                                <h3 className="font-bold text-text-primary text-sm">{curve.name} Curve</h3>
-                              </div>
-                              <p className="text-xs text-text-muted mb-3">{curve.desc}</p>
-                              <div className="flex-1 min-h-[100px]">
-                                {selectedCurve === curve.id ? (
-                                  <BondingCurveChart curveType={curve.id} color={curve.color} />
-                                ) : (
-                                  <div className="w-full h-full flex items-end justify-end pb-2 opacity-40">
-                                    <svg viewBox="0 0 40 25" className="w-[60px] h-[35px]">
-                                      <path d={curve.svg} fill="none" stroke={curve.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Image Upload */}
-                    <div className="border border-dashed border-[rgba(99,102,241,0.2)] rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center text-center hover:bg-[rgba(99,102,241,0.03)] hover:border-[rgba(99,102,241,0.4)] transition-all cursor-pointer group">
-                      <div className="w-12 h-12 rounded-xl bg-[rgba(99,102,241,0.08)] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[rgba(99,102,241,0.15)] transition-all">
-                        <Upload className="w-5 h-5 text-[#6366F1]" />
-                      </div>
-                      <div className="text-sm font-semibold text-text-primary mb-1">Upload token image</div>
-                      <div className="text-xs text-text-faint">PNG, JPG up to 2MB (optional)</div>
-                    </div>
-                    
-                    {/* Navigation */}
-                    <div className="flex gap-4 mt-4">
-                      {mode === 'ai' ? (
-                        <>
-                          <button onClick={() => setCurrentStep(1)} className="flex-1 py-3.5 rounded-xl border border-[rgba(99,102,241,0.12)] text-text-secondary font-semibold hover:bg-[rgba(99,102,241,0.05)] hover:text-text-primary transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">Back</button>
-                          <button onClick={() => setCurrentStep(3)} disabled={!isTickerValid} className="flex-1 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#6366F1] to-[#4F46E5] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] disabled:opacity-40 disabled:shadow-none transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">Continue to Deploy</button>
-                        </>
-                      ) : (
-                        <button 
-                          onClick={() => setCurrentStep(2)}
-                          disabled={!formData.name || !formData.ticker || !formData.description || !isTickerValid}
-                          className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#6366F1] to-[#4F46E5] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] disabled:opacity-40 disabled:shadow-none transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                        >
-                          Continue to Settings
-                        </button>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* CUSTOM STEP 2: Settings */}
-                {mode === 'custom' && currentStep === 2 && (
-                  <motion.div key="settings-step" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col gap-4 sm:gap-6 md:gap-8 relative z-10">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary display-safe">Launch Settings</h2>
-                      <p className="text-text-muted text-sm mt-1">Configure your bonding curve and liquidity.</p>
-                    </div>
-                    
-                    {/* Curve Selection */}
-                    <div>
-                      <label className="block text-sm font-semibold text-text-secondary mb-4">Select Bonding Curve</label>
+                      <label className={`block text-xs font-black uppercase mb-3 ${bText}`}>BONDING CURVE CONFIG</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {CURVES.map(curve => (
+                        {CURVES.slice(0, 2).map(curve => (
                           <div 
                             key={curve.id} 
                             onClick={() => setSelectedCurve(curve.id)}
-                            className={`p-5 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col ${selectedCurve === curve.id ? 'border-[#6366F1] bg-[rgba(99,102,241,0.06)] shadow-[0_0_20px_rgba(99,102,241,0.12)] md:col-span-2' : 'border-[rgba(99,102,241,0.08)] bg-[var(--color-surface-1)] hover:border-[rgba(99,102,241,0.2)]'}`}
+                            className={`p-4 border-2 cursor-pointer transition-all ${
+                              selectedCurve === curve.id 
+                                ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]' 
+                                : isDark ? 'border-gray-800 bg-black text-gray-400' : 'border-gray-300 bg-white text-black'
+                            }`}
                           >
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center gap-2">
-                                <span style={{ color: curve.color }}>{curve.icon}</span>
-                                <h3 className="font-bold text-text-primary text-sm">{curve.name}</h3>
-                              </div>
-                              {curve.recommended && selectedCurve !== curve.id && <span className="text-[10px] bg-[rgba(99,102,241,0.1)] text-[#818CF8] px-2 py-0.5 rounded-full uppercase font-bold border border-[rgba(99,102,241,0.2)]">Rec</span>}
+                            <div className="flex items-center gap-2 mb-1">
+                              {curve.icon}
+                              <h3 className="font-black text-xs uppercase">{curve.name}</h3>
                             </div>
-                            <p className={`text-text-muted ${selectedCurve === curve.id ? 'text-sm mb-4' : 'text-xs mb-2'}`}>{curve.desc}</p>
-                            
-                            <div className="flex-1 w-full min-h-[60px] flex items-end">
-                              {selectedCurve === curve.id ? (
-                                <div className="w-full h-[150px]">
-                                  <BondingCurveChart curveType={curve.id} color={curve.color} />
-                                </div>
-                              ) : (
-                                <div className="w-full flex justify-between items-end group">
-                                  <span className="text-[10px] uppercase font-bold tracking-wider font-mono" style={{ color: curve.color }}>{curve.risk}</span>
-                                  <svg viewBox="0 0 40 25" className="w-[40px] h-[25px] opacity-40 group-hover:opacity-80 transition-opacity">
-                                    <motion.path 
-                                      initial={{ pathLength: 0 }}
-                                      animate={{ pathLength: 1 }}
-                                      transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: "linear" }}
-                                      d={curve.svg} 
-                                      fill="none" 
-                                      stroke={curve.color} 
-                                      strokeWidth="2" 
-                                      strokeLinecap="round" 
-                                      strokeLinejoin="round" 
-                                    />
-                                  </svg>
-                                </div>
-                              )}
-                            </div>
+                            <p className="text-[10px] font-bold uppercase mb-2 opacity-80">{curve.desc}</p>
                           </div>
                         ))}
                       </div>
                     </div>
-                    
-                    {/* Liquidity Split */}
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <label className="block text-sm font-semibold text-text-secondary">Liquidity Split</label>
-                        <button 
-                          onClick={() => setIsAdvancedMode(!isAdvancedMode)}
-                          className={`text-xs font-bold px-4 py-1.5 rounded-full border transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${isAdvancedMode ? 'bg-[rgba(139,92,246,0.1)] border-[#8B5CF6] text-[#A78BFA] shadow-[0_0_15px_rgba(139,92,246,0.2)]' : 'bg-transparent border-border-subtle text-text-muted hover:text-text-primary hover:border-border-default'}`}
-                        >
-                          {isAdvancedMode ? 'Advanced: ON' : 'Advanced'}
-                        </button>
-                      </div>
-                      
-                      <AnimatePresence mode="wait">
-                        {isAdvancedMode ? (
-                          <motion.div key="advanced" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="p-6 rounded-xl border border-[#8B5CF6] bg-[rgba(139,92,246,0.04)] shadow-[0_0_25px_rgba(139,92,246,0.08)] overflow-hidden">
-                            <div className="flex justify-between items-center mb-6">
-                              <div>
-                                <div className="font-bold text-text-primary text-lg">{devAllocation}% Dev Allocation</div>
-                                <div className="text-sm text-text-muted">Tokens reserved for creator</div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-bold text-[#10B981] text-lg">{100 - devAllocation}% Pool</div>
-                                <div className="text-sm text-text-muted">Initial liquidity</div>
-                              </div>
-                            </div>
-                            
-                            <div className="relative pt-4 pb-2">
-                              <input 
-                                type="range" 
-                                min="0" 
-                                max="50" 
-                                step="1"
-                                value={devAllocation} 
-                                onChange={(e) => setDevAllocation(Number(e.target.value))}
-                                className="w-full h-2 bg-[var(--color-surface-2)] rounded-lg appearance-none cursor-pointer accent-[#8B5CF6] border border-[rgba(139,92,246,0.2)] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                              />
-                              <div className="absolute top-[28px] pointer-events-none" style={{ left: `calc(${devAllocation * 2}% - 14px)` }}>
-                                 <motion.div layout className="bg-[#8B5CF6] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-[0_0_12px_rgba(139,92,246,0.4)]">
-                                   {devSolCost} SOL
-                                 </motion.div>
-                              </div>
-                              <div className="flex justify-between text-xs text-text-faint mt-6 font-mono">
-                                <span>0% (0 SOL)</span>
-                                <span>25% (~21 SOL)</span>
-                                <span>50% (~42 SOL)</span>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ) : (
-                          <motion.div key="simple" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col gap-3">
-                            {[
-                              { id: 'fair', label: 'Fair Launch', desc: '100% to liquidity pool. Maximum community trust.', rec: true },
-                              { id: 'standard', label: 'Standard', desc: '70% pool / 30% dev allocation for operations.', rec: false }
-                            ].map(opt => (
-                              <div 
-                                key={opt.id}
-                                onClick={() => {
-                                  setSelectedLiquidity(opt.id);
-                                  setDevAllocation(opt.id === 'fair' ? 0 : 30);
-                                }}
-                                className={`p-5 rounded-xl border flex items-center gap-4 cursor-pointer transition-all duration-300 ${selectedLiquidity === opt.id ? 'border-[#10B981] bg-[rgba(16,185,129,0.04)] shadow-[0_0_20px_rgba(16,185,129,0.08)]' : 'border-[rgba(99,102,241,0.08)] bg-[var(--color-surface-1)] hover:border-[rgba(99,102,241,0.2)]'}`}
-                              >
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedLiquidity === opt.id ? 'border-[#10B981]' : 'border-[#334155]'}`}>
-                                  {selectedLiquidity === opt.id && <motion.div layoutId="liq-dot" className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="font-bold text-text-primary flex items-center gap-2 text-sm">
-                                    {opt.label}
-                                    {opt.rec && <span className="text-[10px] bg-[rgba(16,185,129,0.1)] text-[#10B981] px-2 py-0.5 rounded-full uppercase font-bold border border-[rgba(16,185,129,0.2)]">Recommended</span>}
-                                  </div>
-                                  <div className="text-sm text-text-muted">{opt.desc}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    
-                    <div className="flex gap-4 mt-2">
-                      <button onClick={() => setCurrentStep(1)} className="flex-1 py-3.5 rounded-xl border border-[rgba(99,102,241,0.12)] text-text-secondary font-semibold hover:bg-[rgba(99,102,241,0.05)] hover:text-text-primary transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">Back</button>
-                      <button onClick={() => setCurrentStep(3)} className="flex-1 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#6366F1] to-[#4F46E5] shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">Review & Deploy</button>
-                    </div>
-                  </motion.div>
-                )}
-                
-                {/* SHARED STEP 3: Deploy */}
-                {currentStep === 3 && (
-                  <motion.div key="deploy-step" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col gap-6 relative z-10">
-                    <div className="text-center mb-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[rgba(16,185,129,0.15)] to-[rgba(16,185,129,0.05)] flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-                        <Rocket className="w-8 h-8 text-[#10B981]" />
-                      </div>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary display-safe">Ready to Deploy</h2>
-                      <p className="text-text-muted text-sm mt-1">Review your token details before launching.</p>
-                    </div>
-                    
-                    {/* Token Summary Card */}
-                    <div className="bg-[var(--color-surface-2)] rounded-2xl p-6 border border-[rgba(99,102,241,0.12)] flex flex-col gap-4 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-40 h-40 bg-[rgba(99,102,241,0.06)] blur-[60px] rounded-full pointer-events-none" />
-                      
-                      <div className="flex justify-between items-center relative z-10">
-                        <span className="text-text-muted text-sm">Token</span>
-                        <span className="font-bold text-text-primary text-lg">{formData.name} <span className="text-[#818CF8] font-mono ml-1">${formData.ticker}</span></span>
-                      </div>
-                      <div className="flex justify-between items-start relative z-10">
-                        <span className="text-text-muted text-sm whitespace-nowrap mr-8">Description</span>
-                        <span className="text-text-secondary text-right text-sm line-clamp-3">{formData.description}</span>
-                      </div>
-                      <div className="flex justify-between items-center relative z-10">
-                        <span className="text-text-muted text-sm">Bonding Curve</span>
-                        <span className="text-[#10B981] capitalize font-bold text-sm">{selectedCurve}</span>
-                      </div>
-                      
-                      <div className="h-px bg-[rgba(99,102,241,0.08)] my-1" />
-                      
-                      {/* Transaction Receipt */}
-                      <div className="bg-[var(--color-surface-base)] rounded-xl p-5 border border-[rgba(99,102,241,0.08)] space-y-3">
-                         <div className="flex justify-between items-center text-sm">
-                           <span className="text-text-muted">Dev Allocation ({devAllocation}%)</span>
-                           <span className="font-mono text-text-primary">{devSolCost} SOL</span>
-                         </div>
-                         <div className="flex justify-between items-center text-sm">
-                           <span className="text-text-muted">Network Fee</span>
-                           <span className="font-mono text-text-primary">0.002 SOL</span>
-                         </div>
-                         <div className="flex justify-between items-center text-sm">
-                           <span className="text-text-muted">Platform Fee</span>
-                           <span className="font-mono text-[#10B981]">--</span>
-                         </div>
-                         <div className="h-px bg-[rgba(99,102,241,0.1)] w-full" />
-                         <div className="flex justify-between items-center font-bold">
-                           <span className="text-text-primary">Total Cost</span>
-                           <span className="font-mono text-[#F59E0B] text-lg">
-                             ~{(Number(devSolCost) + 0.002).toFixed(3)} SOL
-                           </span>
-                         </div>
-                      </div>
+                  )}
 
-                      <div className="flex justify-between items-center relative z-10 mt-1">
-                        <span className="text-text-muted text-sm">Network</span>
-                        <span className="text-text-primary font-semibold text-sm">Multi-Chain Deployment</span>
-                      </div>
-                    </div>
-                    
-                    {/* Deploy Actions */}
-                    <div className="flex gap-4 mt-2">
-                      <button onClick={() => setCurrentStep(mode === 'ai' ? 2 : 2)} className="py-4 px-6 rounded-xl border border-[rgba(99,102,241,0.12)] text-text-secondary font-semibold hover:bg-[rgba(99,102,241,0.05)] hover:text-text-primary transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">Back</button>
+                  {/* Navigation */}
+                  <div className="flex gap-4 pt-4 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                    {mode === 'ai' ? (
+                      <>
+                        <button onClick={() => setCurrentStep(1)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                        <button onClick={() => setCurrentStep(3)} disabled={!isTickerValid || !formData.name} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] disabled:opacity-40"}`}>[ CONTINUE TO DEPLOY ]</button>
+                      </>
+                    ) : (
                       <button 
-                        onClick={handleDeploy}
-                        disabled={isDeploying || !anchorWallet}
-                        className={`flex-1 py-4 text-lg rounded-xl flex items-center justify-center gap-3 font-bold text-white transition-all duration-300 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
-                          isDeploying 
-                            ? 'bg-gradient-to-r from-[#6366F1] to-[#4F46E5] animate-pulse shadow-[0_0_40px_rgba(99,102,241,0.5)]' 
-                            : 'bg-gradient-to-r from-[#6366F1] to-[#4F46E5] shadow-[0_0_25px_rgba(99,102,241,0.35)] hover:shadow-[0_0_45px_rgba(99,102,241,0.5)]'
-                        }`}
+                        onClick={() => setCurrentStep(2)}
+                        disabled={!formData.name || !formData.ticker || !formData.description || !isTickerValid}
+                        className={`w-full py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981] disabled:opacity-40" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000] disabled:opacity-40"}`}
                       >
-                        {isDeploying ? <Loader2 className="w-6 h-6 animate-spin" /> : <Rocket className="w-6 h-6" />}
-                        {isDeploying ? "Deploying Token..." : !anchorWallet ? "Connect Wallet to Deploy" : "Launch Token"}
+                        [ CONTINUE TO SETTINGS ]
                       </button>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* CUSTOM STEP 2: Settings */}
+              {mode === 'custom' && currentStep === 2 && (
+                <motion.div key="settings-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
+                  <div className="border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <h2 className={`text-xl sm:text-2xl font-black uppercase ${bText}`}>[ LAUNCH SETTINGS ]</h2>
+                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>CONFIGURE BONDING CURVE & LIQUIDITY SPLIT.</p>
+                  </div>
+                  
+                  {/* Curve Selection */}
+                  <div>
+                    <label className={`block text-xs font-black uppercase mb-3 ${bText}`}>SELECT BONDING CURVE</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {CURVES.map(curve => (
+                        <div 
+                          key={curve.id} 
+                          onClick={() => setSelectedCurve(curve.id)}
+                          className={`p-4 border-2 cursor-pointer transition-all ${
+                            selectedCurve === curve.id 
+                              ? isDark ? 'border-[#10B981] bg-[#10B981]/10 text-white' : 'border-black bg-yellow-300 text-black shadow-[3px_3px_0px_0px_#000]' 
+                              : isDark ? 'border-gray-800 bg-black text-gray-400' : 'border-gray-300 bg-white text-black'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            {curve.icon}
+                            <h3 className="font-black text-xs uppercase">{curve.name}</h3>
+                          </div>
+                          <p className="text-[10px] font-bold uppercase opacity-80">{curve.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4 border-t" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                    <button onClick={() => setCurrentStep(1)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                    <button onClick={() => setCurrentStep(3)} className={`flex-1 py-3.5 text-xs font-black uppercase border-2 ${isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#6366F1] text-white border-black shadow-[3px_3px_0px_0px_#000]"}`}>[ REVIEW & DEPLOY ]</button>
+                  </div>
+                </motion.div>
+              )}
+              
+              {/* STEP 3: Deploy */}
+              {currentStep === 3 && (
+                <motion.div key="deploy-step" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
+                  <div className="text-center border-b pb-4" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }}>
+                    <div className={`w-14 h-14 border-2 flex items-center justify-center mx-auto mb-3 ${isDark ? "border-[#10B981] bg-[#10B981]/10 text-[#10B981]" : "border-black bg-[#10B981] text-black shadow-[3px_3px_0px_0px_#000]"}`}>
+                      <Rocket className="w-7 h-7" />
+                    </div>
+                    <h2 className={`text-2xl font-black uppercase ${bText}`}>[ READY TO DEPLOY ]</h2>
+                    <p className={`text-xs font-bold uppercase mt-1 ${bMuted}`}>REVIEW YOUR TOKEN RECEIPT BEFORE LAUNCHING ON-CHAIN.</p>
+                  </div>
+                  
+                  {/* Receipt Box */}
+                  <div className={`p-6 border-2 flex flex-col gap-3 ${isDark ? "border-white bg-black" : "border-black bg-gray-50 shadow-[4px_4px_0px_0px_#000]"}`}>
+                    <div className="flex justify-between text-xs font-black uppercase">
+                      <span>TOKEN NAME:</span>
+                      <span className="text-[#6366F1]">{formData.name}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-black uppercase">
+                      <span>TICKER SYMBOL:</span>
+                      <span className="text-[#6366F1]">${formData.ticker}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-black uppercase">
+                      <span>BONDING CURVE:</span>
+                      <span className="text-[#10B981]">{selectedCurve}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-black uppercase">
+                      <span>NETWORK:</span>
+                      <span>SOLANA MULTI-CHAIN</span>
                     </div>
                     
-                    <p className="text-xs text-center text-text-faint">By launching, you agree to our Terms. Tokens deployed on-chain cannot be deleted after launch.</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </TiltCard>
+                    <div className="border-t my-2" style={{ borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'black' }} />
+
+                    <div className="flex justify-between text-sm font-black uppercase">
+                      <span>ESTIMATED COST:</span>
+                      <span className="text-[#F59E0B]">~0.002 SOL</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4 pt-2">
+                    <button onClick={() => setCurrentStep(2)} className={`py-4 px-6 text-xs font-black uppercase border-2 ${isDark ? "bg-black text-white border-gray-700" : "bg-white text-black border-black"}`}>[ BACK ]</button>
+                    <button 
+                      onClick={handleDeploy}
+                      disabled={isDeploying || !anchorWallet}
+                      className={`flex-1 py-4 text-sm font-black uppercase border-2 flex items-center justify-center gap-2 ${
+                        isDark 
+                          ? "bg-[#10B981] text-black border-[#10B981] hover:bg-[#059669] disabled:opacity-40" 
+                          : "bg-[#6366F1] text-white border-black shadow-[4px_4px_0px_0px_#000] hover:bg-black hover:text-white disabled:opacity-40"
+                      }`}
+                    >
+                      {isDeploying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                      {isDeploying ? "[ DEPLOYING ON-CHAIN... ]" : !anchorWallet ? "[ CONNECT WALLET TO DEPLOY ]" : "[ FORGE TOKEN ON-CHAIN ]"}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+          </div>
         </motion.div>
       )}
 
