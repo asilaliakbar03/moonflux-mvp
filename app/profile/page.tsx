@@ -3,11 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import {
-  User, Wallet, Activity, Award, Zap, TrendingUp, TrendingDown,
-  Flame, Star, Crown, Copy, Check, Share2, Edit3, ExternalLink,
-  Globe, MessageCircle, Rocket, Shield, BarChart2,
-  ChevronRight, ArrowUpRight, ArrowDownRight, Calendar, Clock,
-  Users, Bot, Bookmark, Target, Link2
+  User, Wallet, Copy, Check, Share2, ExternalLink,
+  Globe, MessageCircle, Rocket, BarChart2,
+  ArrowUpRight, ArrowDownRight, Clock,
+  Users, Crown, Flame, Award, Activity, ChevronRight,
+  TrendingUp, Star, Zap, Target
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
@@ -20,59 +20,65 @@ import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-// ── MOCK DATA ─────────────────────────────────────────────────────────────────
 const HOLDINGS = [
-  { icon: "🐕", name: "Luna Doge",  ticker: "LDOGE", qty: "1,200,000", avgBuy: "$0.00097", current: "$0.00234", value: "$2,808", pnl: "+$1,969", pnlPct: "+141.2%", pos: true,  color: "#F59E0B", sparkline: [8,12,19,25,31,44,52,71,65,89,95,110] },
-  { icon: "🧠", name: "NeuralFi",   ticker: "NFI",   qty: "4,500",     avgBuy: "$1.12",    current: "$1.42",    value: "$6,390", pnl: "+$1,350", pnlPct: "+26.8%",  pos: true,  color: "#8B5CF6", sparkline: [50,55,58,62,60,65,70,72,75,80,82,88] },
-  { icon: "🚀", name: "RocketDoge", ticker: "RDOGE", qty: "500,000",   avgBuy: "$0.00310", current: "$0.00248", value: "$1,240", pnl: "-$310",   pnlPct: "-20.0%",  pos: false, color: "#F43F5E", sparkline: [80,75,70,65,60,55,50,45,48,42,38,35] },
-  { icon: "⚡", name: "NovaFlux",   ticker: "NVFX",  qty: "12,000",    avgBuy: "$0.038",   current: "$0.0445",  value: "$534",  pnl: "+$78",    pnlPct: "+17.1%",  pos: true,  color: "#10B981", sparkline: [30,35,38,42,48,52,58,65,70,68,75,80] },
+  { icon: "🐕", name: "Luna Doge",  ticker: "LDOGE", qty: "1,200,000", value: "$2,808", pnl: "+$1,969", pnlPct: "+141.2%", pos: true,  color: "#F59E0B", sparkline: [8,12,19,25,31,44,52,71,65,89,95,110] },
+  { icon: "🧠", name: "NeuralFi",   ticker: "NFI",   qty: "4,500",     value: "$6,390", pnl: "+$1,350", pnlPct: "+26.8%",  pos: true,  color: "#8B5CF6", sparkline: [50,55,58,62,60,65,70,72,75,80,82,88] },
+  { icon: "🚀", name: "RocketDoge", ticker: "RDOGE", qty: "500,000",   value: "$1,240", pnl: "-$310",   pnlPct: "-20.0%",  pos: false, color: "#F43F5E", sparkline: [80,75,70,65,60,55,50,45,48,42,38,35] },
+  { icon: "⚡", name: "NovaFlux",   ticker: "NVFX",  qty: "12,000",    value: "$534",   pnl: "+$78",    pnlPct: "+17.1%",  pos: true,  color: "#10B981", sparkline: [30,35,38,42,48,52,58,65,70,68,75,80] },
 ];
 
 const ACHIEVEMENTS = [
-  { title: "Early Hunter",   desc: "Top 100 buyer in 5 launches",             icon: "🎯", rarity: "LEGENDARY", color: "#F59E0B", unlocked: true  },
-  { title: "Whale Status",   desc: "Deployed over 100 SOL in a single trade", icon: "🐋", rarity: "EPIC",      color: "#6366F1", unlocked: true  },
-  { title: "Diamond Hands",  desc: "Held through 80% drawdown and recovered", icon: "💎", rarity: "RARE",      color: "#06B6D4", unlocked: true  },
-  { title: "Alpha Caller",   desc: "Predicted 3 tokens before 10x",           icon: "📡", rarity: "EPIC",      color: "#8B5CF6", unlocked: true  },
-  { title: "Volume Titan",   desc: "50+ SOL traded in one week",              icon: "⚡", rarity: "RARE",      color: "#10B981", unlocked: true  },
-  { title: "Graduation Day", desc: "Held a token that graduated to DEX",      icon: "🎓", rarity: "LEGENDARY", color: "#F59E0B", unlocked: false },
-];
-
-const CREATED_TOKENS = [
-  { icon: "🐕", name: "Luna Doge", ticker: "LDOGE", status: "Graduated", mcap: "$1.87M", holders: 8341, progress: 100, date: "2w ago", color: "#F59E0B" },
-  { icon: "🐱", name: "AstroCat",  ticker: "ACAT",  status: "Live",      mcap: "$440K",  holders: 2901, progress: 68,  date: "1mo ago", color: "#8B5CF6" },
+  { title: "Early Hunter",   icon: "🎯", rarity: "LEGENDARY", color: "#F59E0B", unlocked: true  },
+  { title: "Whale Status",   icon: "🐋", rarity: "EPIC",      color: "#6366F1", unlocked: true  },
+  { title: "Diamond Hands",  icon: "💎", rarity: "RARE",      color: "#06B6D4", unlocked: true  },
+  { title: "Alpha Caller",   icon: "📡", rarity: "EPIC",      color: "#8B5CF6", unlocked: true  },
+  { title: "Volume Titan",   icon: "⚡", rarity: "RARE",      color: "#10B981", unlocked: true  },
+  { title: "Graduation Day", icon: "🎓", rarity: "LEGENDARY", color: "#F59E0B", unlocked: false },
 ];
 
 const ACTIVITY_FEED = [
-  { type: "buy",    icon: "💚", token: "Luna Doge",  ticker: "LDOGE", amount: "12.4 SOL",  time: "2h ago",   desc: "Bought 1.2M tokens" },
-  { type: "launch", icon: "🚀", token: "AstroCat",   ticker: "ACAT",  amount: "",          time: "1d ago",   desc: "Launched new token" },
-  { type: "sell",   icon: "🔴", token: "RocketDoge", ticker: "RDOGE", amount: "3.1 SOL",   time: "3d ago",   desc: "Sold 200K tokens" },
-  { type: "vote",   icon: "⚔️", token: "Arena Battle", ticker: "",    amount: "",          time: "5d ago",   desc: "Voted in Arena vs. DegenApe" },
-  { type: "buy",    icon: "💚", token: "NovaFlux",   ticker: "NVFX",  amount: "4.8 SOL",   time: "1w ago",   desc: "Bought 12,000 tokens" },
-  { type: "launch", icon: "🚀", token: "Luna Doge",  ticker: "LDOGE", amount: "",          time: "2w ago",   desc: "Launched Luna Doge — now graduated" },
+  { type: "buy",    icon: "💚", ticker: "LDOGE", amount: "12.4 SOL",  time: "2h ago",  desc: "Bought 1.2M Luna Doge" },
+  { type: "launch", icon: "🚀", ticker: "ACAT",  amount: "",          time: "1d ago",  desc: "Launched AstroCat" },
+  { type: "sell",   icon: "🔴", ticker: "RDOGE", amount: "3.1 SOL",   time: "3d ago",  desc: "Sold 200K RocketDoge" },
+  { type: "vote",   icon: "⚔️", ticker: "",      amount: "",          time: "5d ago",  desc: "Voted in Arena battle" },
+  { type: "buy",    icon: "💚", ticker: "NVFX",  amount: "4.8 SOL",   time: "1w ago",  desc: "Bought 12K NovaFlux" },
 ];
 
-// ── COMPONENT ─────────────────────────────────────────────────────────────────
+const CREATED_TOKENS = [
+  { icon: "🐕", name: "Luna Doge", ticker: "LDOGE", status: "Graduated", mcap: "$1.87M", holders: 8341, progress: 100, color: "#F59E0B" },
+  { icon: "🐱", name: "AstroCat",  ticker: "ACAT",  status: "Live",      mcap: "$440K",  holders: 2901, progress: 68,  color: "#8B5CF6" },
+];
+
+// ── Stat pill component ───────────────────────────────────────────────────────
+function StatPill({ label, value, color = "text-[var(--color-text-primary)]" }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <span className={`font-black font-mono text-sm ${color}`}>{value}</span>
+      <span className="text-[10px] text-[var(--color-text-faint)] uppercase tracking-wider">{label}</span>
+    </div>
+  );
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { showToast } = useToast();
   const { connected, address } = useMoonWallet();
   const { setModalOpen } = useWalletModal();
-  const [activeTab, setActiveTab] = useState<"portfolio" | "tokens" | "activity" | "badges" | "roast">("portfolio");
   const [copied, setCopied] = useState(false);
-  const [activityFilter, setActivityFilter] = useState<"all" | "trades" | "launches" | "social">("all");
+  const [activeTab, setActiveTab] = useState<"portfolio" | "activity" | "badges">("portfolio");
   const [roastData, setRoastData] = useState<any>(null);
   const [isRoasting, setIsRoasting] = useState(false);
 
-  const shortAddr = address ? `${address.slice(0, 6)}...${address.slice(-6)}` : "Not Connected";
+  const displayName = connected && address ? `${address.slice(0,4)}...${address.slice(-4)}` : "DegenDave";
+  const handle = connected && address ? address.slice(0, 8) : "degendave";
 
   const handleCopy = () => {
-    if (address) {
-      navigator.clipboard.writeText(address);
-      setCopied(true);
-      showToast("Address copied!", "success");
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (address) { navigator.clipboard.writeText(address); }
+    setCopied(true);
+    showToast("Address copied!", "success");
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleRoast = async () => {
@@ -86,630 +92,516 @@ export default function ProfilePage() {
       const data = await res.json();
       setRoastData(data.roast);
     } catch {
-      showToast("Roast failed. The AI felt bad for you.", "error");
+      showToast("Roast failed.", "error");
     } finally {
       setIsRoasting(false);
     }
   };
 
-  const filteredActivity = ACTIVITY_FEED.filter(a => {
-    if (activityFilter === "all") return true;
-    if (activityFilter === "trades") return a.type === "buy" || a.type === "sell";
-    if (activityFilter === "launches") return a.type === "launch";
-    if (activityFilter === "social") return a.type === "vote";
-    return true;
-  });
+  const glass = isDark
+    ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.07)]"
+    : "bg-white/70 border-gray-200/80";
+
+  const glassHover = isDark
+    ? "hover:bg-[rgba(99,102,241,0.06)] hover:border-[rgba(99,102,241,0.25)]"
+    : "hover:bg-indigo-50/60 hover:border-indigo-300/60";
 
   const TABS = [
-    { id: "portfolio", label: "Portfolio",  icon: BarChart2,    color: "#6366F1" },
-    { id: "tokens",    label: "Tokens",     icon: Rocket,       color: "#10B981" },
-    { id: "activity",  label: "Activity",   icon: Activity,     color: "#F59E0B" },
-    { id: "badges",    label: "Badges",     icon: Award,        color: "#8B5CF6" },
-    { id: "roast",     label: "AI Roast",   icon: Flame,        color: "#F43F5E" },
+    { id: "portfolio", label: "Portfolio", icon: BarChart2 },
+    { id: "activity",  label: "Activity",  icon: Activity  },
+    { id: "badges",    label: "Badges",    icon: Award     },
   ] as const;
 
-  const surface = isDark
-    ? "bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.10)]"
-    : "bg-white/80 border-gray-200";
-
   return (
-    <div className="w-full max-w-6xl mx-auto pb-24 overflow-x-hidden">
+    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 pt-2 pb-24 overflow-x-hidden">
 
-      {/* ── COVER BANNER ─────────────────────────────────────────────────── */}
+      {/* ─────────────────────────────────────────────────────────────────
+          HERO — cinematic full-width banner with integrated identity
+      ───────────────────────────────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="relative w-full h-40 sm:h-52 md:h-60 rounded-2xl overflow-hidden mb-0"
+        transition={{ duration: 0.55, ease: EASE }}
+        className={`relative w-full rounded-2xl overflow-hidden mb-6 border backdrop-blur-xl ${glass}`}
       >
-        {/* Animated gradient mesh banner */}
-        <div className={`absolute inset-0 ${isDark
-          ? "bg-[radial-gradient(ellipse_at_20%_50%,rgba(99,102,241,0.35)_0%,rgba(139,92,246,0.15)_40%,rgba(5,5,16,1)_100%)]"
-          : "bg-[radial-gradient(ellipse_at_20%_50%,rgba(99,102,241,0.2)_0%,rgba(139,92,246,0.1)_40%,rgba(240,240,255,1)_100%)]"
-        }`} />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=60 height=60 xmlns=http://www.w3.org/2000/svg%3E%3Cpath d=M 0 30 L 60 30 M 30 0 L 30 60 stroke=rgba(99,102,241,0.06) stroke-width=1/%3E%3C/svg%3E')]" />
-
-        {/* Glow orbs */}
-        <div className="absolute top-8 left-1/4 w-32 h-32 bg-[#6366F1] rounded-full blur-[80px] opacity-20 animate-pulse" />
-        <div className="absolute top-4 right-1/4 w-24 h-24 bg-[#8B5CF6] rounded-full blur-[60px] opacity-15 animate-pulse" style={{ animationDelay: "1s" }} />
-
-        {/* Banner label */}
-        <div className="absolute bottom-4 right-4 text-[10px] font-mono text-[rgba(255,255,255,0.3)] uppercase tracking-widest">
-          MoonFluxx // Profile
+        {/* Animated banner background */}
+        <div className="relative h-36 sm:h-44 overflow-hidden">
+          <div className={`absolute inset-0 ${isDark
+            ? "bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]"
+            : "bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-50"
+          }`} />
+          {/* Glow orbs */}
+          <div className="absolute -left-10 top-0 w-56 h-56 bg-[#6366F1] rounded-full blur-[100px] opacity-30" />
+          <div className="absolute right-20 -top-8 w-40 h-40 bg-[#8B5CF6] rounded-full blur-[80px] opacity-20" />
+          <div className="absolute right-0 bottom-0 w-32 h-32 bg-[#06B6D4] rounded-full blur-[70px] opacity-15" />
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-[0.04]"
+            style={{ backgroundImage: "linear-gradient(rgba(99,102,241,1) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,1) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+          {/* Username watermark top right */}
+          <div className="absolute top-4 right-4 text-[10px] font-mono tracking-[0.3em] uppercase opacity-30 text-[var(--color-text-primary)]">
+            moonflux // profile
+          </div>
         </div>
-      </motion.div>
 
-      {/* ── IDENTITY HEADER ──────────────────────────────────────────────── */}
-      <div className="relative px-4 sm:px-6 -mt-14 sm:-mt-16 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        {/* Identity bar — overlaps banner bottom */}
+        <div className="relative px-4 sm:px-6 pb-5 -mt-12">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
 
-          {/* Avatar + identity */}
-          <div className="flex items-end gap-4">
-            {/* Avatar */}
-            <div className="relative shrink-0">
-              <div className="absolute inset-0 rounded-full bg-[#6366F1] blur-2xl opacity-40 animate-pulse" />
-              <div className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 shadow-[0_0_40px_rgba(99,102,241,0.5)] ${isDark ? "bg-[rgba(30,25,60,0.95)] border-[#6366F1]" : "bg-indigo-50 border-[#6366F1]"}`}>
-                <User className="w-10 h-10 sm:w-12 sm:h-12 text-[#818CF8]" />
+            {/* Avatar + name */}
+            <div className="flex items-end gap-4">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className="absolute inset-[-4px] rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] blur-[8px] opacity-60" />
+                <div className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center border-4 shadow-xl ${
+                  isDark ? "bg-[#0d0b1a] border-[#6366F1]" : "bg-indigo-50 border-[#6366F1]"
+                }`}>
+                  <User className="w-9 h-9 sm:w-11 sm:h-11 text-[#818CF8]" />
+                  {/* Online dot */}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#10B981] rounded-full border-2 border-white shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+                </div>
+                {/* Level badge */}
+                <div className="absolute -top-2 -left-2 bg-gradient-to-r from-[#F59E0B] to-[#F97316] text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg whitespace-nowrap">
+                  LVL 42
+                </div>
               </div>
-              {/* Online indicator */}
-              <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#10B981] rounded-full border-2 border-white shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              {/* Level badge */}
-              <div className="absolute -top-1 -right-1 bg-[#F59E0B] text-black text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-lg">
-                Lv42
-              </div>
-            </div>
 
-            {/* Name & handle */}
-            <div className="pb-2">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h1 className="text-xl sm:text-2xl font-bold font-display text-[var(--color-text-primary)] display-safe">
-                  {connected && address ? `${address.slice(0,4)}...${address.slice(-4)}` : "DegenDave"}
-                </h1>
-                <span className="bg-[#6366F1] text-[10px] text-white px-2 py-0.5 rounded-full font-bold shadow-[0_0_10px_rgba(99,102,241,0.5)] uppercase tracking-wider">Pro</span>
-                <span className="bg-[rgba(16,185,129,0.15)] text-[#10B981] text-[10px] px-2 py-0.5 rounded-full font-bold border border-[rgba(16,185,129,0.3)] uppercase tracking-wider">Verified</span>
-              </div>
-              <div className="flex items-center gap-2 text-[var(--color-text-secondary)] font-mono text-sm flex-wrap">
-                <span className="text-[#818CF8]">@{connected && address ? address.slice(0,8) : "degendave"}</span>
-                <span className="text-[var(--color-text-faint)]">·</span>
-                <div className="flex items-center gap-1 text-[var(--color-text-faint)] text-xs">
-                  <Calendar className="w-3 h-3" />
-                  <span>Joined Jul 2024</span>
+              {/* Name block */}
+              <div className="pb-1">
+                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                  <h1 className="text-lg sm:text-2xl font-black font-display text-[var(--color-text-primary)] tracking-tight">
+                    {displayName}
+                  </h1>
+                  <span className="text-[10px] bg-[#6366F1] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(99,102,241,0.5)]">Pro</span>
+                  <span className="text-[10px] bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded-full font-bold uppercase border border-[rgba(16,185,129,0.3)]">✓ Verified</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-[var(--color-text-muted)] font-mono">
+                  <span className="text-[#818CF8]">@{handle}</span>
+                  <span className="opacity-40">·</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Joined Jul 2024</span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-2 pb-2 flex-wrap">
-            {!connected ? (
-              <MagneticButton as="div" strength={0.3}>
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 pb-1">
+              {connected ? (
+                <>
+                  <button
+                    onClick={handleCopy}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
+                      isDark ? "bg-[rgba(99,102,241,0.1)] border-[rgba(99,102,241,0.25)] text-[#818CF8] hover:bg-[rgba(99,102,241,0.18)]"
+                             : "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                    }`}
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span className="hidden sm:inline font-mono">{address?.slice(0,6)}...{address?.slice(-4)}</span>
+                  </button>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Link copied!", "success"); }}
+                    className={`p-2 rounded-xl text-xs border transition-all active:scale-95 ${
+                      isDark ? "bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+                             : "bg-gray-50 border-gray-200 text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
                 <button
                   onClick={() => setModalOpen(true)}
-                  className="px-5 py-2 rounded-full bg-[#6366F1] text-white font-bold text-sm shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5] transition-all active:scale-[0.97] border border-[#818CF8]"
+                  className="px-5 py-2 rounded-xl bg-[#6366F1] text-white text-sm font-bold shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:bg-[#4F46E5] transition-all active:scale-95"
                 >
                   Connect Wallet
                 </button>
-              </MagneticButton>
-            ) : (
-              <>
-                <button
-                  onClick={handleCopy}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all border active:scale-[0.97] ${isDark ? "bg-[rgba(99,102,241,0.1)] border-[rgba(99,102,241,0.25)] text-[#818CF8] hover:bg-[rgba(99,102,241,0.2)]" : "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"}`}
-                >
-                  {copied ? <Check className="w-4 h-4 text-[#10B981]" /> : <Copy className="w-4 h-4" />}
-                  <span className="font-mono text-xs hidden sm:inline">{shortAddr}</span>
-                </button>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Profile link copied!", "success"); }}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all border active:scale-[0.97] ${isDark ? "bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)] text-[var(--color-text-secondary)] hover:bg-[rgba(255,255,255,0.08)]" : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"}`}
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </button>
-              </>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Bio & social links */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <p className="text-[var(--color-text-secondary)] text-sm max-w-lg leading-relaxed">
-            Full-degen alpha hunter on Solana. 🎯 Top 5% Creator on MoonFluxx. Trading since 2021. Graduated 2 tokens to Raydium.
+          {/* Bio */}
+          <p className="mt-3 text-sm text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+            Full-degen alpha hunter on Solana 🎯 · Top 5% Creator on MoonFluxx · Graduated 2 tokens to Raydium · Trading since 2021
           </p>
-          <div className="flex items-center gap-3">
-            <a href="#" className="text-[#94A3B8] hover:text-[#1DA1F2] transition-colors"><Link2 className="w-4 h-4" /></a>
-            <a href="#" className="text-[#94A3B8] hover:text-[#818CF8] transition-colors"><MessageCircle className="w-4 h-4" /></a>
-            <a href="#" className="text-[#94A3B8] hover:text-[var(--color-text-primary)] transition-colors"><Globe className="w-4 h-4" /></a>
-          </div>
-        </div>
 
-        {/* Stats row */}
-        <div className={`mt-5 flex items-center gap-6 sm:gap-10 pt-5 border-t ${isDark ? "border-[rgba(255,255,255,0.06)]" : "border-gray-200"} flex-wrap`}>
-          {[
-            { label: "Followers",  value: "--",   color: "text-[var(--color-text-primary)]" },
-            { label: "Following",  value: "124",  color: "text-[var(--color-text-primary)]" },
-            { label: "Win Rate",   value: "68%",  color: "text-[#10B981]" },
-            { label: "Tokens Made", value: "2",   color: "text-[#818CF8]" },
-            { label: "Volume",     value: "42 SOL", color: "text-[#F59E0B]" },
-          ].map((s, i) => (
-            <div key={i} className="flex flex-col">
-              <span className={`font-bold text-base ${s.color} font-mono`}>{s.value}</span>
-              <span className="text-[var(--color-text-faint)] text-xs">{s.label}</span>
+          {/* Stats strip */}
+          <div className={`mt-4 pt-4 border-t flex items-center gap-6 sm:gap-10 flex-wrap ${isDark ? "border-[rgba(255,255,255,0.05)]" : "border-gray-100"}`}>
+            <StatPill label="Followers"  value="—"        />
+            <StatPill label="Following"  value="124"      />
+            <StatPill label="Win Rate"   value="68%"      color="text-[#10B981]" />
+            <StatPill label="Launched"   value="2 Tokens" color="text-[#818CF8]" />
+            <StatPill label="Vol. Traded" value="42 SOL"  color="text-[#F59E0B]" />
+            {/* XP Progress */}
+            <div className="flex-1 min-w-[120px] hidden sm:block">
+              <div className="flex justify-between text-[10px] font-mono mb-1">
+                <span className="text-[var(--color-text-faint)]"><Crown className="w-3 h-3 inline text-[#F59E0B]" /> Lv42 Diamond Trader</span>
+                <span className="text-[#818CF8]">94.2K XP</span>
+              </div>
+              <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? "bg-[rgba(99,102,241,0.12)]" : "bg-indigo-100"}`}>
+                <motion.div
+                  initial={{ width: 0 }} animate={{ width: "75%" }}
+                  transition={{ duration: 1.2, ease: EASE, delay: 0.4 }}
+                  className="h-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] shadow-[0_0_8px_#6366F1]"
+                />
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── NET WORTH BANNER ────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, ease: EASE }}
-        className={`mx-4 sm:mx-6 mb-6 backdrop-blur-2xl border rounded-2xl p-5 sm:p-6 relative overflow-hidden ${surface}`}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(99,102,241,0.06),transparent_60%)]" />
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-6">
-          <div>
-            <div className="text-xs text-[var(--color-text-muted)] uppercase font-mono tracking-wider mb-1 flex items-center gap-1"><Wallet className="w-3 h-3" /> Net Worth</div>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-[var(--color-text-primary)]">$10,972</div>
-            <div className="flex items-center gap-1 mt-1">
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#10B981]" />
-              <span className="text-[#10B981] text-xs font-bold font-mono">+$1,987 (+22.1%) today</span>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--color-text-muted)] uppercase font-mono tracking-wider mb-1">24h PnL</div>
-            <div className="text-2xl font-mono font-black text-[#10B981]">+$1,987</div>
-            <div className="text-xs text-[var(--color-text-faint)] font-mono mt-1">Past 24 hours</div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--color-text-muted)] uppercase font-mono tracking-wider mb-1">All-Time PnL</div>
-            <div className="text-2xl font-mono font-black text-[#10B981]">+$4,240</div>
-            <div className="text-xs text-[var(--color-text-faint)] font-mono mt-1">Since joining</div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--color-text-muted)] uppercase font-mono tracking-wider mb-1">AI Risk Score</div>
-            <div className="text-2xl font-mono font-black text-[#F59E0B]">6.2<span className="text-sm text-[var(--color-text-muted)]">/10</span></div>
-            <div className="text-xs text-[#F59E0B] font-mono mt-1">Moderate Degen</div>
-          </div>
-        </div>
-
-        {/* XP bar */}
-        <div className={`relative z-10 mt-5 pt-5 border-t ${isDark ? "border-[rgba(255,255,255,0.05)]" : "border-gray-100"}`}>
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-              <Crown className="w-4 h-4 text-[#F59E0B]" />
-              <span className="font-bold text-[var(--color-text-primary)]">Level 42</span>
-              <span>· Diamond Trader</span>
-            </div>
-            <span className="text-[#818CF8] font-mono font-bold text-sm">94,200 / 125,000 XP</span>
-          </div>
-          <div className={`h-2 w-full rounded-full overflow-hidden ${isDark ? "bg-[rgba(99,102,241,0.1)]" : "bg-indigo-100"} border border-[rgba(99,102,241,0.2)]`}>
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "75%" }}
-              transition={{ duration: 1.2, ease: EASE, delay: 0.3 }}
-              className="h-full bg-[#6366F1] shadow-[0_0_12px_#6366F1]"
-            />
           </div>
         </div>
       </motion.div>
 
-      {/* ── TABS ─────────────────────────────────────────────────────────── */}
-      <div className={`mx-4 sm:mx-6 mb-6 flex gap-1 p-1 rounded-xl border overflow-x-auto scrollbar-hide ${isDark ? "bg-[rgba(5,5,16,0.6)] border-[rgba(99,102,241,0.1)]" : "bg-gray-100 border-gray-200"}`}>
+      {/* ─────────────────────────────────────────────────────────────────
+          BENTO METRICS GRID
+      ───────────────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {[
+          {
+            label: "Net Worth", value: "$10,972", sub: "+$1,987 today",
+            subColor: "text-[#10B981]", icon: Wallet, iconColor: "#10B981",
+            gradient: "from-[#10B981]/10 to-transparent",
+          },
+          {
+            label: "24h PnL", value: "+$1,987", sub: "+22.1%",
+            subColor: "text-[#10B981]", icon: TrendingUp, iconColor: "#10B981",
+            gradient: "from-[#10B981]/8 to-transparent",
+          },
+          {
+            label: "All-Time PnL", value: "+$4,240", sub: "Since Jul 2024",
+            subColor: "text-[var(--color-text-faint)]", icon: BarChart2, iconColor: "#818CF8",
+            gradient: "from-[#6366F1]/8 to-transparent",
+          },
+          {
+            label: "AI Risk Score", value: "6.2/10", sub: "Moderate Degen",
+            subColor: "text-[#F59E0B]", icon: Zap, iconColor: "#F59E0B",
+            gradient: "from-[#F59E0B]/8 to-transparent",
+          },
+        ].map((m, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 * i, ease: EASE }}
+            className={`relative overflow-hidden rounded-2xl border p-4 backdrop-blur-xl transition-all ${glass} ${glassHover}`}
+          >
+            <div className={`absolute inset-0 bg-gradient-to-br ${m.gradient} pointer-events-none`} />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] text-[var(--color-text-faint)] uppercase font-mono tracking-wider">{m.label}</span>
+                <m.icon className="w-4 h-4 opacity-50" style={{ color: m.iconColor }} />
+              </div>
+              <div className="text-xl sm:text-2xl font-black font-mono text-[var(--color-text-primary)] leading-none mb-1">{m.value}</div>
+              <div className={`text-xs font-mono ${m.subColor}`}>{m.sub}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────────
+          TABS
+      ───────────────────────────────────────────────────────────────── */}
+      <div className={`flex gap-0 mb-5 rounded-xl overflow-hidden border p-1 w-fit ${isDark ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.07)]" : "bg-gray-100/80 border-gray-200"}`}>
         {TABS.map(tab => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const active = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all flex-1 justify-center focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
-                isActive
-                  ? isDark ? "bg-[rgba(99,102,241,0.15)] text-[var(--color-text-primary)] shadow-[0_0_12px_rgba(99,102,241,0.2)]" : "bg-white text-gray-900 shadow-sm"
+              className={`relative flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all ${
+                active
+                  ? isDark ? "bg-[rgba(99,102,241,0.2)] text-[var(--color-text-primary)] shadow-[inset_0_0_12px_rgba(99,102,241,0.2)]"
+                           : "bg-white text-gray-900 shadow-sm"
                   : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
               }`}
             >
-              {isActive && (
-                <motion.div layoutId="tab-indicator" className="absolute inset-0 rounded-lg border border-[rgba(99,102,241,0.3)]" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
-              )}
-              <Icon className="w-4 h-4 relative z-10" style={{ color: isActive ? tab.color : undefined }} />
+              {active && <motion.div layoutId="tab-pill" className="absolute inset-0 rounded-lg border border-[rgba(99,102,241,0.4)]" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
+              <Icon className="w-3.5 h-3.5 relative z-10" />
               <span className="relative z-10">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* ── TAB CONTENT ───────────────────────────────────────────────────── */}
-      <div className="px-4 sm:px-6">
-        <AnimatePresence mode="wait">
+      {/* ─────────────────────────────────────────────────────────────────
+          TAB CONTENT
+      ───────────────────────────────────────────────────────────────── */}
+      <AnimatePresence mode="wait">
 
-          {/* ─── PORTFOLIO TAB ─── */}
-          {activeTab === "portfolio" && (
-            <motion.div key="portfolio" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ ease: EASE, duration: 0.35 }} className="flex flex-col gap-6">
+        {/* ── PORTFOLIO ── */}
+        {activeTab === "portfolio" && (
+          <motion.div key="portfolio" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ ease: EASE, duration: 0.3 }}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-              {/* Holdings table */}
-              <div className={`backdrop-blur-2xl border rounded-2xl overflow-hidden ${surface}`}>
-                <div className={`px-5 py-4 border-b flex items-center justify-between ${isDark ? "border-[rgba(255,255,255,0.05)]" : "border-gray-100"}`}>
-                  <h3 className="font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              {/* Holdings — takes 2 cols */}
+              <div className={`lg:col-span-2 rounded-2xl border overflow-hidden backdrop-blur-xl ${glass}`}>
+                <div className={`px-5 py-4 border-b flex items-center justify-between ${isDark ? "border-[rgba(255,255,255,0.06)]" : "border-gray-100"}`}>
+                  <h3 className="font-bold text-[var(--color-text-primary)] flex items-center gap-2 text-sm">
                     <BarChart2 className="w-4 h-4 text-[#6366F1]" /> Holdings
                   </h3>
-                  <span className="text-xs text-[var(--color-text-muted)] font-mono">{HOLDINGS.length} assets</span>
+                  <span className="text-xs text-[var(--color-text-faint)] font-mono">{HOLDINGS.length} assets · $10,972</span>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className={`text-xs font-mono uppercase border-b ${isDark ? "border-[rgba(255,255,255,0.04)] text-[#475569] bg-[rgba(255,255,255,0.02)]" : "border-gray-100 text-gray-400 bg-gray-50"}`}>
-                        <th className="px-5 py-3">Asset</th>
-                        <th className="px-5 py-3 hidden sm:table-cell">Balance</th>
-                        <th className="px-5 py-3">Value</th>
-                        <th className="px-5 py-3 hidden md:table-cell">Avg Buy</th>
-                        <th className="px-5 py-3">PnL</th>
-                        <th className="px-5 py-3 hidden lg:table-cell">Chart</th>
-                        <th className="px-5 py-3 hidden md:table-cell"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {HOLDINGS.map((h, i) => (
-                        <motion.tr
-                          key={i}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.07, ease: EASE }}
-                          className={`border-b transition-colors ${isDark ? "border-[rgba(255,255,255,0.04)] hover:bg-[rgba(99,102,241,0.04)]" : "border-gray-50 hover:bg-indigo-50/30"}`}
-                        >
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border" style={{ backgroundColor: `${h.color}18`, borderColor: `${h.color}30` }}>
-                                {h.icon}
-                              </div>
-                              <div>
-                                <div className="font-bold text-[var(--color-text-primary)] text-sm">{h.name}</div>
-                                <div className="text-[var(--color-text-muted)] font-mono text-xs">${h.ticker}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 font-mono text-sm text-[var(--color-text-secondary)] hidden sm:table-cell">{h.qty}</td>
-                          <td className="px-5 py-4 font-mono text-sm font-bold text-[var(--color-text-primary)]">{h.value}</td>
-                          <td className="px-5 py-4 font-mono text-xs text-[var(--color-text-muted)] hidden md:table-cell">{h.avgBuy}</td>
-                          <td className="px-5 py-4">
-                            <div className={`font-mono text-sm font-bold ${h.pos ? "text-[#10B981]" : "text-[#F43F5E]"}`}>
-                              <div className="flex items-center gap-1">
-                                {h.pos ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                                {h.pnl}
-                              </div>
-                              <div className={`text-[10px] mt-0.5 px-1.5 py-0.5 rounded w-fit border ${h.pos ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)]" : "bg-[rgba(244,63,94,0.1)] border-[rgba(244,63,94,0.3)]"}`}>
-                                {h.pnlPct}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 hidden lg:table-cell">
-                            <div className="w-20 h-10">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={h.sparkline.map((v, i) => ({ x: i, y: v }))}>
-                                  <Line type="monotone" dataKey="y" stroke={h.pos ? "#10B981" : "#F43F5E"} strokeWidth={2} dot={false} isAnimationActive />
-                                </LineChart>
-                              </ResponsiveContainer>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 hidden md:table-cell">
-                            <Link href={`/token/tok_${h.ticker.toLowerCase()}`} className="text-xs text-[#818CF8] hover:text-[#6366F1] font-bold transition-colors flex items-center gap-1">
-                              Trade <ChevronRight className="w-3 h-3" />
-                            </Link>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Allocation summary */}
-              <div className={`backdrop-blur-2xl border rounded-2xl p-5 ${surface}`}>
-                <h3 className="font-bold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
-                  <Target className="w-4 h-4 text-[#F59E0B]" /> Portfolio Allocation
-                </h3>
-                <div className="space-y-3">
-                  {[
-                    { label: "Meme Coins", pct: 45, color: "#F59E0B" },
-                    { label: "AI / DeFi",  pct: 32, color: "#8B5CF6" },
-                    { label: "SOL Native", pct: 18, color: "#06B6D4" },
-                    { label: "Staked",     pct: 5,  color: "#10B981" },
-                  ].map((a, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm text-[var(--color-text-secondary)]">{a.label}</span>
-                        <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{a.pct}%</span>
+                <div className="divide-y divide-[var(--color-border-subtle)]">
+                  {HOLDINGS.map((h, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.06, ease: EASE }}
+                      className={`flex items-center gap-3 px-5 py-3.5 transition-colors ${
+                        isDark ? "hover:bg-[rgba(99,102,241,0.05)]" : "hover:bg-indigo-50/40"
+                      }`}
+                    >
+                      {/* Icon */}
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 border" style={{ backgroundColor: `${h.color}15`, borderColor: `${h.color}30` }}>
+                        {h.icon}
                       </div>
-                      <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDark ? "bg-[rgba(255,255,255,0.06)]" : "bg-gray-100"}`}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${a.pct}%` }}
-                          transition={{ duration: 0.9, ease: EASE, delay: i * 0.1 }}
-                          className="h-full rounded-full"
-                          style={{ backgroundColor: a.color, boxShadow: `0 0 8px ${a.color}` }}
-                        />
+                      {/* Name */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-[var(--color-text-primary)] text-sm truncate">{h.name}</div>
+                        <div className="text-[var(--color-text-faint)] font-mono text-[10px]">{h.qty}</div>
                       </div>
-                    </div>
+                      {/* Sparkline */}
+                      <div className="w-16 h-8 hidden sm:block shrink-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={h.sparkline.map((v, i) => ({ x: i, y: v }))}>
+                            <Line type="monotone" dataKey="y" stroke={h.pos ? "#10B981" : "#F43F5E"} strokeWidth={1.5} dot={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                      {/* Value */}
+                      <div className="text-right shrink-0">
+                        <div className="font-black font-mono text-sm text-[var(--color-text-primary)]">{h.value}</div>
+                        <div className={`text-[11px] font-mono font-bold flex items-center justify-end gap-0.5 ${h.pos ? "text-[#10B981]" : "text-[#F43F5E]"}`}>
+                          {h.pos ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                          {h.pnlPct}
+                        </div>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
-            </motion.div>
-          )}
 
-          {/* ─── CREATED TOKENS TAB ─── */}
-          {activeTab === "tokens" && (
-            <motion.div key="tokens" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ ease: EASE, duration: 0.35 }} className="flex flex-col gap-6">
-
-              {/* Creator stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: "Tokens Launched", value: "2",    color: "#6366F1", icon: Rocket },
-                  { label: "Total Holders",   value: "11.2K", color: "#10B981", icon: Users },
-                  { label: "Success Rate",    value: "100%", color: "#F59E0B", icon: Star },
-                  { label: "Creator Score",   value: "94",   color: "#8B5CF6", icon: Crown },
-                ].map((s, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, ease: EASE }}
-                    className={`backdrop-blur-2xl border rounded-2xl p-4 relative overflow-hidden ${surface}`}
-                    style={{ borderLeftColor: s.color, borderLeftWidth: "3px" }}
-                  >
-                    <div className="absolute top-2 right-2 opacity-10">
-                      <s.icon className="w-8 h-8" style={{ color: s.color }} />
-                    </div>
-                    <div className="text-xs text-[var(--color-text-muted)] mb-1 font-mono uppercase">{s.label}</div>
-                    <div className="text-2xl font-mono font-black" style={{ color: s.color }}>{s.value}</div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Token cards */}
+              {/* Right column: Allocation + Created tokens */}
               <div className="flex flex-col gap-4">
-                {CREATED_TOKENS.map((t, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.1, ease: EASE }}
-                    className={`backdrop-blur-2xl border rounded-2xl p-5 relative overflow-hidden hover:shadow-[0_0_25px_rgba(99,102,241,0.12)] transition-all ${surface}`}
-                  >
-                    <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.8),transparent_60%)]" />
-                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border" style={{ backgroundColor: `${t.color}18`, borderColor: `${t.color}30` }}>
-                          {t.icon}
+                {/* Allocation */}
+                <div className={`rounded-2xl border p-5 backdrop-blur-xl ${glass}`}>
+                  <h3 className="font-bold text-[var(--color-text-primary)] text-sm mb-4 flex items-center gap-2">
+                    <Target className="w-4 h-4 text-[#F59E0B]" /> Allocation
+                  </h3>
+                  <div className="space-y-2.5">
+                    {[
+                      { label: "Meme",  pct: 45, color: "#F59E0B" },
+                      { label: "AI",    pct: 32, color: "#8B5CF6" },
+                      { label: "SOL",   pct: 18, color: "#06B6D4" },
+                      { label: "Stake", pct: 5,  color: "#10B981" },
+                    ].map((a, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-[var(--color-text-muted)]">{a.label}</span>
+                          <span className="font-mono font-bold text-[var(--color-text-primary)]">{a.pct}%</span>
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-bold text-[var(--color-text-primary)] text-lg">{t.name}</span>
-                            <span className="font-mono text-[#818CF8] text-sm">${t.ticker}</span>
-                            {t.status === "Graduated" ? (
-                              <span className="bg-[rgba(16,185,129,0.15)] text-[#10B981] px-2 py-0.5 rounded-full text-[10px] font-bold border border-[rgba(16,185,129,0.3)] uppercase">🎓 Graduated</span>
-                            ) : (
-                              <span className="bg-[rgba(99,102,241,0.15)] text-[#818CF8] px-2 py-0.5 rounded-full text-[10px] font-bold border border-[rgba(99,102,241,0.3)] uppercase">Live</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)] font-mono">
-                            <span>MCap: <span className="text-[var(--color-text-primary)] font-bold">{t.mcap}</span></span>
-                            <span>Holders: <span className="text-[var(--color-text-primary)] font-bold">{t.holders.toLocaleString()}</span></span>
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {t.date}</span>
-                          </div>
+                        <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? "bg-[rgba(255,255,255,0.06)]" : "bg-gray-100"}`}>
+                          <motion.div
+                            initial={{ width: 0 }} animate={{ width: `${a.pct}%` }}
+                            transition={{ duration: 0.8, ease: EASE, delay: 0.1 * i }}
+                            className="h-full rounded-full" style={{ backgroundColor: a.color }}
+                          />
                         </div>
                       </div>
-                      <div className="flex flex-col gap-2 min-w-[160px]">
-                        <div className="flex justify-between text-xs font-mono text-[var(--color-text-muted)]">
-                          <span>Bonding Curve</span>
-                          <span className="text-[#818CF8] font-bold">{t.progress}%</span>
-                        </div>
-                        <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-[rgba(255,255,255,0.06)]" : "bg-gray-100"} border border-[rgba(99,102,241,0.2)]`}>
-                          <div className="h-full bg-[#6366F1] shadow-[0_0_10px_#6366F1] transition-all" style={{ width: `${t.progress}%` }} />
-                        </div>
-                        <Link href={`/token/tok_${t.ticker.toLowerCase()}`}>
-                          <button className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold text-[#818CF8] border border-[rgba(99,102,241,0.25)] hover:bg-[rgba(99,102,241,0.1)] transition-all">
-                            View Token <ExternalLink className="w-3 h-3" />
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    ))}
+                  </div>
+                </div>
 
-                {/* Empty CTA */}
-                <div className={`backdrop-blur-2xl border rounded-2xl p-8 text-center border-dashed ${isDark ? "border-[rgba(99,102,241,0.2)]" : "border-indigo-200"}`}>
-                  <div className="text-4xl mb-3">🚀</div>
-                  <div className="font-bold text-[var(--color-text-primary)] mb-1">Launch Your Next Token</div>
-                  <div className="text-sm text-[var(--color-text-muted)] mb-4">Create a new token with AI assistance and ride the bonding curve to Raydium.</div>
-                  <Link href="/launch">
-                    <button className="px-6 py-2.5 bg-[#6366F1] text-white font-bold rounded-full shadow-[0_0_20px_rgba(99,102,241,0.35)] hover:bg-[#4F46E5] transition-all text-sm">
-                      Launch Token
-                    </button>
-                  </Link>
+                {/* Creator quick stats */}
+                <div className={`rounded-2xl border p-5 backdrop-blur-xl ${glass}`}>
+                  <h3 className="font-bold text-[var(--color-text-primary)] text-sm mb-3 flex items-center gap-2">
+                    <Rocket className="w-4 h-4 text-[#10B981]" /> Created Tokens
+                  </h3>
+                  <div className="space-y-3">
+                    {CREATED_TOKENS.map((t, i) => (
+                      <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${isDark ? "border-[rgba(255,255,255,0.06)] hover:border-[rgba(99,102,241,0.25)]" : "border-gray-100 hover:border-indigo-200"}`}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0 border" style={{ backgroundColor: `${t.color}15`, borderColor: `${t.color}30` }}>{t.icon}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-[var(--color-text-primary)] text-xs truncate">{t.name}</div>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <div className={`h-1 rounded-full flex-1 overflow-hidden ${isDark ? "bg-[rgba(255,255,255,0.06)]" : "bg-gray-100"}`}>
+                              <div className="h-full bg-[#6366F1]" style={{ width: `${t.progress}%` }} />
+                            </div>
+                            <span className="text-[9px] font-mono text-[#818CF8] shrink-0">{t.progress}%</span>
+                          </div>
+                        </div>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border uppercase ${t.status === "Graduated" ? "text-[#10B981] bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)]" : "text-[#818CF8] bg-[rgba(99,102,241,0.1)] border-[rgba(99,102,241,0.3)]"}`}>
+                          {t.status === "Graduated" ? "🎓" : "●"} {t.status}
+                        </span>
+                      </div>
+                    ))}
+                    <Link href="/launch">
+                      <div className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed text-xs font-bold transition-all cursor-pointer ${isDark ? "border-[rgba(99,102,241,0.2)] text-[var(--color-text-muted)] hover:border-[rgba(99,102,241,0.4)] hover:text-[#818CF8]" : "border-indigo-200 text-indigo-500 hover:bg-indigo-50"}`}>
+                        <span>+ Launch New Token</span>
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-          {/* ─── ACTIVITY TAB ─── */}
-          {activeTab === "activity" && (
-            <motion.div key="activity" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ ease: EASE, duration: 0.35 }} className="flex flex-col gap-6">
-
-              {/* Filter pills */}
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                {(["all", "trades", "launches", "social"] as const).map(f => (
-                  <button
-                    key={f}
-                    onClick={() => setActivityFilter(f)}
-                    className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap border transition-all ${
-                      activityFilter === f
-                        ? "bg-[#6366F1] text-white border-[#6366F1] shadow-[0_0_12px_rgba(99,102,241,0.35)]"
-                        : `border-[rgba(99,102,241,0.15)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] ${isDark ? "bg-[rgba(99,102,241,0.05)]" : "bg-white"}`
-                    }`}
-                  >
-                    {f.charAt(0).toUpperCase() + f.slice(1)}
-                  </button>
-                ))}
-              </div>
-
+        {/* ── ACTIVITY ── */}
+        {activeTab === "activity" && (
+          <motion.div key="activity" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ ease: EASE, duration: 0.3 }}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Feed */}
-              <div className={`backdrop-blur-2xl border rounded-2xl overflow-hidden ${surface}`}>
-                {filteredActivity.map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06, ease: EASE }}
-                    className={`flex items-center gap-4 px-5 py-4 border-b transition-colors ${
-                      isDark ? "border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)]" : "border-gray-50 hover:bg-indigo-50/20"
-                    } last:border-0`}
-                  >
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0 bg-[rgba(99,102,241,0.08)] border border-[rgba(99,102,241,0.12)]">
-                      {item.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[var(--color-text-primary)] text-sm">{item.desc}</span>
-                        {item.ticker && <span className="text-[#818CF8] font-mono text-xs">${item.ticker}</span>}
-                      </div>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[var(--color-text-faint)] text-xs flex items-center gap-1"><Clock className="w-3 h-3" />{item.time}</span>
-                        {item.amount && (
-                          <span className={`text-xs font-mono font-bold ${item.type === "buy" ? "text-[#10B981]" : item.type === "sell" ? "text-[#F43F5E]" : "text-[#818CF8]"}`}>
-                            {item.amount}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className={`text-xs font-bold px-2 py-1 rounded-full capitalize ${
-                      item.type === "buy" ? "bg-[rgba(16,185,129,0.1)] text-[#10B981]" :
-                      item.type === "sell" ? "bg-[rgba(244,63,94,0.1)] text-[#F43F5E]" :
-                      item.type === "launch" ? "bg-[rgba(99,102,241,0.1)] text-[#818CF8]" :
-                      "bg-[rgba(245,158,11,0.1)] text-[#F59E0B]"
-                    }`}>{item.type}</div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ─── BADGES TAB ─── */}
-          {activeTab === "badges" && (
-            <motion.div key="badges" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ ease: EASE, duration: 0.35 }} className="flex flex-col gap-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ACHIEVEMENTS.map((ach, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.07, ease: EASE }}
-                    className={`relative overflow-hidden border rounded-2xl p-5 transition-all ${
-                      ach.unlocked
-                        ? `${isDark ? "bg-[rgba(5,5,16,0.80)]" : "bg-white"} hover:shadow-[0_0_20px_rgba(99,102,241,0.12)] hover:-translate-y-0.5`
-                        : `${isDark ? "bg-[rgba(5,5,16,0.40)]" : "bg-gray-50"} opacity-50 grayscale`
-                    } ${isDark ? "border-[rgba(99,102,241,0.1)]" : "border-gray-200"}`}
-                  >
-                    {ach.unlocked && (
-                      <>
-                        <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-[0.08]" style={{ backgroundColor: ach.color }} />
-                        <div className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-[#10B981]" />
-                        </div>
-                      </>
-                    )}
-                    <div className="text-4xl mb-3 drop-shadow-[0_0_10px_currentColor]" style={{ color: ach.color }}>{ach.icon}</div>
-                    <h4 className="font-bold text-[var(--color-text-primary)] mb-1">{ach.title}</h4>
-                    <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-3">{ach.desc}</p>
-                    <span
-                      className="text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-full border"
-                      style={ach.unlocked ? { color: ach.color, backgroundColor: `${ach.color}18`, borderColor: `${ach.color}40` } : {}}
+              <div className={`lg:col-span-2 rounded-2xl border overflow-hidden backdrop-blur-xl ${glass}`}>
+                <div className={`px-5 py-4 border-b ${isDark ? "border-[rgba(255,255,255,0.06)]" : "border-gray-100"}`}>
+                  <h3 className="font-bold text-[var(--color-text-primary)] text-sm flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-[#F59E0B]" /> Recent Activity
+                  </h3>
+                </div>
+                <div className="divide-y divide-[var(--color-border-subtle)]">
+                  {ACTIVITY_FEED.map((item, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.06, ease: EASE }}
+                      className={`flex items-center gap-4 px-5 py-4 transition-colors ${isDark ? "hover:bg-[rgba(255,255,255,0.02)]" : "hover:bg-gray-50/60"}`}
                     >
-                      {ach.unlocked ? ach.rarity : "🔒 LOCKED"}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ─── AI ROAST TAB ─── */}
-          {activeTab === "roast" && (
-            <motion.div key="roast" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ ease: EASE, duration: 0.35 }} className="flex flex-col gap-6">
-              <div className={`backdrop-blur-2xl border rounded-2xl p-6 sm:p-8 relative overflow-hidden ${isDark ? "bg-[rgba(5,5,16,0.80)] border-[rgba(244,63,94,0.25)]" : "bg-red-50 border-red-200"}`}>
-                <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(ellipse_at_top_right,rgba(244,63,94,0.8),transparent_60%)]" />
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[rgba(244,63,94,0.15)] flex items-center justify-center border border-[rgba(244,63,94,0.3)]">
-                        <Flame className="w-5 h-5 text-[#F43F5E]" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[var(--color-text-primary)]">AI Wallet Roast</h3>
-                        <p className="text-xs text-[var(--color-text-muted)]">Let the AI analyze your on-chain behaviour. Warning: brutal.</p>
-                      </div>
-                    </div>
-                    {!roastData && (
-                      <MagneticButton as="div" strength={0.25}>
-                        <button
-                          onClick={handleRoast}
-                          disabled={isRoasting}
-                          className={`px-5 py-2 rounded-full font-bold text-sm border transition-all active:scale-[0.97] disabled:opacity-50 ${isDark ? "bg-[rgba(244,63,94,0.15)] text-[#F43F5E] border-[rgba(244,63,94,0.35)] hover:bg-[rgba(244,63,94,0.25)]" : "bg-red-100 text-red-700 border-red-300 hover:bg-red-200"}`}
-                        >
-                          {isRoasting ? "⏳ Roasting..." : "🔥 Roast Me"}
-                        </button>
-                      </MagneticButton>
-                    )}
-                  </div>
-
-                  {roastData ? (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                      <div className="flex justify-between items-start gap-4">
-                        <h4 className="text-xl font-bold text-[var(--color-text-primary)]">{roastData.persona}</h4>
-                        <div className="text-right shrink-0">
-                          <div className="text-3xl font-mono font-black text-[#F43F5E]">{roastData.portfolioScore}</div>
-                          <div className="text-[10px] text-[var(--color-text-muted)] uppercase">/ 100</div>
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0 border ${
+                        item.type === "buy"    ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.2)]" :
+                        item.type === "sell"   ? "bg-[rgba(244,63,94,0.1)] border-[rgba(244,63,94,0.2)]"  :
+                        item.type === "launch" ? "bg-[rgba(99,102,241,0.1)] border-[rgba(99,102,241,0.2)]" :
+                                                 "bg-[rgba(245,158,11,0.1)] border-[rgba(245,158,11,0.2)]"
+                      }`}>{item.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-[var(--color-text-primary)] text-sm">{item.desc}</div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {item.ticker && <span className="text-[#818CF8] font-mono text-[10px] font-bold">${item.ticker}</span>}
+                          <span className="text-[var(--color-text-faint)] text-[10px] flex items-center gap-1"><Clock className="w-2.5 h-2.5" />{item.time}</span>
                         </div>
                       </div>
-                      <p className={`text-sm leading-relaxed border-l-2 border-[#F43F5E] pl-4 py-1 ${isDark ? "text-[#F1F5F9]" : "text-gray-800"}`}>
+                      <div className="flex items-center gap-2">
+                        {item.amount && <span className={`font-mono text-xs font-bold ${item.type === "buy" ? "text-[#10B981]" : "text-[#F43F5E]"}`}>{item.amount}</span>}
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                          item.type === "buy"    ? "bg-[rgba(16,185,129,0.15)] text-[#10B981]" :
+                          item.type === "sell"   ? "bg-[rgba(244,63,94,0.15)] text-[#F43F5E]"  :
+                          item.type === "launch" ? "bg-[rgba(99,102,241,0.15)] text-[#818CF8]" :
+                                                   "bg-[rgba(245,158,11,0.15)] text-[#F59E0B]"
+                        }`}>{item.type}</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Roast Panel */}
+              <div className={`rounded-2xl border overflow-hidden backdrop-blur-xl relative ${isDark ? "bg-[rgba(244,63,94,0.04)] border-[rgba(244,63,94,0.2)]" : "bg-red-50/60 border-red-200"}`}>
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(244,63,94,0.08),transparent_60%)] pointer-events-none" />
+                <div className={`px-5 py-4 border-b relative z-10 ${isDark ? "border-[rgba(244,63,94,0.15)]" : "border-red-100"}`}>
+                  <h3 className="font-bold text-[var(--color-text-primary)] text-sm flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-[#F43F5E]" /> AI Wallet Roast
+                  </h3>
+                </div>
+                <div className="p-5 relative z-10">
+                  {roastData ? (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-black text-[var(--color-text-primary)]">{roastData.persona}</h4>
+                        <div className="text-right">
+                          <div className="text-2xl font-black font-mono text-[#F43F5E]">{roastData.portfolioScore}</div>
+                          <div className="text-[9px] text-[var(--color-text-faint)] uppercase">score</div>
+                        </div>
+                      </div>
+                      <p className={`text-sm leading-relaxed border-l-2 border-[#F43F5E] pl-3 ${isDark ? "text-[#F1F5F9]" : "text-gray-800"}`}>
                         "{roastData.roast}"
                       </p>
-                      <div className="grid grid-cols-3 gap-4 pt-2">
-                        <div className="text-center">
-                          <div className="text-lg font-mono font-bold text-[#10B981]">{roastData.winRate}</div>
-                          <div className="text-[10px] text-[var(--color-text-muted)] uppercase">Win Rate</div>
+                      <div className="grid grid-cols-2 gap-2 pt-2">
+                        <div className={`text-center rounded-xl p-2 border ${isDark ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.06)]" : "bg-white border-gray-100"}`}>
+                          <div className="text-sm font-mono font-black text-[#10B981]">{roastData.winRate}</div>
+                          <div className="text-[9px] text-[var(--color-text-faint)] uppercase">Win Rate</div>
                         </div>
-                        <div className="text-center">
-                          <div className="text-lg font-mono font-bold text-[#F43F5E]">{roastData.rugCount}x</div>
-                          <div className="text-[10px] text-[var(--color-text-muted)] uppercase">Rugged</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-mono font-bold text-[#818CF8]">{roastData.portfolioScore}/100</div>
-                          <div className="text-[10px] text-[var(--color-text-muted)] uppercase">Score</div>
+                        <div className={`text-center rounded-xl p-2 border ${isDark ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.06)]" : "bg-white border-gray-100"}`}>
+                          <div className="text-sm font-mono font-black text-[#F43F5E]">{roastData.rugCount}x</div>
+                          <div className="text-[9px] text-[var(--color-text-faint)] uppercase">Rugged</div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => setRoastData(null)}
-                        className={`text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors mt-2`}
-                      >
-                        Roast again →
+                      <button onClick={() => setRoastData(null)} className="text-[10px] text-[var(--color-text-faint)] hover:text-[var(--color-text-secondary)] transition-colors">
+                        ← Roast again
                       </button>
-                    </motion.div>
+                    </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <div className="text-5xl mb-4 opacity-60">🤖</div>
-                      <p className="text-[var(--color-text-muted)] text-sm max-w-xs mx-auto leading-relaxed">
-                        The AI will analyze your on-chain history, portfolio choices, and trading patterns — then mercilessly roast you.
+                    <div className="text-center py-6">
+                      <div className="text-4xl mb-3 opacity-50">🤖</div>
+                      <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-5">
+                        Let the AI brutally analyze your on-chain history. Warning: no mercy.
                       </p>
+                      <button
+                        onClick={handleRoast}
+                        disabled={isRoasting}
+                        className={`w-full py-2.5 rounded-xl text-sm font-bold border transition-all active:scale-95 disabled:opacity-50 ${
+                          isDark ? "bg-[rgba(244,63,94,0.15)] text-[#F43F5E] border-[rgba(244,63,94,0.35)] hover:bg-[rgba(244,63,94,0.25)]"
+                                 : "bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+                        }`}
+                      >
+                        {isRoasting ? "⏳ Analyzing..." : "🔥 Roast My Wallet"}
+                      </button>
                     </div>
                   )}
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
-        </AnimatePresence>
-      </div>
+        {/* ── BADGES ── */}
+        {activeTab === "badges" && (
+          <motion.div key="badges" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ ease: EASE, duration: 0.3 }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {ACHIEVEMENTS.map((ach, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.07, ease: EASE }}
+                  className={`relative overflow-hidden rounded-2xl border p-4 text-center transition-all group cursor-default ${
+                    ach.unlocked
+                      ? `${glass} ${glassHover} hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(99,102,241,0.15)]`
+                      : `${glass} opacity-40 grayscale`
+                  }`}
+                >
+                  {ach.unlocked && (
+                    <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl" style={{ backgroundColor: ach.color }} />
+                  )}
+                  <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">{ach.icon}</div>
+                  <div className="font-bold text-[var(--color-text-primary)] text-xs mb-1 leading-tight">{ach.title}</div>
+                  <span
+                    className="text-[8px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full border"
+                    style={ach.unlocked ? { color: ach.color, backgroundColor: `${ach.color}18`, borderColor: `${ach.color}40` } : {}}
+                  >
+                    {ach.unlocked ? ach.rarity : "🔒 LOCKED"}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Stats summary */}
+            <div className={`mt-4 rounded-2xl border p-5 backdrop-blur-xl ${glass}`}>
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-black font-mono text-[#F59E0B]">5</div>
+                  <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Badges Earned</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-black font-mono text-[var(--color-text-primary)]">Level 42</div>
+                  <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Diamond Trader</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-black font-mono text-[#818CF8]">94.2K</div>
+                  <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Total XP</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+      </AnimatePresence>
     </div>
   );
 }
