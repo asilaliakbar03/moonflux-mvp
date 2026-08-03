@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Settings, Shield, Bell, Palette, Globe, Wallet, Key, Trash2, Plus, BellRing, ChevronRight, Moon, Sun } from "lucide-react";
+import { Settings, Shield, Bell, Palette, Globe, Wallet, Key, Trash2, Plus, BellRing, ChevronRight, Moon, Sun, AlertTriangle } from "lucide-react";
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useToast } from "@/components/ToastProvider";
 import MagneticButton from '@/components/MagneticButton';
@@ -78,156 +78,181 @@ export default function SettingsPage() {
     "Performance Animations": true,
   });
 
+  const getBorder = () => isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black';
+  const getShadow = (color?: string) => isDark ? `shadow-[4px_4px_0px_0px_${color || '#10B981'}]` : `shadow-[4px_4px_0px_0px_#000]`;
+  const getBg = () => isDark ? 'bg-[#050510]' : 'bg-white';
+  const getPanelBg = () => isDark ? 'bg-black' : 'bg-gray-50';
 
   return (
-    <div className="max-w-4xl mx-auto w-full pt-4 sm:pt-6 md:pt-8 pb-24 px-4 sm:px-6 md:px-8 max-w-full overflow-x-hidden">
-      
-      {/* ── HEADER ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 text-center md:text-left">
-        <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-text-primary mb-2 flex items-center justify-center md:justify-start gap-3 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] display-safe">
-            <Settings className="w-8 h-8 text-indigo-400" />
-            Settings
-          </h1>
-          <p className="text-text-secondary">Manage your account, trading preferences, and alerts.</p>
-        </div>
+    <div className={`min-h-screen ${getBg()} font-mono uppercase tracking-wider text-sm sm:text-base ${isDark ? 'text-white' : 'text-black'} p-4 md:p-8 pb-24 overflow-x-hidden`}>
+      <div className="max-w-5xl mx-auto w-full">
         
-        <div className="flex flex-col sm:flex-row w-full md:w-auto p-1 bg-surface-base backdrop-blur-2xl border border-border-subtle rounded-xl shadow-card">
-          <MagneticButton
-            onClick={() => setActiveTab('general')}
-            className={`flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
-              activeTab === 'general'
-                ? 'bg-indigo-500/15 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-            }`}
-          >
-            General Settings
-          </MagneticButton>
-          <MagneticButton
-            onClick={() => setActiveTab('alerts')}
-            className={`flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${
-              activeTab === 'alerts'
-                ? 'bg-indigo-500/15 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.2)]' 
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-            }`}
-          >
-            Price Alerts
-          </MagneticButton>
-        </div>
-      </motion.div>
+        {/* ── HEADER ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+          <div className={`${getPanelBg()} ${getBorder()} ${getShadow('#06B6D4')} p-4 flex flex-col md:flex-row justify-between items-center mb-6`}>
+            <div className="font-black flex flex-wrap items-center gap-2 mb-4 md:mb-0 text-[#06B6D4]">
+              <Settings className="w-5 h-5 hidden md:block" />
+              <span>&gt; SYSTEM STATUS: ONLINE</span>
+              <span className="hidden xl:inline"> // </span>
+              <span className="hidden lg:inline text-[#10B981]">RPC LATENCY: 24MS</span>
+              <span className="hidden xl:inline"> // </span>
+              <span className="hidden md:inline text-[#F59E0B]">WALLET: {anchorWallet ? 'CONNECTED' : 'DISCONNECTED'}</span>
+            </div>
+            
+            <div className="flex gap-4 w-full md:w-auto">
+              <button
+                onClick={() => setActiveTab('general')}
+                className={`flex-1 md:flex-none px-4 py-2 font-black transition-all ${getBorder()} ${
+                  activeTab === 'general'
+                    ? (isDark ? 'bg-[#10B981] text-black shadow-[2px_2px_0px_0px_#10B981]' : 'bg-black text-white shadow-[2px_2px_0px_0px_#000]')
+                    : 'bg-transparent hover:bg-gray-500/10'
+                }`}
+              >
+                [ GENERAL ]
+              </button>
+              <button
+                onClick={() => setActiveTab('alerts')}
+                className={`flex-1 md:flex-none px-4 py-2 font-black transition-all ${getBorder()} ${
+                  activeTab === 'alerts'
+                    ? (isDark ? 'bg-[#10B981] text-black shadow-[2px_2px_0px_0px_#10B981]' : 'bg-black text-white shadow-[2px_2px_0px_0px_#000]')
+                    : 'bg-transparent hover:bg-gray-500/10'
+                }`}
+              >
+                [ ALERTS ]
+              </button>
+            </div>
+          </div>
+        </motion.div>
 
-      {/* ── GENERAL SETTINGS ── */}
-      {activeTab === 'general' && (
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SECTIONS.map((sec, i) => (
-            <div key={i} className="bg-surface-base backdrop-blur-2xl border border-border-subtle flex flex-col overflow-hidden rounded-xl hover:border-border-focus transition-all">
-              <div className="p-4 border-b border-border-subtle flex items-center gap-3">
-                <sec.icon className="w-5 h-5 text-indigo-400" />
-                <h3 className="font-bold text-text-primary">{sec.title}</h3>
+        {/* ── GENERAL SETTINGS ── */}
+        {activeTab === 'general' && (
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {SECTIONS.map((sec, i) => (
+              <div key={i} className={`${getPanelBg()} ${getBorder()} ${getShadow('#10B981')} flex flex-col`}>
+                <div className={`p-4 ${getBorder()} border-t-0 border-l-0 border-r-0 flex items-center gap-3 ${isDark ? 'bg-[#10B981] text-black' : 'bg-black text-white'}`}>
+                  <sec.icon className="w-6 h-6" />
+                  <h3 className="font-black tracking-widest">[ &gt; {sec.title} ]</h3>
+                </div>
+                
+                <div className="flex flex-col p-4 gap-4">
+                  {sec.title === 'Display' && (
+                    <div className={`p-4 mb-2 ${getBorder()} flex flex-col gap-3`}>
+                       <span className="font-black text-[#F59E0B]">&gt; THEME MODE</span>
+                       <div className="flex gap-3">
+                         <button onClick={() => setTheme('dark')} className={`flex-1 flex items-center justify-center gap-2 p-2 font-black transition-all ${getBorder()} ${isDark ? 'bg-[#F43F5E] text-black shadow-[2px_2px_0px_0px_#F43F5E]' : 'bg-transparent hover:bg-gray-200'}`}>
+                           <Moon className="w-5 h-5" />
+                           [ DARK ]
+                         </button>
+                         <button onClick={() => setTheme('light')} className={`flex-1 flex items-center justify-center gap-2 p-2 font-black transition-all ${getBorder()} ${!isDark ? 'bg-[#F43F5E] text-black shadow-[2px_2px_0px_0px_#000]' : 'bg-transparent hover:bg-gray-200'}`}>
+                           <Sun className="w-5 h-5" />
+                           [ LIGHT ]
+                         </button>
+                       </div>
+                    </div>
+                  )}
+                  {sec.items.map((item, idx) => (
+                    <div key={idx} className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 ${idx !== sec.items.length - 1 ? `pb-4 border-b-2 border-dashed ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'}` : ''}`}>
+                      <span className="font-bold">{item.label}</span>
+                      
+                      {item.type === 'value' && (
+                        <span className={`font-black p-2 ${getBorder()} ${isDark ? 'bg-[#06B6D4] text-black' : 'bg-gray-200 text-black'}`}>
+                          {item.value === '0x...' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}
+                        </span>
+                      )}
+                      
+                      {item.type === 'toggle' && (
+                         <button 
+                           onClick={() => setToggles(prev => ({ ...prev, [item.label]: !prev[item.label] }))}
+                           className={`font-black px-3 py-1 ${getBorder()} transition-all ${(toggles[item.label] ?? item.value) ? (isDark ? 'bg-[#10B981] text-black shadow-[2px_2px_0px_0px_#10B981]' : 'bg-black text-white shadow-[2px_2px_0px_0px_#000]') : 'bg-transparent text-gray-500'}`}
+                         >
+                           { (toggles[item.label] ?? item.value) ? '[ ENABLED ]' : '[ DISABLED ]' }
+                         </button>
+                      )}
+                      
+                      {item.type === 'select' && (
+                        <div className={`flex items-center gap-2 font-black px-3 py-1 cursor-pointer ${getBorder()} hover:bg-gray-200 transition-all ${!isDark && 'hover:bg-gray-300'} ${isDark && 'hover:text-black hover:bg-[#F59E0B]'}`}>
+                          {item.value} <ChevronRight className="w-4 h-4" />
+                        </div>
+                      )}
+                      
+                      {item.type === 'action' && (
+                        <button className={`px-4 py-1 font-black transition-all active:translate-y-1 active:shadow-none ${getBorder()} ${item.actionLabel === 'Disconnect' ? 'bg-[#F43F5E] text-black shadow-[2px_2px_0px_0px_#000]' : 'bg-[#6366F1] text-black shadow-[2px_2px_0px_0px_#000]'} `}>
+                          [ {item.actionLabel.toUpperCase()} ]
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* DANGER ZONE */}
+            <div className={`col-span-1 lg:col-span-2 mt-4 p-6 ${getBorder()} bg-[#F43F5E] text-black flex flex-col md:flex-row justify-between items-center gap-4 ${getShadow('#F43F5E')}`}>
+               <div className="flex items-center gap-3 font-black text-lg md:text-xl">
+                 <AlertTriangle className="w-8 h-8" />
+                 DANGER ZONE
+               </div>
+               <button className={`px-6 py-3 font-black bg-black text-[#F43F5E] ${isDark ? 'border-2 border-black' : 'border-3 border-black'} hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none`}>
+                 [ ⚠️ RESET ALL SYSTEM PREFERENCES ]
+               </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── PRICE ALERTS ── */}
+        {activeTab === 'alerts' && (
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-8">
+            <div className={`p-6 ${getPanelBg()} ${getBorder()} ${getShadow('#6366F1')} flex flex-col md:flex-row justify-between items-center gap-4`}>
+              <div>
+                <h3 className="text-xl font-black mb-2 text-[#06B6D4]">&gt; SYSTEM ALERTS PROVISIONING</h3>
+                <p className="text-sm font-bold opacity-80">ESTABLISH NEW PRICE TARGET THRESHOLDS.</p>
+              </div>
+              <button className={`font-black px-6 py-3 bg-[#6366F1] text-black ${getBorder()} shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2`}>
+                <Plus className="w-5 h-5" /> [ ADD ALERT ]
+              </button>
+            </div>
+
+            <div className={`${getPanelBg()} ${getBorder()} ${getShadow('#F59E0B')}`}>
+              <div className={`p-4 ${getBorder()} border-t-0 border-l-0 border-r-0 flex items-center gap-3 ${isDark ? 'bg-[#F59E0B] text-black' : 'bg-black text-white'}`}>
+                <BellRing className="w-6 h-6" />
+                <h3 className="font-black tracking-widest">[ &gt; ACTIVE ALERTS ]</h3>
               </div>
               
-              <div className="flex flex-col p-2">
-                {sec.title === 'Display' && (
-                  <div className="p-3 mb-2 border-b border-border-subtle">
-                     <span className="text-sm font-medium text-text-secondary block mb-3">Theme Mode</span>
-                     <div className="flex gap-3">
-                       <button onClick={() => setTheme('dark')} className={`flex-1 flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${isDark ? 'border-indigo-500 bg-indigo-500/10' : 'border-border-subtle hover:border-border-focus hover:bg-surface-hover'}`}>
-                         <Moon className="w-5 h-5 mb-1.5 text-indigo-400" />
-                         <span className="text-xs font-medium text-text-primary">Dark</span>
-                       </button>
-                       <button onClick={() => setTheme('light')} className={`flex-1 flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${!isDark ? 'border-indigo-500 bg-indigo-500/10' : 'border-border-subtle hover:border-border-focus hover:bg-surface-hover'}`}>
-                         <Sun className="w-5 h-5 mb-1.5 text-indigo-400" />
-                         <span className="text-xs font-medium text-text-primary">Light</span>
-                       </button>
-                     </div>
-                  </div>
-                )}
-                {sec.items.map((item, idx) => (
-                  <div key={idx} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-3 sm:gap-0 rounded-lg hover:bg-surface-hover transition-colors ${idx !== sec.items.length - 1 ? 'border-b border-border-subtle' : ''}`}>
-                    <span className="text-sm font-medium text-text-secondary">{item.label}</span>
-                    
-                    {item.type === 'value' && (
-                      <span className="text-sm text-text-primary font-mono bg-surface-1 border border-border-default px-2 py-1 rounded shadow-inner">{item.value === '0x...' && anchorWallet ? anchorWallet.publicKey.toBase58().substring(0,8)+'...' : item.value}</span>
-                    )}
-                    
-                    {item.type === 'toggle' && (
-                      <div 
-                        onClick={() => setToggles(prev => ({ ...prev, [item.label]: !prev[item.label] }))}
-                        className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-colors border ${(toggles[item.label] ?? item.value) ? 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.3)]' : 'bg-surface-1 border-border-default'}`}
-                      >
-                        <div className={`w-4 h-4 rounded-full bg-text-primary transition-transform ${(toggles[item.label] ?? item.value) ? 'translate-x-5 shadow-[0_0_5px_var(--color-text-primary)]' : 'translate-x-0 opacity-50'}`} />
-                      </div>
-                    )}
-                    
-                    {item.type === 'select' && (
-                      <div className="flex items-center gap-1 text-sm font-medium text-text-primary bg-surface-1 px-3 py-1 rounded cursor-pointer border border-border-subtle hover:border-indigo-400 hover:shadow-[0_0_10px_rgba(129,140,248,0.2)] transition-all">
-                        {item.value} <ChevronRight className="w-3.5 h-3.5 text-text-muted" />
-                      </div>
-                    )}
-                    
-                    {item.type === 'action' && (
-                      <MagneticButton strength={0.2} className={`px-3 py-1 rounded text-sm font-bold transition-all border active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${item.actionLabel === 'Disconnect' ? 'bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/20'}`}>
-                        {item.actionLabel}
-                      </MagneticButton>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      )}
-
-      {/* ── PRICE ALERTS ── */}
-      {activeTab === 'alerts' && (
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
-          <div className="bg-surface-base backdrop-blur-2xl border border-border-subtle rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 hover:border-border-focus transition-all">
-            <div>
-              <h3 className="text-xl font-bold text-text-primary mb-1 display-safe">Create New Alert</h3>
-              <p className="text-sm text-text-secondary">Get notified when a token hits your target price.</p>
-            </div>
-            <MagneticButton strength={0.25} className="bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-400 rounded-lg font-bold px-4 py-2 transition-all flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
-              <Plus className="w-4 h-4" /> Add Alert
-            </MagneticButton>
-          </div>
-
-          <div className="bg-surface-base backdrop-blur-2xl border border-border-subtle overflow-hidden rounded-xl">
-            <div className="p-5 border-b border-border-subtle bg-surface-base backdrop-blur-2xl flex items-center gap-2">
-              <BellRing className="w-5 h-5 text-indigo-400 drop-shadow-[0_0_5px_rgba(129,140,248,0.3)]" />
-              <h3 className="text-lg font-bold text-text-primary drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">Active Alerts</h3>
-            </div>
-            <div className="flex flex-col p-2">
-              {alerts.length === 0 ? (
-                <div className="p-4 sm:p-6 md:p-8 text-center text-text-secondary">No active price alerts.</div>
-              ) : (
-                alerts.map((alert) => (
-                  <div key={alert.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 gap-4 sm:gap-0 border-b border-border-subtle hover:bg-surface-hover transition-colors rounded-lg group">
-                    <div className="flex items-center gap-4">
-                      <div 
-                        onClick={() => setAlerts(alerts.map(a => a.id === alert.id ? { ...a, active: !a.active } : a))}
-                        className={`w-10 h-5 rounded-full p-0.5 cursor-pointer transition-all border ${alert.active ? 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.3)]' : 'bg-surface-1 border-border-default'}`}
-                      >
-                        <div className={`w-4 h-4 rounded-full bg-text-primary transition-transform ${alert.active ? 'translate-x-5 shadow-[0_0_5px_var(--color-text-primary)]' : 'translate-x-0 opacity-50'}`} />
-                      </div>
-                      <div>
-                        <div className="font-bold text-text-primary group-hover:text-indigo-400 transition-colors">${alert.token}</div>
-                        <div className="text-xs text-text-secondary font-mono">
-                          {alert.condition === 'above' ? 'Goes above ' : 'Drops below '}
-                          <span className="font-bold text-green-500"><AnimatedCounter value={alert.price} prefix="$" decimals={4} /></span>
+              <div className="flex flex-col p-4">
+                {alerts.length === 0 ? (
+                  <div className="p-8 text-center font-bold opacity-50">&gt; NO ACTIVE ALERTS IN SYSTEM.</div>
+                ) : (
+                  alerts.map((alert, idx) => (
+                    <div key={alert.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 gap-4 sm:gap-0 ${idx !== alerts.length - 1 ? `border-b-2 border-dashed ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'}` : ''}`}>
+                      <div className="flex items-center gap-6">
+                        <button 
+                           onClick={() => setAlerts(alerts.map(a => a.id === alert.id ? { ...a, active: !a.active } : a))}
+                           className={`font-black px-3 py-1 transition-all ${getBorder()} ${alert.active ? (isDark ? 'bg-[#10B981] text-black shadow-[2px_2px_0px_0px_#10B981]' : 'bg-black text-white shadow-[2px_2px_0px_0px_#000]') : 'bg-transparent text-gray-500'}`}
+                         >
+                           { alert.active ? '[ ACTIVE ]' : '[ INACTIVE ]' }
+                        </button>
+                        <div>
+                          <div className="font-black text-lg sm:text-xl flex items-center gap-2">
+                             <img src={`https://robohash.org/${alert.token.toLowerCase()}?set=set1&bgset=bg1&size=400x400`} alt={alert.token} className={`w-8 h-8 rounded-none ${getBorder()} bg-white`} />
+                             ${alert.token}
+                          </div>
+                          <div className="text-sm font-bold opacity-80 mt-1">
+                            {alert.condition === 'above' ? 'TARGET > ' : 'TARGET < '}
+                            <span className="text-[#10B981]"><AnimatedCounter value={alert.price} prefix="$" decimals={4} /></span>
+                          </div>
                         </div>
                       </div>
+                      <button className={`p-3 font-black bg-[#F43F5E] text-black ${getBorder()} shadow-[2px_2px_0px_0px_#000] active:translate-y-1 active:shadow-none hover:bg-black hover:text-[#F43F5E] transition-all`}>
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     </div>
-                    <MagneticButton strength={0.2} className="p-2 text-text-secondary hover:text-red-500 hover:bg-red-500/10 rounded transition-colors border border-transparent hover:border-red-500/30 focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none">
-                      <Trash2 className="w-4 h-4" />
-                    </MagneticButton>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        </motion.div>
-      )}
-
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

@@ -24,7 +24,7 @@ function useCountdown(initialSeconds: number) {
 
 const BATTLE = {
   tokenA: { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', icon:'🐶', color:'#10B981', votes:8432, pct:57 },
-  tokenB: { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', icon:'💎', color:'#EF4444', votes:6318, pct:43 },
+  tokenB: { id:'tok_degen_ape', name:'DegenApe', ticker:'DAPE', icon:'💎', color:'#F43F5E', votes:6318, pct:43 },
 };
 
 const getPastDate = (daysAgo: number) => {
@@ -40,6 +40,12 @@ const PAST_BATTLES = [
   { date: getPastDate(4), winner: "StormCat", icon: "⚡", pct: 62, loser: "Void Inu" },
 ];
 
+const getAsciiBar = (pct: number, length: number = 10) => {
+  const filled = Math.round((pct / 100) * length);
+  const empty = length - filled;
+  return `[${'█'.repeat(filled)}${'░'.repeat(empty)}]`;
+}
+
 export default function ArenaPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -51,8 +57,8 @@ export default function ArenaPage() {
   const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const [analysisText, setAnalysisText] = useState({
-    a: "Luna Doge enters the arena backed by explosive social velocity. The Dog Meta narrative is at peak strength. Holder count is up this week making it a clear favorite.",
-    b: "DegenApe fights back with classic underdog energy. Viral potential is high, and recent volume spikes suggest whale accumulation. Don't count it out."
+    a: "LUNA DOGE ENTERS THE ARENA BACKED BY EXPLOSIVE SOCIAL VELOCITY. THE DOG META NARRATIVE IS AT PEAK STRENGTH. HOLDER COUNT IS UP THIS WEEK MAKING IT A CLEAR FAVORITE.",
+    b: "DEGENAPE FIGHTS BACK WITH CLASSIC UNDERDOG ENERGY. VIRAL POTENTIAL IS HIGH, AND RECENT VOLUME SPIKES SUGGEST WHALE ACCUMULATION. DON'T COUNT IT OUT."
   });
 
   const handleVote = (side: 'a' | 'b') => {
@@ -83,216 +89,263 @@ export default function ArenaPage() {
     
     await new Promise(r => setTimeout(r, 1500));
     setAnalysisText({
-      a: "Updated Analysis: Luna Doge's on-chain metrics are extraordinary. Forged from social momentum and volume consistency, the dog meta is entering euphoric territory.",
-      b: "Updated Analysis: DegenApe has quietly built a war chest. Three historically accurate early-mover wallets loaded significant positions recently."
+      a: "UPDATED ANALYSIS: LUNA DOGE'S ON-CHAIN METRICS ARE EXTRAORDINARY. FORGED FROM SOCIAL MOMENTUM AND VOLUME CONSISTENCY, THE DOG META IS ENTERING EUPHORIC TERRITORY.",
+      b: "UPDATED ANALYSIS: DEGENAPE HAS QUIETLY BUILT A WAR CHEST. THREE HISTORICALLY ACCURATE EARLY-MOVER WALLETS LOADED SIGNIFICANT POSITIONS RECENTLY."
     });
     setAnalysisLoading(false);
   };
 
+  const borderClass = isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black';
+  const borderHeavyClass = isDark ? 'border-4 border-[rgba(255,255,255,0.2)]' : 'border-4 border-black';
+  
+  const bgRoot = isDark ? 'bg-[#050510]' : 'bg-white';
+  const textPrimary = isDark ? 'text-white' : 'text-black';
+  const textMuted = isDark ? 'text-[rgba(255,255,255,0.5)]' : 'text-gray-500';
+
+  const shadowA = isDark ? 'shadow-[4px_4px_0px_0px_#10B981]' : 'shadow-[4px_4px_0px_0px_#000]';
+  const shadowB = isDark ? 'shadow-[4px_4px_0px_0px_#F43F5E]' : 'shadow-[4px_4px_0px_0px_#000]';
+  const shadowNeutral = isDark ? 'shadow-[4px_4px_0px_0px_#06B6D4]' : 'shadow-[4px_4px_0px_0px_#000]';
+  
+  const shadowHoverA = isDark ? 'hover:shadow-[6px_6px_0px_0px_#10B981]' : 'hover:shadow-[6px_6px_0px_0px_#000]';
+  const shadowHoverB = isDark ? 'hover:shadow-[6px_6px_0px_0px_#F43F5E]' : 'hover:shadow-[6px_6px_0px_0px_#000]';
+
   return (
-    <div className="max-w-4xl mx-auto w-full pt-8 pb-24 md:pb-16 px-4 sm:px-0">
-      
-      {/* ── HEADER ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-1">Token Arena</h1>
-          <p className="text-text-secondary text-sm">Daily battle. Two tokens. One winner. You decide.</p>
-        </div>
-        <div className={`border rounded-xl px-4 py-2 flex items-center gap-4 ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
-          <span className="text-text-muted text-xs uppercase tracking-wider font-semibold">Resets in</span>
-          <span className="text-lg font-mono font-medium text-text-primary">{countdown}</span>
-        </div>
-      </motion.div>
+    <div className={`min-h-screen ${bgRoot} ${textPrimary} font-mono uppercase tracking-wider selection:bg-[#F59E0B] selection:text-black`}>
+      <div className="max-w-6xl mx-auto w-full pt-8 pb-24 md:pb-16 px-4 sm:px-6">
+        
+        {/* ── HEADER ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+          <div>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-2 tracking-widest leading-none drop-shadow-md">
+              TOKEN<br/>ARENA
+            </h1>
+            <p className={`font-bold text-sm sm:text-base ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`}>
+              [ DAILY BATTLE. TWO TOKENS. ONE SURVIVOR. ]
+            </p>
+          </div>
+          <div className={`${borderHeavyClass} p-4 bg-[#F59E0B] text-black ${shadowNeutral} transform -rotate-1`}>
+            <div className="text-xs font-black mb-1">[ SYSTEM RESET IN ]</div>
+            <div className="text-3xl font-black tracking-widest">{countdown}</div>
+          </div>
+        </motion.div>
 
-      {/* ── TODAY'S BATTLE ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }}>
-        <div className={`mb-8 border rounded-xl p-4 sm:p-6 md:p-8 relative ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
-          
-          <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+        {/* ── TODAY'S BATTLE ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <div className={`${borderHeavyClass} p-6 sm:p-8 relative ${isDark ? 'bg-black' : 'bg-gray-50'} ${shadowNeutral} mb-12`}>
             
-            {/* Token A */}
-            <motion.div 
-              whileHover={{ y: -2 }}
-              className={`flex-1 flex flex-col p-5 rounded-xl border w-full transition-colors hover:border-[#10B981]/30 ${isDark ? 'bg-[rgba(0,0,0,0.5)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-2 border-border-subtle'}`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl bg-[#10B981]/10 border border-[#10B981]/20">
-                    {BATTLE.tokenA.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-text-primary font-bold text-lg leading-tight">{BATTLE.tokenA.name}</h2>
-                    <span className="text-text-secondary text-sm font-mono">${BATTLE.tokenA.ticker}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-text-primary font-mono text-xl font-medium"><AnimatedCounter value={BATTLE.tokenA.pct} suffix="%" className="font-mono" /></div>
-                  <div className="text-text-muted text-xs"><AnimatedCounter value={BATTLE.tokenA.votes} /> votes</div>
-                </div>
-              </div>
+            <div className="absolute -top-3 -left-3 bg-[#10B981] text-black text-xs font-black px-2 py-1 border-2 border-black z-20">
+              [ LIVE DUEL ]
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-stretch gap-8 relative z-10">
               
-              <MagneticButton as="div" strength={0.25} className="w-full">
-                {!voted ? (
-                  confirming === 'a' ? (
-                    <div className="flex gap-2 w-full">
-                      <button onClick={() => handleVote('a')} className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-all flex-1 bg-[#10B981] hover:bg-[#059669]">Confirm</button>
-                      <button onClick={() => setConfirming(null)} className={`px-4 py-2 rounded-lg text-sm border transition-colors flex-1 ${isDark ? 'border-[rgba(99,102,241,0.06)] text-[#94A3B8] hover:bg-[rgba(99,102,241,0.04)]' : 'border-border-subtle text-text-secondary hover:bg-surface-hover'}`}>Cancel</button>
+              {/* Token A Card */}
+              <div className={`flex-1 flex flex-col p-6 ${borderHeavyClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowA} relative transition-transform hover:-translate-y-1`}>
+                <div className="absolute top-2 right-2 text-xs font-black text-[#10B981]">[ CONTENDER A ]</div>
+                <div className="flex flex-col items-center mb-6 mt-4">
+                  <div className={`${borderClass} bg-[#10B981] w-32 h-32 mb-4 overflow-hidden`}>
+                    <img src={`https://robohash.org/${BATTLE.tokenA.ticker.toLowerCase()}?set=set1&bgset=bg1&size=400x400`} alt="Token A" className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all" />
+                  </div>
+                  <h2 className="font-black text-3xl tracking-widest text-[#10B981]">{BATTLE.tokenA.name}</h2>
+                  <span className={`text-xl font-bold ${textMuted}`}>${BATTLE.tokenA.ticker}</span>
+                </div>
+
+                <div className="mb-6 w-full text-center">
+                  <div className="text-[#10B981] font-black text-xl mb-2">
+                    {getAsciiBar(BATTLE.tokenA.pct)} <AnimatedCounter value={BATTLE.tokenA.pct} suffix="%" />
+                  </div>
+                  <div className={`text-xs font-bold ${textMuted}`}>
+                    [ <AnimatedCounter value={BATTLE.tokenA.votes} /> VOTES LOGGED ]
+                  </div>
+                </div>
+                
+                <div className="mt-auto">
+                  {!voted ? (
+                    confirming === 'a' ? (
+                      <div className="flex gap-4 w-full">
+                        <button onClick={() => handleVote('a')} className={`flex-1 py-4 font-black text-lg bg-[#10B981] text-black ${borderClass} hover:bg-white transition-colors`}>
+                          [ CONFIRM ]
+                        </button>
+                        <button onClick={() => setConfirming(null)} className={`flex-1 py-4 font-black text-lg bg-transparent ${borderClass} hover:bg-[#F43F5E] hover:text-black transition-colors`}>
+                          [ CANCEL ]
+                        </button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setConfirming('a')} className={`w-full py-4 font-black text-xl bg-[#10B981] text-black ${borderClass} ${shadowHoverA} transition-all active:translate-y-1 active:shadow-none`}>
+                        [ VOTE {BATTLE.tokenA.ticker} ]
+                      </button>
+                    )
+                  ) : voted === 'a' ? (
+                    <div className={`w-full py-4 text-center font-black text-xl bg-[#10B981] text-black ${borderClass}`}>
+                      [ VOTE SECURED ]
                     </div>
                   ) : (
-                    <button onClick={() => setConfirming('a')} className="px-4 py-2 rounded-lg text-sm font-medium bg-[#10B981] text-white transition-colors hover:bg-[#059669] w-full">
-                      Vote {BATTLE.tokenA.ticker}
-                    </button>
-                  )
-                ) : voted === 'a' ? (
-                  <button disabled className="bg-[#10B981]/10 text-[#10B981] px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center border border-[#10B981]/20 w-full opacity-100 cursor-not-allowed">
-                    Voted
-                  </button>
-                ) : (
-                  <button disabled className={`px-4 py-2 text-sm font-medium w-full rounded-lg cursor-not-allowed border ${isDark ? 'text-[#475569] bg-[rgba(0,0,0,0.2)] border-[rgba(99,102,241,0.06)]' : 'text-text-muted bg-surface-base border-border-subtle'}`}>Voted elsewhere</button>
-                )}
-              </MagneticButton>
-            </motion.div>
-
-            {/* VS Badge */}
-            <div className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 z-20 md:my-0 my-2 fluxx-breathe ${isDark ? 'bg-[#000000] border-[rgba(99,102,241,0.12)]' : 'bg-surface-base border-border-default'}`}>
-              <span className="font-medium text-text-secondary text-xs">VS</span>
-            </div>
-
-            {/* Token B */}
-            <motion.div 
-              whileHover={{ y: -2 }}
-              className={`flex-1 flex flex-col p-5 rounded-xl border w-full transition-colors hover:border-[#EF4444]/30 ${isDark ? 'bg-[rgba(0,0,0,0.5)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-2 border-border-subtle'}`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl bg-[#EF4444]/10 border border-[#EF4444]/20">
-                    {BATTLE.tokenB.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-text-primary font-bold text-lg leading-tight">{BATTLE.tokenB.name}</h2>
-                    <span className="text-text-secondary text-sm font-mono">${BATTLE.tokenB.ticker}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-text-primary font-mono text-xl font-medium"><AnimatedCounter value={BATTLE.tokenB.pct} suffix="%" className="font-mono" /></div>
-                  <div className="text-text-muted text-xs"><AnimatedCounter value={BATTLE.tokenB.votes} /> votes</div>
+                    <div className={`w-full py-4 text-center font-black text-xl ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
+                      [ LOCKED OUT ]
+                    </div>
+                  )}
                 </div>
               </div>
-              
-              <MagneticButton as="div" strength={0.25} className="w-full">
-                {!voted ? (
-                  confirming === 'b' ? (
-                    <div className="flex gap-2 w-full">
-                      <button onClick={() => handleVote('b')} className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-all flex-1 bg-[#EF4444] hover:bg-[#DC2626]">Confirm</button>
-                      <button onClick={() => setConfirming(null)} className={`px-4 py-2 rounded-lg text-sm border transition-colors flex-1 ${isDark ? 'border-[rgba(99,102,241,0.06)] text-[#94A3B8] hover:bg-[rgba(99,102,241,0.04)]' : 'border-border-subtle text-text-secondary hover:bg-surface-hover'}`}>Cancel</button>
+
+              {/* VS Badge */}
+              <div className="flex items-center justify-center lg:w-16 lg:h-auto shrink-0 z-20 py-4 lg:py-0">
+                <div className={`${borderHeavyClass} bg-[#F59E0B] text-black w-16 h-16 flex items-center justify-center font-black text-2xl transform rotate-12 shadow-[4px_4px_0px_0px_#000]`}>
+                  VS
+                </div>
+              </div>
+
+              {/* Token B Card */}
+              <div className={`flex-1 flex flex-col p-6 ${borderHeavyClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowB} relative transition-transform hover:-translate-y-1`}>
+                <div className="absolute top-2 right-2 text-xs font-black text-[#F43F5E]">[ CONTENDER B ]</div>
+                <div className="flex flex-col items-center mb-6 mt-4">
+                  <div className={`${borderClass} bg-[#F43F5E] w-32 h-32 mb-4 overflow-hidden`}>
+                    <img src={`https://robohash.org/${BATTLE.tokenB.ticker.toLowerCase()}?set=set1&bgset=bg1&size=400x400`} alt="Token B" className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all" />
+                  </div>
+                  <h2 className="font-black text-3xl tracking-widest text-[#F43F5E]">{BATTLE.tokenB.name}</h2>
+                  <span className={`text-xl font-bold ${textMuted}`}>${BATTLE.tokenB.ticker}</span>
+                </div>
+
+                <div className="mb-6 w-full text-center">
+                  <div className="text-[#F43F5E] font-black text-xl mb-2">
+                    {getAsciiBar(BATTLE.tokenB.pct)} <AnimatedCounter value={BATTLE.tokenB.pct} suffix="%" />
+                  </div>
+                  <div className={`text-xs font-bold ${textMuted}`}>
+                    [ <AnimatedCounter value={BATTLE.tokenB.votes} /> VOTES LOGGED ]
+                  </div>
+                </div>
+                
+                <div className="mt-auto">
+                  {!voted ? (
+                    confirming === 'b' ? (
+                      <div className="flex gap-4 w-full">
+                        <button onClick={() => handleVote('b')} className={`flex-1 py-4 font-black text-lg bg-[#F43F5E] text-black ${borderClass} hover:bg-white transition-colors`}>
+                          [ CONFIRM ]
+                        </button>
+                        <button onClick={() => setConfirming(null)} className={`flex-1 py-4 font-black text-lg bg-transparent ${borderClass} hover:bg-[#10B981] hover:text-black transition-colors`}>
+                          [ CANCEL ]
+                        </button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setConfirming('b')} className={`w-full py-4 font-black text-xl bg-[#F43F5E] text-black ${borderClass} ${shadowHoverB} transition-all active:translate-y-1 active:shadow-none`}>
+                        [ VOTE {BATTLE.tokenB.ticker} ]
+                      </button>
+                    )
+                  ) : voted === 'b' ? (
+                    <div className={`w-full py-4 text-center font-black text-xl bg-[#F43F5E] text-black ${borderClass}`}>
+                      [ VOTE SECURED ]
                     </div>
                   ) : (
-                    <button onClick={() => setConfirming('b')} className="px-4 py-2 rounded-lg text-sm font-medium bg-[#EF4444] text-white transition-colors hover:bg-[#DC2626] w-full">
-                      Vote {BATTLE.tokenB.ticker}
-                    </button>
-                  )
-                ) : voted === 'b' ? (
-                  <button disabled className="bg-[#EF4444]/10 text-[#EF4444] px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center border border-[#EF4444]/20 w-full opacity-100 cursor-not-allowed">
-                    Voted
+                    <div className={`w-full py-4 text-center font-black text-xl ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
+                      [ LOCKED OUT ]
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Battle Stats Grid */}
+            <div className={`mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t-4 ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'}`}>
+              <div className={`${borderClass} p-4 bg-[#6366F1] text-white flex flex-col`}>
+                <span className="text-xs font-black mb-2">[ 24H VOLUME DUEL ]</span>
+                <div className="flex justify-between items-end mt-auto">
+                  <span className="font-bold text-[#10B981]">$1.2M</span>
+                  <span className="font-bold text-[#F43F5E]">$980K</span>
+                </div>
+              </div>
+              <div className={`${borderClass} p-4 bg-[#06B6D4] text-black flex flex-col`}>
+                <span className="text-xs font-black mb-2">[ HOLDER GROWTH ]</span>
+                <div className="flex justify-between items-end mt-auto">
+                  <span className="font-bold text-black">+14%</span>
+                  <span className="font-bold text-white">+22%</span>
+                </div>
+              </div>
+              <div className={`${borderClass} p-4 bg-[#F59E0B] text-black flex flex-col`}>
+                <span className="text-xs font-black mb-2">[ SENTIMENT METER ]</span>
+                <div className="text-xl font-black mt-auto">
+                  [██████░░░░] EXTREME
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+        {/* ── AI ANALYSIS ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-12">
+          <div className={`${borderHeavyClass} ${isDark ? 'bg-black' : 'bg-white'} ${shadowNeutral}`}>
+            <button 
+              onClick={() => setAnalysisOpen(!analysisOpen)}
+              className={`w-full flex justify-between items-center p-6 ${isDark ? 'hover:bg-[#111]' : 'hover:bg-gray-100'} transition-colors`}
+            >
+              <div className="flex items-center gap-4">
+                <Swords className={`w-8 h-8 ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`} />
+                <span className="font-black text-xl tracking-widest">[ NEURAL ANALYSIS ]</span>
+              </div>
+              <span className={`font-bold text-lg ${isDark ? 'text-[#F59E0B]' : 'text-orange-500'}`}>
+                [{analysisOpen ? ' COLLAPSE ' : ' EXPAND '}]
+              </span>
+            </button>
+
+            {analysisOpen && (
+              <div className={`p-6 pt-0 border-t-4 ${isDark ? 'border-[rgba(255,255,255,0.2)] bg-[#111]' : 'border-black bg-gray-50'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                  <div className={`${borderClass} p-4 bg-[rgba(16,185,129,0.1)]`}>
+                    <h3 className="font-black text-[#10B981] text-lg mb-4 border-b-2 border-[#10B981] pb-2">
+                      [ {BATTLE.tokenA.ticker} DATABANK ]
+                    </h3>
+                    <p className="font-bold text-sm leading-relaxed text-justify">{analysisText.a}</p>
+                  </div>
+                  <div className={`${borderClass} p-4 bg-[rgba(244,63,94,0.1)]`}>
+                    <h3 className="font-black text-[#F43F5E] text-lg mb-4 border-b-2 border-[#F43F5E] pb-2">
+                      [ {BATTLE.tokenB.ticker} DATABANK ]
+                    </h3>
+                    <p className="font-bold text-sm leading-relaxed text-justify">{analysisText.b}</p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-start mt-8">
+                  <button 
+                    onClick={regenerateAnalysis}
+                    disabled={analysisLoading}
+                    className={`flex items-center gap-3 font-black px-6 py-3 ${borderClass} bg-[#6366F1] text-white hover:bg-white hover:text-black transition-colors disabled:opacity-50`}
+                  >
+                    <RefreshCw className={`w-5 h-5 ${analysisLoading ? 'animate-spin' : ''}`} />
+                    [ {analysisLoading ? "RECALCULATING..." : "REGENERATE ANALYSIS"} ]
                   </button>
-                ) : (
-                  <button disabled className={`px-4 py-2 text-sm font-medium w-full rounded-lg cursor-not-allowed border ${isDark ? 'text-[#475569] bg-[rgba(0,0,0,0.2)] border-[rgba(99,102,241,0.06)]' : 'text-text-muted bg-surface-base border-border-subtle'}`}>Voted elsewhere</button>
-                )}
-              </MagneticButton>
-            </motion.div>
-
+                </div>
+              </div>
+            )}
           </div>
+        </motion.div>
 
-          {/* Progress Bar */}
-          <div className="mt-8 max-w-2xl mx-auto relative z-10">
-            <div className={`h-2 w-full rounded-full overflow-hidden flex border ${isDark ? 'bg-[rgba(0,0,0,0.6)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-3 border-border-subtle'}`}>
-              <motion.div 
-                initial={{ width: 0 }} animate={{ width: `${BATTLE.tokenA.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                className="h-full bg-[#10B981]" 
-              />
-              <motion.div 
-                initial={{ width: '100%' }} animate={{ width: `${BATTLE.tokenB.pct}%` }} transition={{ duration: 1, ease: EASE }}
-                className="h-full bg-[#EF4444]" 
-              />
-            </div>
+        {/* ── PAST BATTLES ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <h3 className="text-2xl font-black mb-6 tracking-widest drop-shadow-sm">[ ARCHIVED CONFLICTS ]</h3>
+          <div className={`${borderHeavyClass} ${isDark ? 'bg-black' : 'bg-white'} ${shadowNeutral}`}>
+            {PAST_BATTLES.map((b, i) => (
+              <div key={i} className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 transition-colors ${
+                i !== PAST_BATTLES.length - 1 ? (isDark ? 'border-b-4 border-[rgba(255,255,255,0.2)]' : 'border-b-4 border-black') : ''
+              } ${isDark ? 'hover:bg-[#111]' : 'hover:bg-gray-100'}`}>
+                <div className="flex items-center gap-6 mb-4 sm:mb-0">
+                  <div className={`font-black text-lg w-20 ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`}>{b.date}</div>
+                  <div className="flex items-center gap-4">
+                    <span className={`text-3xl ${borderClass} p-2 bg-[#10B981] leading-none`}>{b.icon}</span>
+                    <span className="font-black text-xl">{b.winner}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                  <span className={`text-sm font-bold ${textMuted}`}>[ TERMINATED {b.loser.toUpperCase()} ]</span>
+                  <div className={`text-[#10B981] text-lg font-black bg-black ${borderClass} px-4 py-2`}>
+                    {b.pct}%
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* ── AI ANALYSIS ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.2 }} className="mb-10">
-        <div className={`border rounded-xl overflow-hidden ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
-          <button 
-            onClick={() => setAnalysisOpen(!analysisOpen)}
-            className={`w-full flex justify-between items-center p-4 transition-colors focus:outline-none ${isDark ? 'hover:bg-[rgba(99,102,241,0.02)]' : 'hover:bg-surface-hover'}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-[#818CF8]">
-                <Swords className="w-4 h-4" />
-              </div>
-              <span className="font-medium text-text-primary text-sm">AI Battle Analysis</span>
-            </div>
-            <span className="text-xs text-text-secondary">{analysisOpen ? 'Hide' : 'Show'}</span>
-          </button>
-
-          {analysisOpen && (
-            <div className={`p-4 pt-0 border-t ${isDark ? 'border-[rgba(99,102,241,0.06)] bg-[rgba(0,0,0,0.2)]' : 'border-border-subtle bg-surface-base'}`}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div>
-                  <h3 className="font-medium text-[#10B981] text-sm mb-2 flex items-center gap-2">
-                    {BATTLE.tokenA.icon} {BATTLE.tokenA.name}
-                  </h3>
-                  <p className="text-text-secondary text-sm leading-relaxed">{analysisText.a}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-[#EF4444] text-sm mb-2 flex items-center gap-2">
-                    {BATTLE.tokenB.icon} {BATTLE.tokenB.name}
-                  </h3>
-                  <p className="text-text-secondary text-sm leading-relaxed">{analysisText.b}</p>
-                </div>
-              </div>
-              
-              <div className="flex justify-start mt-6">
-                <button 
-                  onClick={regenerateAnalysis}
-                  disabled={analysisLoading}
-                  className="flex items-center gap-2 text-xs text-text-muted hover:text-text-secondary transition-colors disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3 h-3 ${analysisLoading ? 'animate-spin' : ''}`} />
-                  {analysisLoading ? "Regenerating..." : "Regenerate Analysis"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </motion.div>
-
-      {/* ── PAST BATTLES ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.3 }}>
-        <h3 className="text-sm font-medium text-text-primary mb-4">Recent Results</h3>
-        <div className={`border rounded-xl overflow-hidden ${isDark ? 'bg-[rgba(0,0,0,0.4)] border-[rgba(99,102,241,0.06)]' : 'bg-surface-1 border-border-subtle'}`}>
-          {PAST_BATTLES.map((b, i) => (
-            <div key={i} className={`flex items-center justify-between p-4 transition-colors ${
-              i !== PAST_BATTLES.length - 1 ? (isDark ? 'border-b border-[rgba(99,102,241,0.06)]' : 'border-b border-border-subtle') : ''
-            } ${isDark ? 'hover:bg-[rgba(99,102,241,0.04)]' : 'hover:bg-surface-hover'}`}>
-              <div className="flex items-center gap-4">
-                <div className="text-text-muted text-sm font-mono w-14">{b.date}</div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{b.icon}</span>
-                  <span className="text-text-primary font-medium text-sm">{b.winner}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-xs text-text-muted hidden sm:block">Defeated {b.loser}</span>
-                <div className="text-[#10B981] text-xs font-mono font-medium bg-[#10B981]/10 border border-[#10B981]/20 px-2 py-1 rounded-full">
-                  {b.pct}%
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
+      </div>
     </div>
   );
 }
