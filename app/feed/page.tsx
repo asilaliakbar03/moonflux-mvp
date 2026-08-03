@@ -8,6 +8,13 @@ import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/components/ThemeProvider';
 
+const getMemeImage = (ticker: string) => {
+  const cleanTicker = (ticker || 'token').replace('$', '');
+  const sets = ['set1', 'set2', 'set3', 'set4'];
+  const set = sets[cleanTicker.length % 4];
+  return `https://robohash.org/${cleanTicker.toLowerCase()}?set=${set}&bgset=bg1&size=400x400`;
+};
+
 interface FeedToken {
   id: string;
   matchScore: number;
@@ -77,10 +84,21 @@ function FeedItem({ token, idx, activeIndex, savedTokens, handleSave }: any) {
             </div>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-1 sm:mb-2 shadow-[0_0_25px_rgba(99,102,241,0.25)] flex items-center gap-3 display-safe truncate w-full">
-            {token.name} 
-          </h2>
-          <div className="text-lg sm:text-xl md:text-2xl font-mono text-[#6366F1] font-bold mb-2 sm:mb-4 md:mb-6">{token.ticker}</div>
+          <div className="flex items-center gap-4 mb-2 sm:mb-4">
+            <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 ${isDark ? 'border-[rgba(99,102,241,0.4)] shadow-[0_0_20px_rgba(99,102,241,0.3)] bg-black' : 'border-black shadow-[4px_4px_0px_0px_#000] bg-gray-100'} shrink-0`}>
+              <img 
+                src={getMemeImage(token.ticker)} 
+                alt={token.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-1 shadow-[0_0_25px_rgba(99,102,241,0.25)] flex items-center gap-3 display-safe truncate">
+                {token.name} 
+              </h2>
+              <div className="text-lg sm:text-xl md:text-2xl font-mono text-[#6366F1] font-bold">{token.ticker}</div>
+            </div>
+          </div>
 
           <div 
             onMouseMove={handleMouseMove}
@@ -383,9 +401,16 @@ export default function FeedPage() {
                   {savedTokens.map((token) => (
                     <div key={token.id} className={`${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl p-4 rounded-xl border shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:border-[rgba(99,102,241,0.20)] transition-all`}>
                       <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="text-lg font-bold text-[var(--color-text-primary)] display-safe">{token.name}</h4>
-                          <span className="text-xs font-mono text-[#6366F1]">{token.ticker}</span>
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={getMemeImage(token.ticker)} 
+                            alt={token.name}
+                            className="w-10 h-10 rounded-lg object-cover border border-black shadow-[2px_2px_0px_0px_#000] shrink-0"
+                          />
+                          <div>
+                            <h4 className="text-lg font-bold text-[var(--color-text-primary)] display-safe">{token.name}</h4>
+                            <span className="text-xs font-mono text-[#6366F1]">{token.ticker}</span>
+                          </div>
                         </div>
                         <span className={`text-xs font-bold px-2 py-1 rounded ${isDark ? 'bg-[#000000]/60 border-[rgba(99,102,241,0.08)]' : 'bg-[var(--color-surface-2)] border-[rgba(99,102,241,0.2)]'} border ${getUrgencyColor(token.urgencySignal)}`}>
                           {token.urgencySignal}
