@@ -212,7 +212,7 @@ export default function ExplorePage() {
                     <img 
                       src={getMemeImage(t.ticker)} 
                       alt={t.name}
-                      className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                      className="absolute inset-0 w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                     />
                     
                     {/* Live Badge */}

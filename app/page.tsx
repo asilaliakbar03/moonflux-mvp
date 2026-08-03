@@ -149,7 +149,7 @@ export default function HomePage() {
                       <img 
                         src={getMemeImage(t.ticker)} 
                         alt={t.name}
-                        className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                        className="absolute inset-0 w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                       />
                       {t.isLive && (
                         <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-[9px] font-black tracking-widest uppercase border border-black shadow-[2px_2px_0px_0px_#000] flex items-center gap-1 z-10 animate-pulse">
@@ -222,7 +222,7 @@ export default function HomePage() {
                       <img 
                         src={getMemeImage(t.ticker)} 
                         alt={t.name}
-                        className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:mix-blend-normal group-hover:opacity-100 transition-all duration-300"
+                        className="absolute inset-0 w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                       />
                       <div className={`absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-black uppercase border z-10 ${isDark ? "bg-black text-[#10B981] border-[#10B981]" : "bg-[#10B981] text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
                         NEW
