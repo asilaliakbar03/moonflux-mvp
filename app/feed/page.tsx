@@ -1,421 +1,310 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, MessageCircle, Share2, Flame, Bot, Bookmark, X } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Flame, Bot, Send, Terminal, MessageSquare, Repeat2, Zap } from 'lucide-react';
 import Link from 'next/link';
-import AnimatedCounter from '@/components/AnimatedCounter';
-import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/components/ThemeProvider';
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
-interface FeedToken {
-  id: string;
-  matchScore: number;
-  urgencySignal: string;
-  matchReasons: string[];
-  explanation: string;
-  name: string;
-  ticker: string;
-  videoUrl?: string;
-  progress: number;
-  marketCap: string;
-  risk: string;
-}
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-function FeedItem({ token, idx, activeIndex, savedTokens, handleSave }: any) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+// Helper to convert array of numbers into recharts object format
+const formatSparkline = (data: number[]) => data.map((val, i) => ({ x: i, y: val }));
 
-  const handleMouseMove = (e: any) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    setTilt({ x: -y / 40, y: x / 40 });
-  };
+// Helper to generate unique meme/crypto character images
+const getMemeImage = (ticker: string) => {
+  const sets = ['set1', 'set2', 'set3', 'set4'];
+  const set = sets[ticker.length % 4];
+  return `https://robohash.org/${ticker.toLowerCase()}?set=${set}&bgset=bg1&size=400x400`;
+};
 
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-  };
-
-  const getScoreStyles = (score: number) => {
-    if (score > 85) return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#10B981] text-[#10B981]';
-    if (score >= 50) return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#6366F1] text-[#6366F1]';
-    return 'shadow-[0_0_15px_rgba(99,102,241,0.3)] border-[#475569] text-[#475569]';
-  };
-
-  const getUrgencyColor = (signal: string = '') => {
-    const s = (signal || '').toLowerCase();
-    if (s.includes('high')) return 'text-[#F43F5E]';
-    if (s.includes('medium')) return 'text-[#F59E0B]';
-    return 'text-[#10B981]';
-  };
-
-  return (
-    <div className="h-full w-full max-w-[100vw] overflow-x-hidden snap-start snap-always relative flex items-end md:items-end justify-center p-3 sm:p-8 pb-20 sm:pb-24">
-      {/* Cyberpunk Video Background Placeholder */}
-      <div className={`absolute inset-0 z-0 ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'}`}>
-        <div className={`absolute inset-0 opacity-20 ${isDark ? 'bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.2)_0%,rgba(0,0,0,1)_70%)]' : 'bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.1)_0%,rgba(255,255,255,1)_70%)]'}`} />
-        <div className={`absolute inset-0 border-[1px] ${isDark ? 'border-[rgba(99,102,241,0.08)]' : 'border-[var(--color-border-subtle)]'} m-2 sm:m-4 rounded-3xl`} />
-      </div>
-
-      <div className="relative z-10 w-full max-w-4xl h-full flex flex-row justify-between items-end gap-2 md:gap-6 overflow-y-auto md:overflow-visible scrollbar-hide">
-        
-        {/* Main Info (Bottom Left) */}
-        <motion.div 
-          initial={{ x: -50, opacity: 0 }}
-          animate={activeIndex === idx ? { x: 0, opacity: 1 } : {}}
-          transition={{ delay: 0.1, type: "spring" }}
-          className="flex-1 min-w-0 max-w-2xl flex flex-col justify-end"
-        >
-          <div className="inline-flex flex-col gap-1 sm:gap-2 mb-3 sm:mb-6">
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${getScoreStyles(token.matchScore)} text-xs font-mono font-bold w-fit ${isDark ? 'bg-[rgba(5,5,16,0.80)]' : 'bg-[rgba(255,255,255,0.80)]'} backdrop-blur-2xl`}>
-              <Bot size={14} /> AI MATCH: <AnimatedCounter value={token.matchScore} suffix="%" />
-            </div>
-            <div className={`text-[10px] uppercase tracking-wider font-bold ml-1 ${getUrgencyColor(token.urgencySignal)}`}>
-              {token.urgencySignal}
-            </div>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-1 sm:mb-2 shadow-[0_0_25px_rgba(99,102,241,0.25)] flex items-center gap-3 display-safe truncate w-full">
-            {token.name} 
-          </h2>
-          <div className="text-lg sm:text-xl md:text-2xl font-mono text-[#6366F1] font-bold mb-2 sm:mb-4 md:mb-6">{token.ticker}</div>
-
-          <div 
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-            className={`transition-all duration-300 ease-out ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl border p-3 sm:p-4 md:p-5 rounded-2xl mb-2 sm:mb-4 md:mb-6 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-          >
-            <p className="text-sm md:text-base text-[var(--color-text-primary)] mb-4 leading-relaxed font-medium">
-              {token.explanation}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {(token.matchReasons || []).map((r: string, i: number) => (
-                <span key={i} className="px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full bg-[rgba(99,102,241,0.1)] text-[#6366F1] border border-[rgba(99,102,241,0.2)]">
-                  #{r.replace(/ /g, '')}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Bonding Curve & Actions */}
-          <div 
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-            className={`transition-all duration-300 ease-out ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl border p-3 sm:p-4 md:p-5 rounded-2xl flex flex-col xl:flex-row items-stretch xl:items-center gap-3 sm:gap-4 md:gap-6 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-          >
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between text-[10px] md:text-xs font-mono text-[var(--color-text-secondary)] mb-2 uppercase">
-                <span>Bonding Curve</span>
-                <span className="text-[#6366F1]"><AnimatedCounter value={token.progress} suffix="%" /></span>
-              </div>
-              <div className={`h-2 md:h-2.5 ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-2)]'} rounded-full overflow-hidden border border-[rgba(99,102,241,0.2)]`}>
-                <div className="h-full bg-[#6366F1] shadow-[0_0_25px_rgba(99,102,241,0.25)] transition-all duration-700 ease-out" style={{ width: `${token.progress}%` }} />
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 shrink-0">
-              <MagneticButton as="div" strength={0.2} className="flex-1">
-                <button 
-                  onClick={() => handleSave(token)}
-                  className={`w-full flex items-center justify-center gap-2 px-4 md:px-5 py-2 md:py-2.5 ${isDark ? 'bg-[#000000]/40' : 'bg-[var(--color-surface-base)]/40'} rounded-xl font-bold transition-all border border-[rgba(99,102,241,0.15)] text-sm md:text-base hover:bg-[rgba(99,102,241,0.15)] hover:border-[#6366F1] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none ${savedTokens.find((t: any) => t.id === token.id) ? 'text-[#F59E0B]' : 'text-[#6366F1]'}`}
-                  aria-label={savedTokens.find((t: any) => t.id === token.id) ? "Unsave token" : "Save token"}
-                >
-                  <Bookmark size={18} className={savedTokens.find((t: any) => t.id === token.id) ? "fill-[#F59E0B]" : ""} />
-                  {savedTokens.find((t: any) => t.id === token.id) ? "Saved" : "Save"}
-                </button>
-              </MagneticButton>
-              <MagneticButton as="div" strength={0.25} className="flex-1">
-                <Link 
-                  href={`/token/${token.id}`} 
-                  className="w-full flex items-center justify-center px-4 md:px-6 py-2 md:py-2.5 bg-[#6366F1] text-white rounded-xl font-bold shadow-[0_0_25px_rgba(99,102,241,0.25)] hover:bg-[#4F46E5] transition-all text-sm md:text-base active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                  aria-label="Trade Now"
-                >
-                  Trade Now
-                </Link>
-              </MagneticButton>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Right Action Bar (TikTok Style) */}
-        <motion.div 
-          initial={{ x: 50, opacity: 0 }}
-          animate={activeIndex === idx ? { x: 0, opacity: 1 } : {}}
-          transition={{ delay: 0.2, type: "spring" }}
-          className={`flex flex-col gap-4 md:gap-6 items-center justify-end md:justify-center p-2 rounded-[32px] ${isDark ? 'bg-[rgba(5,5,16,0.90)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.90)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-xl border pb-4 pt-4 mb-4 shrink-0 shadow-[0_0_25px_rgba(99,102,241,0.15)]`}
-        >
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Boost"
-            onClick={() => {
-              console.log('Boost clicked');
-              alert('Coming soon');
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <Flame className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Boost</span>
-          </button>
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Chat"
-            onClick={() => {
-              console.log('Chat clicked');
-              alert('Coming soon');
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Chat</span>
-          </button>
-          <button 
-            className="flex flex-col items-center gap-1 md:gap-1.5 group active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-            aria-label="Share"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: token.name, url: window.location.href }).catch(console.error);
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('URL copied to clipboard');
-              }
-            }}
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[var(--color-text-primary)] group-hover:text-[#818CF8] group-hover:bg-[rgba(99,102,241,0.15)] transition-all border border-transparent group-hover:border-[rgba(99,102,241,0.3)] shadow-[0_0_15px_rgba(99,102,241,0)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
-              <Share2 className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span className="text-[10px] font-bold text-[var(--color-text-secondary)] group-hover:text-[#818CF8]">Share</span>
-          </button>
-        </motion.div>
-      </div>
-
-      {/* Scroll Hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[var(--color-text-muted)] animate-bounce z-10 flex flex-col items-center">
-        <span className="text-[10px] uppercase font-mono mb-1 tracking-widest text-[var(--color-text-secondary)]">Scroll</span>
-        <ChevronDown size={20} className="text-[var(--color-text-secondary)]" />
-      </div>
-    </div>
-  );
-}
+const MOCK_FEED = [
+  {
+    id: 'msg_1',
+    author: 'WHALE_ALERT_BOT',
+    handle: '@whale_alert',
+    time: '2M AGO',
+    tag: '🚨 WHALE ALERT',
+    content: 'MASSIVE INSIDER ACCUMULATION DETECTED ON $SWRM. MULTIPLE NEW WALLETS FUNDED FROM BINANCE SWEEPING THE FLOOR.',
+    token: { id:'tok_ai_swarm', name:'AI Swarm', ticker:'SWRM', price:0.00671, change24h:211.4, marketCap:2300000, progress:85, sparkline:[5,8,12,15,14,18,25,32,28,40,55,70,90,85,110] },
+    stats: { likes: 142, replies: 28, retweets: 56 }
+  },
+  {
+    id: 'msg_2',
+    author: 'CYBER_DEGEN',
+    handle: '@cyberdegen',
+    time: '15M AGO',
+    tag: '🚀 BULLISH CALL',
+    content: 'JUST APED 50 SOL INTO $LDOGE. THE BONDING CURVE IS MELTING FACES. LFG!!!',
+    token: { id:'tok_luna_doge', name:'Luna Doge', ticker:'LDOGE', price:0.00234, change24h:142.5, marketCap:1870000, progress:73, sparkline:[8,12,19,25,31,44,52,71,65,89,95,120,110,140] },
+    stats: { likes: 89, replies: 12, retweets: 5 }
+  },
+  {
+    id: 'msg_3',
+    author: 'AI_AUDITOR',
+    handle: '@ai_auditor',
+    time: '1H AGO',
+    tag: '🤖 AI AUDIT',
+    content: 'SMART CONTRACT AUDIT COMPLETE FOR $NVFX. 100% SAFE. LIQUIDITY BURNED. MINT REVOKED. SEND IT HIGHER.',
+    token: { id:'tok_nova_flux', name:'NovaFlux', ticker:'NVFX', price:0.0445, change24h:67.8, marketCap:8900000, progress:100, sparkline:[30,35,38,42,48,52,58,65,70,68,75,80,90,95,100] },
+    stats: { likes: 312, replies: 45, retweets: 120 }
+  },
+  {
+    id: 'msg_4',
+    author: 'MEME_DISCOVERER',
+    handle: '@meme_sniper',
+    time: '4H AGO',
+    tag: '💎 MEME DISCOVERY',
+    content: 'NEW LAUNCH $PCAT LOOKS PROMISING. DEVS ARE DOING A LIVE STREAM RIGHT NOW.',
+    token: { id:'tok_pixel_cat', name:'PixelCat', ticker:'PCAT', price:0.00329, change24h:-5.4, marketCap:1100000, progress:31, sparkline:[50,48,45,46,44,42,40,41,39,37,35,33,34,32] },
+    stats: { likes: 45, replies: 8, retweets: 2 }
+  }
+];
 
 export default function FeedPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const [tokens, setTokens] = useState<FeedToken[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [savedTokens, setSavedTokens] = useState<FeedToken[]>([]);
-  const [showSavedModal, setShowSavedModal] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    async function loadFeed() {
-      try {
-        const res = await fetch('/api/personalized-feed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
-        });
-        
-        let tokenList = [];
-        if (res.ok) {
-          const data = await res.json();
-          tokenList = data.tokens || [];
-        }
-        
-        if (!tokenList || tokenList.length === 0) {
-          tokenList = [
-            { id: 'tok_luna_doge', name: 'Luna Doge', ticker: '$LDOGE', matchScore: 94, urgencySignal: 'High Conviction', matchReasons: ['High Momentum', 'AI Narrative', 'Whale Inflows'], explanation: 'Whale wallets accumulated $420k in the last 2 hours following AI agent volume spike.', progress: 78, marketCap: '4.2M', risk: 'Medium' },
-            { id: 'tok_cyber_pepe', name: 'Cyber Pepe', ticker: '$CPEPE', matchScore: 88, urgencySignal: 'Medium Signal', matchReasons: ['Breakout Pattern', 'Community Growth'], explanation: 'Consolidating above 200 EMA with expanding volume on DEX. Technical breakout imminent.', progress: 62, marketCap: '1.8M', risk: 'Low' },
-            { id: 'tok_sol_quantum', name: 'Quantum SOL', ticker: '$QSOL', matchScore: 82, urgencySignal: 'High Conviction', matchReasons: ['DePIN AI', 'Cross-chain Bridge'], explanation: 'Node network hash rate up 340% week-over-week with automated yield distribution.', progress: 91, marketCap: '12.5M', risk: 'Low' },
-          ];
-        }
-        
-        const enhanced = tokenList.map((t: any) => ({
-          ...t,
-          name: t.name || t.id.replace('tok_', '').split('_').map((s:string) => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-          ticker: t.ticker || '$' + t.id.replace('tok_', '').substring(0, 4).toUpperCase(),
-          progress: t.progress || Math.floor(Math.random() * 60) + 40,
-          marketCap: t.marketCap || (Math.random() * 50 + 10).toFixed(1) + 'k',
-          risk: t.risk || 'Medium'
-        }));
-        setTokens(enhanced);
-      } catch (e) {
-        console.error('Feed API error:', e);
-        setTokens([
-          { id: 'tok_luna_doge', name: 'Luna Doge', ticker: '$LDOGE', matchScore: 94, urgencySignal: 'High Conviction', matchReasons: ['High Momentum', 'AI Narrative'], explanation: 'Whale wallets accumulated $420k in the last 2 hours following AI agent volume spike.', progress: 78, marketCap: '4.2M', risk: 'Medium' },
-          { id: 'tok_cyber_pepe', name: 'Cyber Pepe', ticker: '$CPEPE', matchScore: 88, urgencySignal: 'Medium Signal', matchReasons: ['Breakout Pattern'], explanation: 'Consolidating above 200 EMA with expanding volume on DEX.', progress: 62, marketCap: '1.8M', risk: 'Low' },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadFeed();
-  }, []);
+  const [activeFilter, setActiveFilter] = useState('ALL BROADCASTS');
+  const [broadcastText, setBroadcastText] = useState('');
 
-  const handleScroll = (e: any) => {
-    if (!containerRef.current) return;
-    const scrollPos = e.currentTarget.scrollTop;
-    const height = e.currentTarget.clientHeight;
-    const index = Math.round(scrollPos / height);
-    if (index !== activeIndex && index >= 0 && index < tokens.length) {
-      setActiveIndex(index);
-    }
-  };
+  const filters = [
+    'ALL BROADCASTS',
+    '🚀 BULLISH CALLS',
+    '🚨 WHALE ALERTS',
+    '🤖 AI INSIGHTS'
+  ];
 
-  const handleSave = (token: FeedToken) => {
-    if (!savedTokens.find(t => t.id === token.id)) {
-      setSavedTokens([...savedTokens, token]);
-    } else {
-      setSavedTokens(savedTokens.filter(t => t.id !== token.id));
-    }
-  };
+  // Brutalist styling variables
+  const bBorder = isDark ? "border-2 border-[rgba(255,255,255,0.2)]" : "border-3 border-black";
+  const bShadow = isDark ? "shadow-[4px_4px_0px_0px_#10B981]" : "shadow-[4px_4px_0px_0px_#000]";
+  const bHoverShadow = isDark ? "hover:shadow-[2px_2px_0px_0px_#10B981] hover:translate-x-[2px] hover:translate-y-[2px]" : "hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]";
+  const bBg = isDark ? "bg-[#050510]" : "bg-white";
+  const bText = isDark ? "text-white" : "text-black";
+  const bMuted = isDark ? "text-gray-400" : "text-gray-600";
 
-  const getUrgencyColor = (signal: string = '') => {
-    const s = (signal || '').toLowerCase();
-    if (s.includes('high')) return 'text-[#F43F5E]';
-    if (s.includes('medium')) return 'text-[#F59E0B]';
-    return 'text-[#10B981]';
-  };
-
-  // Handle keyboard navigation (Up / Down arrows) and lock body scroll
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      const height = containerRef.current.clientHeight;
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        containerRef.current.scrollBy({ top: height, behavior: 'smooth' });
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        containerRef.current.scrollBy({ top: -height, behavior: 'smooth' });
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  if (loading) {
-    return (
-      <div className={`flex flex-col gap-4 h-screen w-full items-center justify-center ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'} text-[#6366F1] font-mono overflow-x-hidden`}>
-        <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin shadow-[0_0_25px_rgba(99,102,241,0.25)]" />
-        <span className="animate-pulse shadow-[0_0_25px_rgba(99,102,241,0.25)]">[INITIALIZING FEED...]</span>
-      </div>
-    );
-  }
-
+  const formatCompact = (num: number) => new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num);
 
   return (
-    <div 
-      ref={containerRef}
-      onScroll={handleScroll}
-      data-lenis-prevent
-      data-lenis-prevent-touch
-      className={`fixed top-[64px] left-0 md:left-[72px] right-0 bottom-16 md:bottom-0 overflow-y-scroll overflow-x-hidden snap-y snap-mandatory ${isDark ? 'bg-[#000000]' : 'bg-[var(--color-surface-base)]'} z-40 scrollbar-hide`}
-    >
-      {/* Top Right Saved Tokens Button */}
-      <div className="absolute top-6 right-6 z-50">
-        <button 
-          onClick={() => setShowSavedModal(true)}
-          className={`flex items-center gap-2 ${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl px-4 py-2 rounded-full border text-[#6366F1] hover:bg-[rgba(99,102,241,0.15)] hover:text-[#818CF8] hover:border-[rgba(99,102,241,0.30)] transition-all shadow-[0_0_25px_rgba(99,102,241,0.25)] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none`}
-          aria-label="View Saved Tokens"
-        >
-          <Bookmark size={16} />
-          <span className="font-mono text-sm font-bold">Saved ({savedTokens.length})</span>
-        </button>
+    <div className="w-full min-h-screen font-mono pb-24 overflow-x-hidden">
+      
+      {/* ── LIVE MARQUEE TICKER ──────────────────────────────────────────────── */}
+      <div className={`w-full overflow-hidden border-b ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#10B981]/20 text-[#10B981]" : "border-black bg-[#10B981] text-black"}`}>
+        <div className="flex whitespace-nowrap py-1.5 animate-marquee text-xs font-black tracking-widest uppercase">
+           {[...Array(10)].map((_, i) => (
+              <span key={i} className="mx-4">
+                {`> BROADCAST NODE #04 // LIVE ALPHA STREAM // 89% EXTREME GREED SENTIMENT // SYNCED TO SOLANA MAINNET // `}
+              </span>
+           ))}
+        </div>
       </div>
 
-      {tokens.map((token, idx) => (
-        <FeedItem
-          key={token.id}
-          token={token}
-          idx={idx}
-          activeIndex={activeIndex}
-          savedTokens={savedTokens}
-          handleSave={handleSave}
-        />
-      ))}
-
-      {/* Saved Tokens Modal */}
-      <AnimatePresence>
-        {showSavedModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={`fixed inset-0 z-[100] ${isDark ? 'bg-black/80' : 'bg-white/80'} backdrop-blur-md flex justify-end`}
-          >
-            <motion.div 
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`w-full max-w-md h-full ${isDark ? 'bg-[rgba(5,5,16,0.95)] border-[rgba(99,102,241,0.08)] shadow-[-10px_0_30px_rgba(0,0,0,0.8)]' : 'bg-[rgba(255,255,255,0.95)] border-[rgba(99,102,241,0.2)] shadow-[-10px_0_30px_rgba(0,0,0,0.1)]'} backdrop-blur-2xl border-l p-6 overflow-y-auto`}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2 display-safe drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                  <Bookmark className="text-[#6366F1]" /> Saved Tokens
-                </h3>
-                <button 
-                  onClick={() => setShowSavedModal(false)}
-                  className="p-2 rounded-full text-[var(--color-text-primary)] hover:text-[#818CF8] hover:bg-[rgba(99,102,241,0.15)] transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                  aria-label="Close saved tokens modal"
-                >
-                  <X size={24} />
-                </button>
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 flex flex-col lg:flex-row gap-6">
+        
+        {/* ── LEFT: FEED & BROADCAST COMPOSER ───────────────────────────────── */}
+        <div className="flex-1 flex flex-col gap-6">
+          
+          {/* BROADCAST COMPOSER */}
+          <div className={`${bBorder} ${bShadow} ${bBg} p-4 flex flex-col gap-4`}>
+            <div className={`flex items-center gap-2 font-black uppercase text-xs tracking-widest ${isDark ? "text-[#10B981]" : "text-black"}`}>
+              <Terminal className="w-4 h-4" /> BROADCAST_ALPHA.EXE
+            </div>
+            <textarea
+              value={broadcastText}
+              onChange={(e) => setBroadcastText(e.target.value)}
+              placeholder="> TYPE YOUR ALPHA / CALLOUT HERE..."
+              className={`w-full h-24 bg-transparent outline-none font-bold uppercase resize-none ${bText} placeholder:text-gray-500`}
+            />
+            <div className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"}`}>
+              <div className="flex items-center gap-2">
+                <button className={`px-2 py-1 text-[10px] font-black uppercase ${bBorder} hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors`}>[ $TAG_TOKEN ]</button>
+                <button className={`px-2 py-1 text-[10px] font-black uppercase ${bBorder} hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors`}>[ 🚀 CALLOUT ]</button>
               </div>
+              <button className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-black uppercase transition-all ${bBorder} ${isDark ? "bg-[#10B981] text-black" : "bg-black text-white"} ${bHoverShadow}`}>
+                <Send className="w-4 h-4" /> [ ⚡ PUBLISH BROADCAST ]
+              </button>
+            </div>
+          </div>
 
-              {savedTokens.length === 0 ? (
-                <div className="text-center text-[var(--color-text-muted)] mt-20 font-mono text-sm">
-                  No saved tokens yet.
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {savedTokens.map((token) => (
-                    <div key={token.id} className={`${isDark ? 'bg-[rgba(5,5,16,0.80)] border-[rgba(99,102,241,0.08)]' : 'bg-[rgba(255,255,255,0.80)] border-[rgba(99,102,241,0.2)]'} backdrop-blur-2xl p-4 rounded-xl border shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:border-[rgba(99,102,241,0.20)] transition-all`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="text-lg font-bold text-[var(--color-text-primary)] display-safe">{token.name}</h4>
-                          <span className="text-xs font-mono text-[#6366F1]">{token.ticker}</span>
-                        </div>
-                        <span className={`text-xs font-bold px-2 py-1 rounded ${isDark ? 'bg-[#000000]/60 border-[rgba(99,102,241,0.08)]' : 'bg-[var(--color-surface-2)] border-[rgba(99,102,241,0.2)]'} border ${getUrgencyColor(token.urgencySignal)}`}>
-                          {token.urgencySignal}
-                        </span>
+          {/* FILTER TABS */}
+          <div className="flex flex-wrap gap-2 mb-2">
+            {filters.map(f => (
+              <button
+                key={f}
+                onClick={() => setActiveFilter(f)}
+                className={`px-3 py-2 text-xs font-black uppercase transition-all ${bBorder} ${
+                  activeFilter === f
+                    ? isDark ? "bg-[#F59E0B] text-black shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]" : "bg-black text-white shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]"
+                    : `${bBg} ${bText} ${bHoverShadow}`
+                }`}
+              >
+                [ {f} ]
+              </button>
+            ))}
+          </div>
+
+          {/* THE FEED */}
+          <div className="flex flex-col gap-6 pb-12">
+            {MOCK_FEED.map((post, i) => {
+              const isPos = post.token.change24h >= 0;
+              const sparkColor = isPos ? "#10B981" : "#F43F5E";
+              
+              let tagColor = "bg-gray-200 text-black";
+              if (post.tag.includes('BULLISH')) tagColor = isDark ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#10B981] text-black";
+              if (post.tag.includes('WHALE')) tagColor = isDark ? "bg-[#F43F5E] text-white border-[#F43F5E]" : "bg-[#F43F5E] text-white";
+              if (post.tag.includes('AI')) tagColor = isDark ? "bg-[#6366F1] text-white border-[#6366F1]" : "bg-[#6366F1] text-white";
+              
+              return (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, ease: EASE }}
+                  className={`flex flex-col ${bBorder} ${bShadow} ${bBg}`}
+                >
+                  {/* Post Header */}
+                  <div className={`p-4 flex items-center justify-between border-b ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 border ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"} relative`}>
+                        <img src={getMemeImage(post.handle)} alt={post.author} className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#10B981] border border-black rounded-full shadow-[1px_1px_0px_0px_#000]" />
                       </div>
-                      <div className="flex gap-2 mt-4">
-                        <Link 
-                          href={`/token/${token.id}`} 
-                          className="flex-1 text-center py-2 bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.2)] text-[#818CF8] hover:bg-[rgba(99,102,241,0.25)] rounded-lg text-sm font-bold transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                          aria-label={`Trade ${token.name}`}
-                        >
-                          Trade
-                        </Link>
-                        <button 
-                          onClick={() => setSavedTokens(savedTokens.filter(t => t.id !== token.id))}
-                          className="px-3 py-2 border border-[rgba(244,63,94,0.2)] text-[#F43F5E] hover:bg-[rgba(244,63,94,0.15)] hover:border-[rgba(244,63,94,0.3)] rounded-lg transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:outline-none"
-                          aria-label={`Remove ${token.name} from saved`}
-                        >
-                          <X size={16} />
-                        </button>
+                      <div className="flex flex-col">
+                        <span className={`font-black uppercase text-sm ${bText}`}>{post.author}</span>
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                          <span className={bMuted}>{post.handle}</span>
+                          <span className={bMuted}>·</span>
+                          <span className={isDark ? "text-[#10B981]" : "text-[#10B981]"}>{post.time}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    <div className={`px-2 py-1 text-[9px] font-black uppercase border border-black ${tagColor} shadow-[2px_2px_0px_0px_#000]`}>
+                      [{post.tag}]
+                    </div>
+                  </div>
 
+                  {/* Post Content */}
+                  <div className="p-4 flex flex-col gap-4">
+                    <p className={`font-bold text-sm leading-relaxed uppercase ${bText}`}>
+                      {post.content.split(' ').map((word, wIdx) => {
+                        if (word.startsWith('$')) {
+                          return <span key={wIdx} className={`inline-block px-1 mx-0.5 ${isDark ? "bg-[#10B981]/20 text-[#10B981]" : "bg-black text-white"}`}>{word}</span>;
+                        }
+                        return word + ' ';
+                      })}
+                    </p>
+                    
+                    {/* Embedded Token Card */}
+                    <Link href={`/token/${post.token.id}`} className={`flex border ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#1A1A2E]" : "border-black bg-gray-50"} hover:bg-gray-100 dark:hover:bg-[#151525] transition-colors cursor-pointer group`}>
+                      <div className={`w-24 h-24 sm:w-32 sm:h-32 border-r ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"} shrink-0 relative`}>
+                        <img src={getMemeImage(post.token.ticker)} alt={post.token.name} className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute bottom-0 left-0 right-0 h-8 opacity-70">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={formatSparkline(post.token.sparkline)}>
+                              <Line type="monotone" dataKey="y" stroke={sparkColor} strokeWidth={2} dot={false} isAnimationActive={false} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                      <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
+                        <div>
+                          <h4 className={`font-black text-sm uppercase truncate ${bText}`}>{post.token.name} <span className={bMuted}>${post.token.ticker}</span></h4>
+                          <div className={`text-[10px] font-black px-1 border inline-block mt-1 ${isDark ? "border-[rgba(255,255,255,0.2)] text-white" : "border-black text-black bg-gray-200"}`}>
+                            ${formatCompact(post.token.marketCap)} MC
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-bold uppercase text-gray-500">Curve Progress</span>
+                            <span className={`text-[10px] font-black uppercase ${isDark ? "text-[#10B981]" : "text-black"}`}>[{post.token.progress}%]</span>
+                          </div>
+                          <div className={`px-2 py-1 text-[9px] font-black uppercase border ${isPos ? (isDark ? "border-[#10B981] text-[#10B981]" : "border-black bg-[#10B981] text-black") : (isDark ? "border-[#F43F5E] text-[#F43F5E]" : "border-black bg-[#F43F5E] text-white")}`}>
+                            {isPos ? "+" : ""}{post.token.change24h}%
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  {/* Action Bar */}
+                  <div className={`flex flex-wrap items-center gap-2 p-2 sm:p-4 border-t ${isDark ? "border-[rgba(255,255,255,0.2)] bg-[#050510]" : "border-black bg-white"}`}>
+                    <button className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase ${bBorder} ${bHoverShadow} hover:bg-gray-100 dark:hover:bg-gray-800 transition-all`}>
+                      <Flame className="w-3 h-3 text-[#F59E0B]" /> [ {post.stats.likes} LFG ]
+                    </button>
+                    <button className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase ${bBorder} ${bHoverShadow} hover:bg-gray-100 dark:hover:bg-gray-800 transition-all`}>
+                      <MessageSquare className="w-3 h-3" /> [ {post.stats.replies} REPLIES ]
+                    </button>
+                    <button className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase ${bBorder} ${bHoverShadow} hover:bg-gray-100 dark:hover:bg-gray-800 transition-all`}>
+                      <Repeat2 className="w-3 h-3 text-[#10B981]" /> [ {post.stats.retweets} RE-BROADCAST ]
+                    </button>
+                    <button className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase ${bBorder} ${bHoverShadow} ${isDark ? "bg-[#10B981] text-black" : "bg-[#10B981] text-black"} transition-all`}>
+                      <Zap className="w-3 h-3" /> [ TIP 0.05 SOL ]
+                    </button>
+                  </div>
+
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── RIGHT: SIDEBAR BENTO ────────────────────────────────────────────── */}
+        <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0">
+          
+          {/* Sentiment Radar */}
+          <div className={`${bBorder} ${bShadow} ${bBg} p-4`}>
+            <h3 className={`text-sm font-black uppercase mb-4 ${bText}`}>[ 📡 SENTIMENT RADAR ]</h3>
+            <div className={`font-mono text-xs font-bold leading-relaxed ${isDark ? "text-[#10B981]" : "text-black"}`}>
+              STATUS: EXTREME GREED<br/>
+              BULL/BEAR RATIO: 8.4<br/>
+              VOLUME: SURGING (+42%)
+            </div>
+            <div className="mt-4 flex flex-col gap-1">
+              <span className={`text-[9px] font-black uppercase ${bMuted}`}>[████████░░] 89% GREED</span>
+              <div className={`h-2 border ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-gray-200"}`}>
+                <div className="h-full bg-[#10B981] w-[89%]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Top Callers */}
+          <div className={`${bBorder} ${bShadow} ${bBg} p-4`}>
+            <h3 className={`text-sm font-black uppercase mb-4 ${bText}`}>[ 🔥 TOP CALLERS ]</h3>
+            <div className="flex flex-col gap-3">
+              {[
+                { name: 'SOL_WHALE', win: '92%' },
+                { name: 'DEGEN_KING', win: '88%' },
+                { name: 'AI_AUDITOR', win: '95%' }
+              ].map((c, idx) => (
+                <div key={idx} className={`flex items-center justify-between pb-3 border-b ${idx === 2 ? 'border-transparent pb-0' : isDark ? 'border-[rgba(255,255,255,0.1)]' : 'border-gray-200'}`}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-xs text-gray-500">0{idx+1}</span>
+                    <span className={`font-bold text-xs uppercase ${bText}`}>@{c.name}</span>
+                  </div>
+                  <span className={`text-[9px] font-black uppercase px-1 border ${isDark ? "border-[#10B981] text-[#10B981]" : "border-black bg-[#10B981] text-black"}`}>
+                    {c.win} WIN
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Hot Tickers */}
+          <div className={`${bBorder} ${bShadow} ${bBg} p-4`}>
+            <h3 className={`text-sm font-black uppercase mb-4 ${bText}`}>[ 📈 HOT TICKERS ]</h3>
+            <div className="flex flex-wrap gap-2">
+              {['$SWRM', '$LDOGE', '$NVFX', '$PCAT', '$CPEP'].map((t, idx) => (
+                <span key={idx} className={`px-2 py-1 text-[10px] font-black uppercase border ${isDark ? "border-[rgba(255,255,255,0.2)] hover:bg-[#10B981] hover:text-black hover:border-[#10B981]" : "border-black hover:bg-black hover:text-white"} cursor-pointer transition-colors`}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+          
+        </div>
+
+      </div>
     </div>
   );
 }
