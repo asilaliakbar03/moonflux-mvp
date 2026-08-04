@@ -111,76 +111,76 @@ export default function ArenaPage() {
 
   return (
     <div className={`min-h-screen ${bgRoot} ${textPrimary} font-mono uppercase tracking-wider selection:bg-[#F59E0B] selection:text-black`}>
-      <div className="max-w-6xl mx-auto w-full pt-8 pb-24 md:pb-16 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto w-full pt-4 pb-24 md:pb-8 px-4 sm:px-6">
         
         {/* ── HEADER ── */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
           <div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-2 tracking-widest leading-none drop-shadow-md">
-              TOKEN<br/>ARENA
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-1 tracking-widest leading-none drop-shadow-md">
+              TOKEN ARENA
             </h1>
-            <p className={`font-bold text-sm sm:text-base ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`}>
+            <p className={`font-bold text-xs sm:text-sm ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`}>
               [ DAILY BATTLE. TWO TOKENS. ONE SURVIVOR. ]
             </p>
           </div>
-          <div className={`${borderHeavyClass} p-4 bg-[#F59E0B] text-black ${shadowNeutral} transform -rotate-1`}>
-            <div className="text-xs font-black mb-1">[ SYSTEM RESET IN ]</div>
-            <div className="text-3xl font-black tracking-widest">{countdown}</div>
+          <div className={`${borderClass} p-2 sm:p-3 bg-[#F59E0B] text-black ${shadowNeutral} transform -rotate-1`}>
+            <div className="text-[10px] font-black mb-0.5">[ RESET IN ]</div>
+            <div className="text-xl sm:text-2xl font-black tracking-widest">{countdown}</div>
           </div>
         </motion.div>
 
         {/* ── TODAY'S BATTLE ── */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <div className={`${borderHeavyClass} p-6 sm:p-8 relative ${isDark ? 'bg-black' : 'bg-gray-50'} ${shadowNeutral} mb-12`}>
+          <div className={`${borderHeavyClass} p-4 sm:p-5 relative ${isDark ? 'bg-black' : 'bg-gray-50'} ${shadowNeutral} mb-6`}>
             
             <div className="absolute -top-3 -left-3 bg-[#10B981] text-black text-xs font-black px-2 py-1 border-2 border-black z-20">
               [ LIVE DUEL ]
             </div>
 
-            <div className="flex flex-col lg:flex-row items-stretch gap-8 relative z-10">
+            <div className="flex flex-col lg:flex-row items-stretch gap-4 relative z-10">
               
               {/* Token A Card */}
-              <div className={`flex-1 flex flex-col p-6 ${borderHeavyClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowA} relative transition-transform hover:-translate-y-1`}>
-                <div className="absolute top-2 right-2 text-xs font-black text-[#10B981]">[ CONTENDER A ]</div>
-                <div className="flex flex-col items-center mb-6 mt-4">
-                  <div className={`${borderClass} bg-[#10B981] w-32 h-32 mb-4 overflow-hidden`}>
+              <div className={`flex-1 flex flex-col p-4 ${borderClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowA} relative transition-transform hover:-translate-y-0.5`}>
+                <div className="absolute top-1 right-1 text-[10px] font-black text-[#10B981]">[ A ]</div>
+                <div className="flex flex-col items-center mb-3 mt-2">
+                  <div className={`${borderClass} bg-[#10B981] w-20 h-20 sm:w-24 sm:h-24 mb-2 overflow-hidden`}>
                     <img src={`https://robohash.org/${BATTLE.tokenA.ticker.toLowerCase()}?set=set1&bgset=bg1&size=400x400`} alt="Token A" className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all" />
                   </div>
-                  <h2 className="font-black text-3xl tracking-widest text-[#10B981]">{BATTLE.tokenA.name}</h2>
-                  <span className={`text-xl font-bold ${textMuted}`}>${BATTLE.tokenA.ticker}</span>
+                  <h2 className="font-black text-xl sm:text-2xl tracking-widest text-[#10B981]">{BATTLE.tokenA.name}</h2>
+                  <span className={`text-sm font-bold ${textMuted}`}>${BATTLE.tokenA.ticker}</span>
                 </div>
 
-                <div className="mb-6 w-full text-center">
-                  <div className="text-[#10B981] font-black text-xl mb-2">
+                <div className="mb-3 w-full text-center">
+                  <div className="text-[#10B981] font-black text-base sm:text-lg mb-1">
                     {getAsciiBar(BATTLE.tokenA.pct)} <AnimatedCounter value={BATTLE.tokenA.pct} suffix="%" />
                   </div>
-                  <div className={`text-xs font-bold ${textMuted}`}>
-                    [ <AnimatedCounter value={BATTLE.tokenA.votes} /> VOTES LOGGED ]
+                  <div className={`text-[10px] font-bold ${textMuted}`}>
+                    [ <AnimatedCounter value={BATTLE.tokenA.votes} /> VOTES ]
                   </div>
                 </div>
                 
                 <div className="mt-auto">
                   {!voted ? (
                     confirming === 'a' ? (
-                      <div className="flex gap-4 w-full">
-                        <button onClick={() => handleVote('a')} className={`flex-1 py-4 font-black text-lg bg-[#10B981] text-black ${borderClass} hover:bg-white transition-colors`}>
+                      <div className="flex gap-2 w-full">
+                        <button onClick={() => handleVote('a')} className={`flex-1 py-3 font-black text-sm bg-[#10B981] text-black ${borderClass} hover:bg-white transition-colors`}>
                           [ CONFIRM ]
                         </button>
-                        <button onClick={() => setConfirming(null)} className={`flex-1 py-4 font-black text-lg bg-transparent ${borderClass} hover:bg-[#F43F5E] hover:text-black transition-colors`}>
+                        <button onClick={() => setConfirming(null)} className={`flex-1 py-3 font-black text-sm bg-transparent ${borderClass} hover:bg-[#F43F5E] hover:text-black transition-colors`}>
                           [ CANCEL ]
                         </button>
                       </div>
                     ) : (
-                      <button onClick={() => setConfirming('a')} className={`w-full py-4 font-black text-xl bg-[#10B981] text-black ${borderClass} ${shadowHoverA} transition-all active:translate-y-1 active:shadow-none`}>
+                      <button onClick={() => setConfirming('a')} className={`w-full py-3 font-black text-base bg-[#10B981] text-black ${borderClass} ${shadowHoverA} transition-all active:translate-y-1 active:shadow-none`}>
                         [ VOTE {BATTLE.tokenA.ticker} ]
                       </button>
                     )
                   ) : voted === 'a' ? (
-                    <div className={`w-full py-4 text-center font-black text-xl bg-[#10B981] text-black ${borderClass}`}>
+                    <div className={`w-full py-3 text-center font-black text-base bg-[#10B981] text-black ${borderClass}`}>
                       [ VOTE SECURED ]
                     </div>
                   ) : (
-                    <div className={`w-full py-4 text-center font-black text-xl ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
+                    <div className={`w-full py-3 text-center font-black text-base ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
                       [ LOCKED OUT ]
                     </div>
                   )}
@@ -188,54 +188,54 @@ export default function ArenaPage() {
               </div>
 
               {/* VS Badge */}
-              <div className="flex items-center justify-center lg:w-16 lg:h-auto shrink-0 z-20 py-4 lg:py-0">
-                <div className={`${borderHeavyClass} bg-[#F59E0B] text-black w-16 h-16 flex items-center justify-center font-black text-2xl transform rotate-12 shadow-[4px_4px_0px_0px_#000]`}>
+              <div className="flex items-center justify-center lg:w-12 lg:h-auto shrink-0 z-20 py-2 lg:py-0">
+                <div className={`${borderClass} bg-[#F59E0B] text-black w-12 h-12 flex items-center justify-center font-black text-lg transform rotate-12 shadow-[3px_3px_0px_0px_#000]`}>
                   VS
                 </div>
               </div>
 
               {/* Token B Card */}
-              <div className={`flex-1 flex flex-col p-6 ${borderHeavyClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowB} relative transition-transform hover:-translate-y-1`}>
-                <div className="absolute top-2 right-2 text-xs font-black text-[#F43F5E]">[ CONTENDER B ]</div>
-                <div className="flex flex-col items-center mb-6 mt-4">
-                  <div className={`${borderClass} bg-[#F43F5E] w-32 h-32 mb-4 overflow-hidden`}>
+              <div className={`flex-1 flex flex-col p-4 ${borderClass} ${isDark ? 'bg-[#111]' : 'bg-white'} ${shadowB} relative transition-transform hover:-translate-y-0.5`}>
+                <div className="absolute top-1 right-1 text-[10px] font-black text-[#F43F5E]">[ B ]</div>
+                <div className="flex flex-col items-center mb-3 mt-2">
+                  <div className={`${borderClass} bg-[#F43F5E] w-20 h-20 sm:w-24 sm:h-24 mb-2 overflow-hidden`}>
                     <img src={`https://robohash.org/${BATTLE.tokenB.ticker.toLowerCase()}?set=set1&bgset=bg1&size=400x400`} alt="Token B" className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all" />
                   </div>
-                  <h2 className="font-black text-3xl tracking-widest text-[#F43F5E]">{BATTLE.tokenB.name}</h2>
-                  <span className={`text-xl font-bold ${textMuted}`}>${BATTLE.tokenB.ticker}</span>
+                  <h2 className="font-black text-xl sm:text-2xl tracking-widest text-[#F43F5E]">{BATTLE.tokenB.name}</h2>
+                  <span className={`text-sm font-bold ${textMuted}`}>${BATTLE.tokenB.ticker}</span>
                 </div>
 
-                <div className="mb-6 w-full text-center">
-                  <div className="text-[#F43F5E] font-black text-xl mb-2">
+                <div className="mb-3 w-full text-center">
+                  <div className="text-[#F43F5E] font-black text-base sm:text-lg mb-1">
                     {getAsciiBar(BATTLE.tokenB.pct)} <AnimatedCounter value={BATTLE.tokenB.pct} suffix="%" />
                   </div>
-                  <div className={`text-xs font-bold ${textMuted}`}>
-                    [ <AnimatedCounter value={BATTLE.tokenB.votes} /> VOTES LOGGED ]
+                  <div className={`text-[10px] font-bold ${textMuted}`}>
+                    [ <AnimatedCounter value={BATTLE.tokenB.votes} /> VOTES ]
                   </div>
                 </div>
                 
                 <div className="mt-auto">
                   {!voted ? (
                     confirming === 'b' ? (
-                      <div className="flex gap-4 w-full">
-                        <button onClick={() => handleVote('b')} className={`flex-1 py-4 font-black text-lg bg-[#F43F5E] text-black ${borderClass} hover:bg-white transition-colors`}>
+                      <div className="flex gap-2 w-full">
+                        <button onClick={() => handleVote('b')} className={`flex-1 py-3 font-black text-sm bg-[#F43F5E] text-black ${borderClass} hover:bg-white transition-colors`}>
                           [ CONFIRM ]
                         </button>
-                        <button onClick={() => setConfirming(null)} className={`flex-1 py-4 font-black text-lg bg-transparent ${borderClass} hover:bg-[#10B981] hover:text-black transition-colors`}>
+                        <button onClick={() => setConfirming(null)} className={`flex-1 py-3 font-black text-sm bg-transparent ${borderClass} hover:bg-[#10B981] hover:text-black transition-colors`}>
                           [ CANCEL ]
                         </button>
                       </div>
                     ) : (
-                      <button onClick={() => setConfirming('b')} className={`w-full py-4 font-black text-xl bg-[#F43F5E] text-black ${borderClass} ${shadowHoverB} transition-all active:translate-y-1 active:shadow-none`}>
+                      <button onClick={() => setConfirming('b')} className={`w-full py-3 font-black text-base bg-[#F43F5E] text-black ${borderClass} ${shadowHoverB} transition-all active:translate-y-1 active:shadow-none`}>
                         [ VOTE {BATTLE.tokenB.ticker} ]
                       </button>
                     )
                   ) : voted === 'b' ? (
-                    <div className={`w-full py-4 text-center font-black text-xl bg-[#F43F5E] text-black ${borderClass}`}>
+                    <div className={`w-full py-3 text-center font-black text-base bg-[#F43F5E] text-black ${borderClass}`}>
                       [ VOTE SECURED ]
                     </div>
                   ) : (
-                    <div className={`w-full py-4 text-center font-black text-xl ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
+                    <div className={`w-full py-3 text-center font-black text-base ${isDark ? 'bg-[#222] text-[#555]' : 'bg-gray-200 text-gray-400'} ${borderClass}`}>
                       [ LOCKED OUT ]
                     </div>
                   )}
@@ -245,25 +245,25 @@ export default function ArenaPage() {
             </div>
 
             {/* Battle Stats Grid */}
-            <div className={`mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t-4 ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'}`}>
-              <div className={`${borderClass} p-4 bg-[#6366F1] text-white flex flex-col`}>
-                <span className="text-xs font-black mb-2">[ 24H VOLUME DUEL ]</span>
-                <div className="flex justify-between items-end mt-auto">
+            <div className={`mt-4 grid grid-cols-3 gap-3 pt-4 border-t-2 ${isDark ? 'border-[rgba(255,255,255,0.2)]' : 'border-black'}`}>
+              <div className={`${borderClass} p-2 sm:p-3 bg-[#6366F1] text-white flex flex-col`}>
+                <span className="text-[10px] font-black mb-1">[ 24H VOL ]</span>
+                <div className="flex justify-between items-end mt-auto text-xs sm:text-sm">
                   <span className="font-bold text-[#10B981]">$1.2M</span>
                   <span className="font-bold text-[#F43F5E]">$980K</span>
                 </div>
               </div>
-              <div className={`${borderClass} p-4 bg-[#06B6D4] text-black flex flex-col`}>
-                <span className="text-xs font-black mb-2">[ HOLDER GROWTH ]</span>
-                <div className="flex justify-between items-end mt-auto">
+              <div className={`${borderClass} p-2 sm:p-3 bg-[#06B6D4] text-black flex flex-col`}>
+                <span className="text-[10px] font-black mb-1">[ HOLDERS ]</span>
+                <div className="flex justify-between items-end mt-auto text-xs sm:text-sm">
                   <span className="font-bold text-black">+14%</span>
                   <span className="font-bold text-white">+22%</span>
                 </div>
               </div>
-              <div className={`${borderClass} p-4 bg-[#F59E0B] text-black flex flex-col`}>
-                <span className="text-xs font-black mb-2">[ SENTIMENT METER ]</span>
-                <div className="text-xl font-black mt-auto">
-                  [██████░░░░] EXTREME
+              <div className={`${borderClass} p-2 sm:p-3 bg-[#F59E0B] text-black flex flex-col`}>
+                <span className="text-[10px] font-black mb-1">[ SENTIMENT ]</span>
+                <div className="text-sm font-black mt-auto">
+                  [██████░░] MAX
                 </div>
               </div>
             </div>
