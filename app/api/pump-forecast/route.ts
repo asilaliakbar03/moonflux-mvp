@@ -123,7 +123,7 @@ For marketSentiment: be realistic about the current cycle phase.
 For breakoutAlert: pick the ONE narrative with the most unusual/surprising signal.`,
         model: MODELS.FAST,
         temperature: 0.3,
-        maxTokens: 600,
+        maxTokens: 1200,
         cacheTtlMs: 300000,
       });
 

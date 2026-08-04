@@ -154,7 +154,7 @@ export async function POST(req: Request) {
         const chips    = chipsMatch
           ? chipsMatch[1].split('|').map(c => c.trim()).filter(Boolean).slice(0, 4)
           : ['Set price alert', 'Check volume trend', 'Size position', 'Run risk scan'];
-        const response = text.replace(/\nCHIPS:\[.*\]/, '').trim();
+        const response = text.replace(/\n?\s*CHIPS:\[.*\]/, '').trim();
 
         return NextResponse.json({ response, chips });
       } catch (err) {

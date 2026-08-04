@@ -31,7 +31,9 @@ const MOCK_ANALYSES: Record<string, string[]> = {
 
 export async function POST(req: Request) {
   try {
-    const { tokenA, tokenB } = await req.json() as { tokenA: string; tokenB: string };
+    const body = await req.json();
+    const tokenA = body.tokenA || 'Unknown Token A';
+    const tokenB = body.tokenB || 'Unknown Token B';
 
     if (!isAIConfigured()) {
       await new Promise(resolve => setTimeout(resolve, 1800));

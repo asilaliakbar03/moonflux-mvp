@@ -1,7 +1,7 @@
 /**
  * lib/ai.ts — Centralized AI client for MoonFluxx
  * 
- * Uses Aerolink.lat (Anthropic-compatible proxy) to route to Claude models.
+ * Uses NVIDIA NIM API (OpenAI-compatible) for all AI features.
  * Features:
  * - In-memory response caching with configurable TTL
  * - Structured JSON output
@@ -49,22 +49,21 @@ function setCache(key: string, data: unknown, ttlMs: number = DEFAULT_CACHE_TTL_
 
 // ── Models ───────────────────────────────────────────────────────────────────
 export const MODELS = {
-  FAST: 'claude-haiku-4-5-20251001',
-  SMART: 'claude-sonnet-5',
+  FAST: 'nvidia/llama-3.1-nemotron-nano-8b-v1',
+  SMART: 'meta/llama-3.3-70b-instruct',
 } as const;
 
 export type ModelId = typeof MODELS[keyof typeof MODELS];
 
 // ── Configuration ────────────────────────────────────────────────────────────
-const AEROLINK_URL = 'https://capi.aerolink.lat/v1/messages';
+const NVIDIA_NIM_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-// User provided specific aero_live key as a fallback
 function getApiKey(): string {
-  return process.env.AEROLINK_API_KEY || "aero_live_CGrq5c0ufYyE34VA65I_KvspqjHbntBL8ZA_yKDhfHg";
+  return process.env.NVIDIA_API_KEY || '';
 }
 
 export function isAIConfigured(): boolean {
-  return true; // We always have the fallback key now
+  return Boolean(getApiKey());
 }
 
 // ── Core AI Call ─────────────────────────────────────────────────────────────
@@ -107,21 +106,22 @@ export async function aiGenerate<T = unknown>(
   }
 
   const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('NVIDIA_API_KEY not configured');
+  }
 
-  const response = await fetch(AEROLINK_URL, {
+  const response = await fetch(NVIDIA_NIM_URL, {
     method: 'POST',
     headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'Accept-Encoding': 'identity'
     },
     body: JSON.stringify({
       model,
       temperature,
       max_tokens: maxTokens,
-      system: `${system}\n\nIMPORTANT: Always respond with valid JSON only. No markdown, no code fences, no extra text.`,
       messages: [
+        { role: 'system', content: `${system}\n\nIMPORTANT: Always respond with valid JSON only. No markdown, no code fences, no extra text.` },
         { role: 'user', content: prompt },
       ],
     }),
@@ -133,8 +133,7 @@ export async function aiGenerate<T = unknown>(
   }
 
   const result = await response.json();
-  const textBlock = result.content?.find((c: any) => c.type === 'text');
-  const content = textBlock?.text;
+  const content = result.choices?.[0]?.message?.content;
   
   if (!content) {
     throw new Error(`AI returned empty response. Raw: ${JSON.stringify(result)}`);
@@ -152,7 +151,17 @@ export async function aiGenerate<T = unknown>(
         throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
       }
     } else {
-      throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
+      // Try to find JSON object/array in the response
+      const objMatch = content.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+      if (objMatch) {
+        try {
+          parsed = JSON.parse(objMatch[1]) as T;
+        } catch {
+          throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
+        }
+      } else {
+        throw new Error(`Failed to parse AI JSON response. Raw string: ${content}`);
+      }
     }
   }
 
@@ -160,7 +169,7 @@ export async function aiGenerate<T = unknown>(
     setCache(cacheKey, parsed, cacheTtlMs);
   }
 
-  const tokensUsed = result.usage?.input_tokens + result.usage?.output_tokens;
+  const tokensUsed = (result.usage?.prompt_tokens || 0) + (result.usage?.completion_tokens || 0);
   return { data: parsed, cached: false, model, tokensUsed };
 }
 
@@ -177,25 +186,26 @@ export async function aiChat(
   } = options;
 
   const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('NVIDIA_API_KEY not configured');
+  }
 
   const messages = [
+    { role: 'system' as const, content: system },
     ...history,
     { role: 'user' as const, content: prompt },
   ];
 
-  const response = await fetch(AEROLINK_URL, {
+  const response = await fetch(NVIDIA_NIM_URL, {
     method: 'POST',
     headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'Accept-Encoding': 'identity'
     },
     body: JSON.stringify({
       model,
       temperature,
       max_tokens: maxTokens,
-      system,
       messages,
     }),
   });
@@ -206,9 +216,8 @@ export async function aiChat(
   }
 
   const result = await response.json();
-  const textBlock = result.content?.find((c: any) => c.type === 'text');
-  const text = textBlock?.text || '';
-  const tokensUsed = result.usage?.input_tokens + result.usage?.output_tokens;
+  const text = result.choices?.[0]?.message?.content || '';
+  const tokensUsed = (result.usage?.prompt_tokens || 0) + (result.usage?.completion_tokens || 0);
 
   return { text, cached: false, tokensUsed };
 }

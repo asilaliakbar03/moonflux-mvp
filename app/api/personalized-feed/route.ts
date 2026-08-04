@@ -112,7 +112,7 @@ ${TOKEN_UNIVERSE.map(t => `- ${t.id}: ${t.name} (${t.ticker}) — ${t.category},
 Rank tokens by fit for this user. Consider: their viewing/buying history, stated preferences, current narrative momentum, and risk tolerance inferred from their history. Give specific, personalized reasons — not generic ones. The urgencySignal must reflect actual current market conditions.`,
         model: MODELS.FAST,
         temperature: 0.3,
-        maxTokens: 400,
+        maxTokens: 1000,
         cacheTtlMs: 300000,
       });
 
@@ -155,7 +155,7 @@ ${TOKEN_UNIVERSE.map(t => `- ${t.id}: ${t.name} (${t.ticker}) — ${t.category},
 Rank tokens by fit for this user. Consider: their viewing/buying history, stated preferences, current narrative momentum, and risk tolerance inferred from their history. Give specific, personalized reasons — not generic ones. The urgencySignal must reflect actual current market conditions.`,
         model: MODELS.FAST,
         temperature: 0.3,
-        maxTokens: 400,
+        maxTokens: 1000,
         cacheTtlMs: 300000,
       });
 

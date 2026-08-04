@@ -134,7 +134,7 @@ export async function POST(req: Request) {
     if (isAIConfigured()) {
       try {
         const result = await aiGenerate<GeneratedToken>({
-          system: "You are the MoonFluxx Terminal AI. Generate completely unique, engaging token metadata based on the prompt. You must strictly return a valid JSON object matching the requested schema. Be creative, witty, and deeply enmeshed in crypto/web3 culture. The whitepaper should be detailed, the roadmap should have 4 quarters, and the xPosts should be funny/degen.",
+          system: SYSTEM_PROMPT,
           prompt: `Generate token data for: ${prompt}`,
           model: MODELS.SMART,
           maxTokens: 4000,

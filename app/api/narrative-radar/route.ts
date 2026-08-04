@@ -140,7 +140,7 @@ For each narrative:
 For breakoutAlert: choose the ONE most unusual signal. Can be null if nothing stands out.`,
         model: MODELS.FAST,
         temperature: 0.3,
-        maxTokens: 600,
+        maxTokens: 1200,
         cacheTtlMs: CACHE_TTL_MS,
       });
 

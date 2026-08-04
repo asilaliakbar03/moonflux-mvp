@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     const pinataJwt = process.env.PINATA_JWT;
 
     // ── Branch: Pinata path ───────────────────────────────────────────────────
-    if (pinataJwt) {
+    if (pinataJwt && !pinataJwt.includes('YOUR_')) {
       // Upload image first (if provided), fallback to a placeholder
       let imageUri = `https://placehold.co/400x400/0a0805/e8b84b?text=${encodeURIComponent(ticker)}`;
       let imageMime = 'image/png';

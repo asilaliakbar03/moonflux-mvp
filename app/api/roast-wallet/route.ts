@@ -142,7 +142,7 @@ Respond with a JSON object containing these fields:
 Roast this wallet holder. Invent a completely plausible but devastating trading history. Reference real events they probably suffered through. Make it highly shareable — the kind of roast people screenshot and post on X. Be brutal but not mean-spirited — more "Comedy Central roast" than "personal attack". The advice should be ACTUALLY useful.`,
           model: MODELS.SMART,
           temperature: 0.3,
-          maxTokens: 400,
+          maxTokens: 800,
           cacheTtlMs: 3600000,
         });
 

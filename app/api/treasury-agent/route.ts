@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           maxTokens: 300,
         });
 
-        return NextResponse.json({ response: text });
+        return NextResponse.json({ response: text, actions: [] });
       } catch (err) {
         console.warn('[treasury-agent] AI failed, using mock:', err);
       }

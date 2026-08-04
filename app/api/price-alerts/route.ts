@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     targetPrice: number;
   };
 
-  if (!userId || !tokenId || !condition || targetPrice == null) {
+  if (!userId || typeof userId !== 'string' || !userId.trim() || !tokenId || !condition || targetPrice == null) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 // DELETE /api/price-alerts?id=xxx — delete alert
 export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id');
-  if (!id) {
+  if (!id || typeof id !== 'string' || !id.trim()) {
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 

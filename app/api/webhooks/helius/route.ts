@@ -61,7 +61,7 @@ export async function POST(req: Request) {
             type: trade.type,
             sol_amount: trade.sol_amount,
             token_amount: trade.token_amount,
-            price_usd: 0, // In a real app, fetch current SOL price to calculate USD value
+            price_usd: trade.sol_amount * 150, // In a real app, fetch current SOL price to calculate USD value
             tx_signature: trade.tx_signature,
           });
 

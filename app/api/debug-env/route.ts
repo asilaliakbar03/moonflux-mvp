@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { isAIConfigured, aiGenerate, MODELS } from '@/lib/ai';
 
 export async function GET() {
-  const key = process.env.OPENROUTER_API_KEY;
   let smartTestResult = null;
   let smartTestError = null;
 
@@ -21,6 +20,7 @@ export async function GET() {
 
   return NextResponse.json({
     aiConfigured: isAIConfigured(),
+    hasNvidiaKey: !!process.env.NVIDIA_API_KEY,
     smartTestError,
     smartTestResult
   });
