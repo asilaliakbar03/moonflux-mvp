@@ -133,8 +133,8 @@ export default function Sidebar() {
         <div className={`flex items-center ${expanded ? 'justify-between' : 'justify-center'} px-2 border-b-3 shrink-0`} style={{ height: 64, borderColor }}>
           {expanded && (
             <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
-                M
+              <div className={`w-8 h-8 flex items-center justify-center overflow-hidden shrink-0 ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
+                <img src="/logo.jpg" alt="MoonFluxx" className="w-full h-full object-cover" />
               </div>
               <span className="font-mono font-black text-sm tracking-[0.15em] uppercase group-hover:text-[#6366F1] transition-colors">
                 MoonFluxx
