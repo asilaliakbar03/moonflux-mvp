@@ -130,33 +130,33 @@ export default function Sidebar() {
         }}
       >
         {/* ── Logo + Toggle ── */}
-        <div className={`flex items-center justify-between px-3 border-b-3`} style={{ height: 64, borderColor }}>
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
-              M
-            </div>
-            {expanded && (
+        <div className={`flex items-center ${expanded ? 'justify-between' : 'justify-center'} px-2 border-b-3 shrink-0`} style={{ height: 64, borderColor }}>
+          {expanded && (
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
+                M
+              </div>
               <span className="font-mono font-black text-sm tracking-[0.15em] uppercase group-hover:text-[#6366F1] transition-colors">
                 MoonFluxx
               </span>
-            )}
-          </Link>
+            </Link>
+          )}
           <button
             onClick={toggle}
             className={`
-              p-1.5 font-mono font-black transition-all
+              p-2 font-mono font-black transition-all
               ${isDark 
                 ? 'text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)]' 
                 : 'text-gray-400 hover:text-black hover:bg-gray-100 border-2 border-gray-200 hover:border-black'}
             `}
             title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
-            {expanded ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+            {expanded ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
           </button>
         </div>
 
         {/* ── Main nav ── */}
-        <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-3 overflow-x-hidden">
+        <nav className="flex flex-col gap-0.5 px-2 pt-3 overflow-x-hidden">
           {MAIN_ITEMS.map((item) => (
             <NavLink
               key={item.href}
