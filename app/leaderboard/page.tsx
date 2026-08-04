@@ -75,28 +75,28 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className={`max-w-6xl mx-auto w-full pt-8 pb-24 md:pb-16 px-4 ${brutalText}`}>
+    <div className={`max-w-6xl mx-auto w-full pt-2 pb-24 md:pb-16 px-4 ${brutalText}`}>
       
       {/* DEMO BANNER */}
-      <div className={`mb-8 p-4 ${brutalBg} ${brutalBorder} ${brutalShadow} text-center`}>
-        <p className={`text-sm ${isDark ? 'text-[#10B981]' : 'text-black'} flex items-center justify-center gap-2`}>
-          <Flame className="w-5 h-5" /> [ STATUS: DEMO_DATA_ACTIVE // RANKINGS AWAITING LIVE INPUT ]
+      <div className={`mb-3 p-2 ${brutalBg} ${brutalBorder} ${brutalShadow} text-center`}>
+        <p className={`text-xs ${isDark ? 'text-[#10B981]' : 'text-black'} flex items-center justify-center gap-2`}>
+          <Flame className="w-4 h-4" /> [ STATUS: DEMO_DATA_ACTIVE // RANKINGS AWAITING LIVE INPUT ]
         </p>
       </div>
 
       {/* HEADER */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 text-center md:text-left">
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} className="flex flex-col md:flex-row justify-between items-end gap-3 mb-4 text-center md:text-left">
         <div>
-          <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
-            <h1 className={`text-3xl sm:text-4xl md:text-5xl flex items-center gap-4 ${isDark ? 'text-[#F59E0B]' : 'text-black'}`}>
-              <Trophy className="w-10 h-10" />
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
+            <h1 className={`text-2xl sm:text-3xl flex items-center gap-3 ${isDark ? 'text-[#F59E0B]' : 'text-black'}`}>
+              <Trophy className="w-7 h-7" />
               HIGH SCORES
             </h1>
-            <span className={`px-3 py-1 text-sm ${brutalBg} ${brutalBorder} ${isDark ? 'text-[#06B6D4]' : 'text-black'}`}>
+            <span className={`px-2 py-0.5 text-xs ${brutalBg} ${brutalBorder} ${isDark ? 'text-[#06B6D4]' : 'text-black'}`}>
               [ SEASON_01 ]
             </span>
           </div>
-          <p className={isDark ? 'text-gray-400' : 'text-gray-700'}>// THE ELITE TRADERS OF MOONFLUXX</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>// THE ELITE TRADERS OF MOONFLUXX</p>
         </div>
         
         <div className={`flex p-2 flex-wrap md:flex-nowrap gap-3 ${brutalBg} ${brutalBorder} ${brutalShadow}`} role="tablist">
@@ -124,37 +124,37 @@ export default function LeaderboardPage() {
       </motion.div>
 
       {/* TOP 3 HERO PODIUM */}
-      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+      <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {topThree.map((trader, i) => {
           const rankNum = i + 1;
           
           return (
-            <div key={trader.name} className={`flex flex-col p-6 relative ${brutalBg} ${getBrutalBorder(rankNum)} ${getBrutalShadow(rankNum)}`}>
-              <div className={`absolute -top-5 -left-5 w-12 h-12 flex items-center justify-center text-2xl ${brutalBg} ${getBrutalBorder(rankNum)} ${isDark ? 'text-white' : 'text-black'}`}>
+            <div key={trader.name} className={`flex flex-col p-3 relative ${brutalBg} ${getBrutalBorder(rankNum)} ${getBrutalShadow(rankNum)}`}>
+              <div className={`absolute -top-3 -left-3 w-9 h-9 flex items-center justify-center text-lg ${brutalBg} ${getBrutalBorder(rankNum)} ${isDark ? 'text-white' : 'text-black'}`}>
                 #{rankNum}
               </div>
-              <div className="flex flex-col items-center mb-6 mt-4">
+              <div className="flex flex-col items-center mb-3 mt-2">
                 <img 
                   src={`https://robohash.org/${trader.handle}?set=set1&bgset=bg1&size=400x400`} 
                   alt={trader.name}
-                  className={`w-24 h-24 rounded-none mb-4 ${getBrutalBorder(rankNum)} ${isDark ? 'bg-[#6366F1]' : 'bg-gray-200'}`}
+                  className={`w-16 h-16 rounded-none mb-2 ${getBrutalBorder(rankNum)} ${isDark ? 'bg-[#6366F1]' : 'bg-gray-200'}`}
                 />
-                <div className={`text-2xl truncate ${isDark ? 'text-white' : 'text-black'}`}>{trader.name}</div>
-                <div className={`text-sm ${isDark ? 'text-[#F43F5E]' : 'text-gray-600'}`}>{trader.handle}</div>
+                <div className={`text-lg truncate ${isDark ? 'text-white' : 'text-black'}`}>{trader.name}</div>
+                <div className={`text-xs ${isDark ? 'text-[#F43F5E]' : 'text-gray-600'}`}>{trader.handle}</div>
               </div>
               
-              <div className={`w-full p-4 ${isDark ? 'bg-black' : 'bg-gray-100'} ${brutalBorder} mb-4`}>
-                <div className={`text-xs mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>// TERMINAL_STATS</div>
-                <div className={`text-sm ${isDark ? 'text-[#10B981]' : 'text-black'}`}>
+              <div className={`w-full p-2 ${isDark ? 'bg-black' : 'bg-gray-100'} ${brutalBorder} mb-2`}>
+                <div className={`text-[10px] mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>// TERMINAL_STATS</div>
+                <div className={`text-xs ${isDark ? 'text-[#10B981]' : 'text-black'}`}>
                   PNL: {trader.pnl} // WIN_RATE: {trader.win}%
                 </div>
-                <div className={`text-sm ${isDark ? 'text-[#06B6D4]' : 'text-black'}`}>
+                <div className={`text-xs ${isDark ? 'text-[#06B6D4]' : 'text-black'}`}>
                   XP: {trader.xp.toLocaleString()}
                 </div>
               </div>
 
               {trader.streak >= 3 && (
-                <div className={`w-full text-center py-2 ${isDark ? 'bg-[#F59E0B] text-black' : 'bg-black text-white'} ${brutalBorder}`}>
+                <div className={`w-full text-center py-1.5 text-xs ${isDark ? 'bg-[#F59E0B] text-black' : 'bg-black text-white'} ${brutalBorder}`}>
                   [ 🔥 STREAK: {trader.streak} WINS ]
                 </div>
               )}
