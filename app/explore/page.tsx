@@ -35,6 +35,8 @@ const TOKENS = [
   { id:'tok_cyber_pep', name:'CyberPep', ticker:'CPEP', price:0.00891, change24h:78.3, marketCap:3210000, holders:6543, tag:'🔥 ABOUT TO GRADUATE', category:'token', color:'#6366F1', sparkline:formatSparkline([20,18,25,30,28,35,42,55,60,58,70,85,90,88]), progress: 80, creator: 'pepe_lord', timeAgo: '6h', isLive: true },
 ];
 
+const SORT_OPTIONS = ['MCAP 🔻', 'VOLUME 📊', 'CHANGE %', 'NEWEST ⚡'];
+
 export default function ExplorePage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -42,6 +44,7 @@ export default function ExplorePage() {
   const [activeFilter, setActiveFilter] = useState('ALL TOKENS');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('MCAP 🔻');
+  const [sortOpen, setSortOpen] = useState(false);
   const [showCount, setShowCount] = useState(20);
 
   const filters = [
@@ -109,8 +112,9 @@ export default function ExplorePage() {
     // Sort
     result = [...result].sort((a, b) => {
       if (sortBy === 'MCAP 🔻') return b.marketCap - a.marketCap;
-      if (sortBy === 'AGE ⚡') return 0; // In real app, sort by timestamp
       if (sortBy === 'VOLUME 📊') return Math.abs(b.change24h) - Math.abs(a.change24h);
+      if (sortBy === 'CHANGE %') return b.change24h - a.change24h;
+      if (sortBy === 'NEWEST ⚡') return 0; // In real app, sort by timestamp
       return 0;
     });
 
@@ -148,46 +152,53 @@ export default function ExplorePage() {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6">
         
-        {/* ── COMMAND LINE HEADER & FILTERS ──────────────────────────────────── */}
-        <div className="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
-          <div className="w-full xl:max-w-xl">
-            <div className={`flex items-center gap-2 p-3 ${bBorder} ${bShadow} ${bBg}`}>
-              <span className={`font-black ${isDark ? "text-[#10B981]" : "text-[#10B981]"}`}>{">"}</span>
-              <input 
-                type="text" 
-                placeholder="SEARCH_TOKENS.EXE --query='...'"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full bg-transparent outline-none font-bold placeholder:text-gray-500 uppercase ${bText}`}
-              />
-            </div>
+        {/* ── FILTERS & SORT BAR ──────────────────────────────────── */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          {/* Filter Tabs */}
+          <div className="flex flex-wrap gap-2">
+            {filters.map(f => {
+              const active = activeFilter === f;
+              return (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`px-3 py-2 text-xs font-black uppercase transition-all ${bBorder} ${
+                    active
+                      ? isDark ? "bg-[#F59E0B] text-black shadow-[4px_4px_0px_0px_#10B981] -translate-x-0.5 -translate-y-0.5" : "bg-black text-white shadow-[4px_4px_0px_0px_#10B981] -translate-x-0.5 -translate-y-0.5"
+                      : `${bBg} ${bText} ${bHoverShadow}`
+                  }`}
+                >
+                  [ {f} ]
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-2">
-              {filters.map(f => {
-                const active = activeFilter === f;
-                return (
+          {/* Sort Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setSortOpen(!sortOpen)}
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-black uppercase shrink-0 cursor-pointer ${bBorder} ${bBg} ${bText} ${bHoverShadow} transition-all`}
+            >
+              [ SORT: {sortBy} ▾ ]
+            </button>
+            {sortOpen && (
+              <div className={`absolute right-0 top-full mt-1 z-50 flex flex-col min-w-[180px] ${bBorder} ${bBg} shadow-[4px_4px_0px_0px_#6366F1]`}>
+                {SORT_OPTIONS.map(opt => (
                   <button
-                    key={f}
-                    onClick={() => setActiveFilter(f)}
-                    className={`px-3 py-2 text-xs font-black uppercase transition-all ${bBorder} ${
-                      active
-                        ? isDark ? "bg-[#F59E0B] text-black shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]" : "bg-black text-white shadow-[4px_4px_0px_0px_#10B981] translate-x-[-2px] translate-y-[-2px]"
-                        : `${bBg} ${bText} ${bHoverShadow}`
+                    key={opt}
+                    onClick={() => { setSortBy(opt); setSortOpen(false); }}
+                    className={`px-4 py-2 text-xs font-black uppercase text-left transition-all ${
+                      sortBy === opt 
+                        ? (isDark ? 'bg-[#6366F1] text-white' : 'bg-black text-white')
+                        : `${bText} ${isDark ? 'hover:bg-[rgba(255,255,255,0.05)]' : 'hover:bg-gray-100'}`
                     }`}
                   >
-                    [ {f} ]
+                    {opt}
                   </button>
-                );
-              })}
-            </div>
-
-            {/* Sort Dropdown (Mock) */}
-            <div className={`relative flex items-center gap-2 px-3 py-2 text-xs font-black uppercase shrink-0 cursor-pointer ${bBorder} ${bBg} ${bText} ${bHoverShadow}`}>
-              [ SORT: {sortBy} ]
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
