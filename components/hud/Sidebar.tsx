@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ThemeProvider';
+import { useSidebar } from '@/components/SidebarContext';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 type NavItem = { icon: LucideIcon; label: string; href: string };
@@ -62,7 +63,7 @@ function NavLink({
         className={`
           flex items-center gap-3 px-3 py-3 cursor-pointer transition-all duration-150 font-mono font-black uppercase tracking-wider text-sm
           ${isActive 
-            ? `${isDark ? 'bg-[#10B981] text-black border-2 border-[rgba(255,255,255,0.2)]' : 'bg-[#10B981] text-black border-3 border-black'}` 
+            ? `${isDark ? 'bg-[#6366F1] text-white border-2 border-[rgba(255,255,255,0.2)]' : 'bg-[#6366F1] text-white border-3 border-black'}` 
             : `${isDark ? 'text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]' : 'text-gray-500 hover:text-black hover:bg-gray-100'} border-2 border-transparent`
           }
         `}
@@ -91,7 +92,7 @@ function NavLink({
             transition-opacity duration-150
             pointer-events-none z-50
             ${isDark ? 'bg-black text-white border-2 border-[rgba(255,255,255,0.2)]' : 'bg-white text-black border-3 border-black'}
-            shadow-[3px_3px_0px_0px_#10B981]
+            shadow-[3px_3px_0px_0px_#6366F1]
           `}
         >
           {item.label}
@@ -106,7 +107,7 @@ export default function Sidebar() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(true); // Default OPEN
+  const { expanded, toggle } = useSidebar();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Close mobile menu on route change
@@ -115,7 +116,6 @@ export default function Sidebar() {
   }, [pathname]);
 
   const sidebarWidth = expanded ? 220 : 64;
-
   const borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#000';
 
   return (
@@ -132,7 +132,7 @@ export default function Sidebar() {
         {/* ── Toggle Button ── */}
         <div className="flex items-center justify-end px-2 pt-4 pb-2">
           <button
-            onClick={() => setExpanded(!expanded)}
+            onClick={toggle}
             className={`
               p-2 font-mono font-black transition-all
               ${isDark 
@@ -155,6 +155,45 @@ export default function Sidebar() {
               expanded={expanded}
             />
           ))}
+
+          {/* ── LAUNCH BUTTON (right below Community) ── */}
+          <div className="mt-2">
+            <Link href="/launch" className="block relative group/link">
+              <div
+                className={`
+                  flex items-center gap-3 px-3 py-3 cursor-pointer font-mono font-black uppercase tracking-wider text-sm
+                  bg-[#10B981] text-black transition-all
+                  ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'}
+                  ${isDark ? 'shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]' : 'shadow-[3px_3px_0px_0px_#000]'}
+                  hover:shadow-[5px_5px_0px_0px_#F59E0B] hover:-translate-y-0.5
+                  active:translate-y-0.5 active:shadow-none
+                  ${pathname === '/launch' ? 'ring-2 ring-white' : ''}
+                `}
+              >
+                <div className="flex items-center justify-center w-7 h-7 shrink-0">
+                  <Rocket size={20} strokeWidth={2.5} />
+                </div>
+                {expanded && <span>Launch</span>}
+              </div>
+              {/* Tooltip when collapsed */}
+              {!expanded && (
+                <div
+                  className={`
+                    absolute left-full top-1/2 -translate-y-1/2 ml-3
+                    px-3 py-2
+                    text-xs font-mono font-black uppercase tracking-wider whitespace-nowrap
+                    opacity-0 group-hover/link:opacity-100
+                    transition-opacity duration-150
+                    pointer-events-none z-50
+                    ${isDark ? 'bg-black text-white border-2 border-[rgba(255,255,255,0.2)]' : 'bg-white text-black border-3 border-black'}
+                    shadow-[3px_3px_0px_0px_#10B981]
+                  `}
+                >
+                  Launch
+                </div>
+              )}
+            </Link>
+          </div>
         </nav>
 
         {/* ── Divider ── */}
@@ -163,8 +202,8 @@ export default function Sidebar() {
           style={{ borderTop: `2px solid ${borderColor}` }}
         />
 
-        {/* ── Bottom section ── */}
-        <div className="flex flex-col gap-1 px-2 pb-2">
+        {/* ── Bottom section (Profile & Settings) ── */}
+        <div className="flex flex-col gap-1 px-2 pb-4">
           {BOTTOM_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -173,25 +212,6 @@ export default function Sidebar() {
               expanded={expanded}
             />
           ))}
-        </div>
-
-        {/* ── LAUNCH BUTTON (like pump.fun Create) ── */}
-        <div className="px-2 pb-4">
-          <Link href="/launch">
-            <div
-              className={`
-                flex items-center justify-center gap-2 py-3 font-mono font-black uppercase tracking-widest text-base cursor-pointer
-                bg-[#10B981] text-black transition-all
-                ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'}
-                ${isDark ? 'shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]' : 'shadow-[3px_3px_0px_0px_#000]'}
-                hover:shadow-[5px_5px_0px_0px_#F59E0B] hover:-translate-y-0.5
-                active:translate-y-0.5 active:shadow-none
-              `}
-            >
-              <Rocket size={18} strokeWidth={2.5} />
-              {expanded && <span>Launch</span>}
-            </div>
-          </Link>
         </div>
       </aside>
 
@@ -210,6 +230,7 @@ export default function Sidebar() {
         ].map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+          const isLaunch = item.href === '/launch';
           
           if (item.href === '#more') {
             return (
@@ -220,12 +241,15 @@ export default function Sidebar() {
             );
           }
 
+          const activeColor = isLaunch ? 'text-[#10B981]' : 'text-[#6366F1]';
+          const inactiveColor = isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400';
+
           return (
             <Link key={item.href} href={item.href} onClick={() => setShowMobileMenu(false)} className="flex flex-col items-center justify-center w-full h-full gap-1">
-              <div className={`flex items-center justify-center p-1 ${isActive ? (isDark ? 'text-[#10B981]' : 'text-[#10B981]') : (isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400')}`}>
+              <div className={`flex items-center justify-center p-1 ${isActive ? activeColor : inactiveColor}`}>
                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span className={`text-[10px] font-mono font-black uppercase ${isActive ? 'text-[#10B981]' : (isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-400')}`}>
+              <span className={`text-[10px] font-mono font-black uppercase ${isActive ? activeColor : inactiveColor}`}>
                 {item.label}
               </span>
             </Link>
@@ -266,7 +290,7 @@ export default function Sidebar() {
                       onClick={() => setShowMobileMenu(false)}
                       className={`flex items-center gap-4 p-4 font-mono font-black uppercase tracking-wider text-base transition-all active:scale-95 ${
                         pathname === item.href 
-                          ? `bg-[#10B981] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
+                          ? `bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
                           : `${isDark ? 'text-[rgba(255,255,255,0.5)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] hover:text-white' : 'text-gray-500 border-2 border-gray-200 hover:border-black hover:text-black'}`
                       }`}
                     >
@@ -274,6 +298,14 @@ export default function Sidebar() {
                       <span>{item.label}</span>
                     </Link>
                   ))}
+
+                  {/* Launch in mobile menu */}
+                  <Link href="/launch" onClick={() => setShowMobileMenu(false)}>
+                    <div className={`flex items-center gap-4 p-4 font-mono font-black uppercase tracking-wider text-base bg-[#10B981] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all`}>
+                      <Rocket size={22} strokeWidth={2.5} />
+                      <span>Launch Token</span>
+                    </div>
+                  </Link>
                 </div>
               </div>
 
@@ -287,7 +319,7 @@ export default function Sidebar() {
                       onClick={() => setShowMobileMenu(false)}
                       className={`flex items-center gap-4 p-4 font-mono font-black uppercase tracking-wider text-base transition-all active:scale-95 ${
                         pathname === item.href 
-                          ? `bg-[#F59E0B] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
+                          ? `bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[4px_4px_0px_0px_#000]` 
                           : `${isDark ? 'text-[rgba(255,255,255,0.5)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)] hover:text-white' : 'text-gray-500 border-2 border-gray-200 hover:border-black hover:text-black'}`
                       }`}
                     >
@@ -297,14 +329,6 @@ export default function Sidebar() {
                   ))}
                 </div>
               </div>
-
-              {/* Launch Button */}
-              <Link href="/launch" onClick={() => setShowMobileMenu(false)}>
-                <div className={`flex items-center justify-center gap-3 py-5 font-mono font-black uppercase tracking-widest text-xl bg-[#10B981] text-black ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'} shadow-[5px_5px_0px_0px_#000] active:translate-y-1 active:shadow-none transition-all`}>
-                  <Rocket size={24} strokeWidth={2.5} />
-                  <span>[ LAUNCH TOKEN ]</span>
-                </div>
-              </Link>
             </div>
           </motion.div>
         )}
