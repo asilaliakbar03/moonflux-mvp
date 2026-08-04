@@ -1,12 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ArrowUpRight, ArrowDownRight, TrendingUp, Zap, Award, X, Hash, Clock, ChevronRight, Flame, BarChart3, Trophy, Settings, Rocket, Globe } from "lucide-react";
+import { Search, ArrowUpRight, ArrowDownRight, Award, X, ChevronRight, BarChart3, Trophy, Settings, Rocket, Globe } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ALL_TOKENS } from "@/lib/mock";
 import { useTheme } from "@/components/ThemeProvider";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 // Quick-action shortcuts
 const QUICK_ACTIONS = [
@@ -19,16 +17,14 @@ const QUICK_ACTIONS = [
 
 const RECENT_IDS = ["tok_luna_doge", "tok_cyber_pep", "tok_ai_swarm"];
 
-function highlight(text: string, query: string, isDark: boolean) {
+function highlight(text: string, query: string) {
   if (!query) return <>{text}</>;
   const idx = text.toLowerCase().indexOf(query.toLowerCase());
   if (idx === -1) return <>{text}</>;
   return (
     <>
       {text.slice(0, idx)}
-      <mark style={{ background: isDark ? "rgba(232,184,75,0.35)" : "rgba(99,102,241,0.2)", color: isDark ? "#ffe6a3" : "var(--color-text-primary)", borderRadius: 2, padding: "0 1px" }}>
-        {text.slice(idx, idx + query.length)}
-      </mark>
+      <mark className="bg-[#F59E0B] text-black px-0.5">{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
     </>
   );
@@ -47,7 +43,10 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Filter tokens by name or ticker
+  const borderColor = isDark ? 'rgba(255,255,255,0.3)' : '#000';
+  const borderClass = isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-3 border-black';
+
+  // Filter tokens
   const results = query.trim().length > 0
     ? ALL_TOKENS.filter(t =>
         t.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -59,7 +58,6 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
   const recentTokens = RECENT_IDS.map(id => ALL_TOKENS.find(t => t.id === id)).filter(Boolean) as typeof ALL_TOKENS;
 
-  // Total navigable items = results (or recent) + quick actions
   const showResults = query.trim().length > 0;
   const tokenItems = showResults ? results : recentTokens;
   const totalItems = tokenItems.length + QUICK_ACTIONS.length;
@@ -120,49 +118,42 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           <motion.div
             key="sb"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[300] bg-black/75 backdrop-blur-md"
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[300] bg-black/80"
             onClick={() => { onClose(); setQuery(""); }}
           />
 
           {/* Modal */}
           <motion.div
             key="sm"
-            initial={{ opacity: 0, scale: 0.94, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -12 }}
-            transition={{ duration: 0.3, ease: EASE }}
-            className="fixed top-[10vh] left-1/2 z-[301] w-full max-w-2xl -translate-x-1/2 flex flex-col rounded-3xl overflow-hidden"
-            style={{
-              background: isDark ? "rgba(8,6,3,0.99)" : "rgba(255,255,255,0.98)",
-              border: `1px solid ${isDark ? "rgba(232,184,75,0.3)" : "rgba(99,102,241,0.15)"}`,
-              boxShadow: isDark 
-                ? "0 48px 120px -24px rgba(0,0,0,0.95), 0 0 80px -30px rgba(232,184,75,0.18)"
-                : "0 48px 120px -24px rgba(0,0,0,0.1), 0 0 80px -30px rgba(99,102,241,0.1)",
-              maxHeight: "80vh",
-            }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className={`
+              fixed top-[8vh] left-1/2 z-[301] w-full max-w-2xl -translate-x-1/2 flex flex-col
+              font-mono uppercase tracking-wider
+              ${isDark ? 'bg-[#050510] border-4 border-[rgba(255,255,255,0.3)] shadow-[8px_8px_0px_0px_#6366F1]' : 'bg-white border-4 border-black shadow-[8px_8px_0px_0px_#000]'}
+            `}
+            style={{ maxHeight: "80vh" }}
           >
-            {/* Top line */}
-            <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${isDark ? "via-mf-gold/70" : "via-indigo-500/50"} to-transparent`} />
-
             {/* Search input row */}
-            <div className="flex items-center gap-4 px-5 py-4" style={{ borderBottom: `1px solid ${isDark ? "rgba(232,184,75,0.1)" : "rgba(99,102,241,0.1)"}` }}>
-              <Search size={18} style={{ color: isDark ? "#e8b84b" : "rgba(99,102,241,1)", flexShrink: 0 }} />
+            <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: `3px solid ${borderColor}` }}>
+              <Search size={18} className={isDark ? 'text-[#6366F1]' : 'text-[#6366F1]'} />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search tokens, tickers, categories…"
-                className="flex-1 bg-transparent border-none outline-none font-body text-base"
-                style={{ color: "var(--color-text-primary)" }}
+                placeholder="> SEARCH_QUERY..."
+                className={`flex-1 bg-transparent border-none outline-none font-mono font-black text-sm uppercase tracking-wider ${isDark ? 'text-white placeholder-[rgba(255,255,255,0.25)]' : 'text-black placeholder-gray-400'}`}
               />
               <div className="flex items-center gap-2 flex-shrink-0">
                 {query && (
-                  <button onClick={() => setQuery("")} className="p-1 rounded-lg transition-colors" style={{ color: "var(--color-text-secondary)" }}>
+                  <button onClick={() => setQuery("")} className={`p-1 ${isDark ? 'text-[rgba(255,255,255,0.4)] hover:text-white' : 'text-gray-400 hover:text-black'}`}>
                     <X size={14} />
                   </button>
                 )}
-                <kbd className="font-mono text-[0.55rem] px-2 py-1 rounded-md" style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)"}`, color: "var(--color-text-secondary)" }}>
+                <kbd className={`font-mono font-black text-[10px] px-2 py-1 ${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)] border-2 border-[rgba(255,255,255,0.15)]' : 'bg-gray-100 text-gray-500 border-2 border-gray-300'}`}>
                   ESC
                 </kbd>
               </div>
@@ -173,18 +164,18 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
               {/* Token results / Recent */}
               <div className="px-3 pt-3">
-                <p className="font-mono text-[0.55rem] tracking-[0.25em] uppercase px-2 mb-2" style={{ color: "var(--color-text-faint)" }}>
-                  {showResults ? `${results.length} result${results.length !== 1 ? "s" : ""}` : "Recent"}
+                <p className={`font-mono font-black text-[10px] tracking-[0.3em] uppercase px-2 mb-2 ${isDark ? 'text-[#06B6D4]' : 'text-blue-600'}`}>
+                  [ {showResults ? `${results.length} RESULT${results.length !== 1 ? "S" : ""}` : "RECENT"} ]
                 </p>
 
                 {tokenItems.length === 0 && showResults && (
                   <div className="flex flex-col items-center py-8 gap-2">
-                    <Search size={24} style={{ color: "var(--color-text-faint)" }} />
-                    <p className="font-mono text-[0.65rem]" style={{ color: "var(--color-text-faint)" }}>No tokens found for "{query}"</p>
+                    <Search size={24} className={isDark ? 'text-[rgba(255,255,255,0.2)]' : 'text-gray-300'} />
+                    <p className={`font-mono font-black text-xs ${isDark ? 'text-[rgba(255,255,255,0.3)]' : 'text-gray-400'}`}>[ NO RESULTS FOR &quot;{query}&quot; ]</p>
                   </div>
                 )}
 
-                <div className="flex flex-col gap-0.5 mb-3">
+                <div className="flex flex-col gap-1 mb-3">
                   {tokenItems.map((token, i) => {
                     const isSelected = selectedIdx === i;
                     return (
@@ -192,42 +183,42 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
                         key={token.id}
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.04, duration: 0.25, ease: EASE }}
+                        transition={{ delay: i * 0.04, duration: 0.2 }}
                         onClick={() => navigate(`/token/${token.id}`)}
                         onMouseEnter={() => setSelectedIdx(i)}
-                        className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-left transition-all"
-                        style={{
-                          background: isSelected ? (isDark ? "rgba(232,184,75,0.06)" : "rgba(99,102,241,0.06)") : "transparent",
-                          border: `1px solid ${isSelected ? (isDark ? "rgba(232,184,75,0.25)" : "rgba(99,102,241,0.2)") : "transparent"}`,
-                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all ${
+                          isSelected 
+                            ? `${isDark ? 'bg-[#6366F1] text-white border-2 border-[rgba(255,255,255,0.3)]' : 'bg-[#6366F1] text-white border-2 border-black'}`
+                            : `${isDark ? 'border-2 border-transparent hover:border-[rgba(255,255,255,0.1)]' : 'border-2 border-transparent hover:border-gray-200'}`
+                        }`}
                       >
                         {/* Icon */}
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                          style={{ background: `${token.color}15`, border: `1px solid ${token.color}30` }}>
+                        <div className={`w-8 h-8 flex items-center justify-center text-sm flex-shrink-0 ${borderClass}`}
+                          style={{ background: `${token.color}20` }}>
                           {token.icon}
                         </div>
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
-                            <span className="font-display text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                              {highlight(token.name, query, isDark)}
+                            <span className="font-mono font-black text-sm">
+                              {highlight(token.name, query)}
                             </span>
-                            <span className="font-mono text-[0.55rem] px-1.5 py-0.5 rounded" style={{ color: isDark ? "#e8b84b" : "rgba(99,102,241,1)", background: isDark ? "rgba(232,184,75,0.1)" : "rgba(99,102,241,0.1)", border: `1px solid ${isDark ? "rgba(232,184,75,0.2)" : "rgba(99,102,241,0.2)"}` }}>
-                              ${highlight(token.ticker, query, isDark)}
+                            <span className={`font-mono font-black text-[10px] px-1.5 py-0.5 ${isDark ? 'bg-[rgba(255,255,255,0.08)] text-[#F59E0B] border border-[rgba(255,255,255,0.15)]' : 'bg-gray-100 text-[#6366F1] border border-gray-300'}`}>
+                              ${highlight(token.ticker, query)}
                             </span>
                             {token.graduated && (
-                              <span className="font-mono text-[0.5rem] px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{ color: "#10b981", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}>
-                                <Award size={8} /> Graduated
+                              <span className="font-mono font-black text-[9px] px-1.5 py-0.5 bg-[#10B981] text-black flex items-center gap-1">
+                                <Award size={8} /> GRAD
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="font-mono text-[0.6rem]" style={{ color: "var(--color-text-secondary)" }}>${token.price.toFixed(5)}</span>
-                            <span className="font-mono text-[0.6rem] capitalize" style={{ color: "var(--color-text-faint)" }}>{token.category}</span>
+                            <span className={`font-mono font-bold text-[10px] ${isSelected ? 'text-[rgba(255,255,255,0.7)]' : (isDark ? 'text-[rgba(255,255,255,0.4)]' : 'text-gray-500')}`}>${token.price.toFixed(5)}</span>
+                            <span className={`font-mono text-[10px] capitalize ${isSelected ? 'text-[rgba(255,255,255,0.5)]' : (isDark ? 'text-[rgba(255,255,255,0.3)]' : 'text-gray-400')}`}>{token.category}</span>
                             {!token.graduated && (
-                              <span className="font-mono text-[0.55rem]" style={{ color: "#a9791f" }}>
-                                {token.bondingCurveProgress}% bonding
+                              <span className="font-mono text-[10px] text-[#F59E0B]">
+                                {token.bondingCurveProgress}% BONDING
                               </span>
                             )}
                           </div>
@@ -235,13 +226,13 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
                         {/* Change */}
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <span className="flex items-center gap-0.5 font-mono text-[0.65rem] font-semibold" style={{ color: token.change24h > 0 ? "#10b981" : "#ef4444" }}>
+                          <span className={`flex items-center gap-0.5 font-mono font-black text-xs ${token.change24h > 0 ? 'text-[#10B981]' : 'text-[#F43F5E]'}`}>
                             {token.change24h > 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                             {token.change24h > 0 ? "+" : ""}{token.change24h}%
                           </span>
                         </div>
 
-                        {isSelected && <ChevronRight size={14} style={{ color: isDark ? "#e8b84b" : "rgba(99,102,241,1)", flexShrink: 0 }} />}
+                        {isSelected && <ChevronRight size={14} className="text-white flex-shrink-0" />}
                       </motion.button>
                     );
                   })}
@@ -249,14 +240,14 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
               </div>
 
               {/* Divider */}
-              <div className="h-px mx-5" style={{ background: isDark ? "rgba(232,184,75,0.08)" : "rgba(99,102,241,0.08)" }} />
+              <div className="mx-3" style={{ borderTop: `2px solid ${borderColor}` }} />
 
               {/* Quick Actions */}
               <div className="px-3 pt-3 pb-3">
-                <p className="font-mono text-[0.55rem] tracking-[0.25em] uppercase px-2 mb-2" style={{ color: "var(--color-text-faint)" }}>
-                  Quick Actions
+                <p className={`font-mono font-black text-[10px] tracking-[0.3em] uppercase px-2 mb-2 ${isDark ? 'text-[#F59E0B]' : 'text-orange-600'}`}>
+                  [ QUICK ACTIONS ]
                 </p>
-                <div className="grid grid-cols-1 gap-0.5">
+                <div className="grid grid-cols-1 gap-1">
                   {QUICK_ACTIONS.map((action, i) => {
                     const itemIdx = tokenItems.length + i;
                     const isSelected = selectedIdx === itemIdx;
@@ -266,21 +257,23 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
                         key={action.href}
                         onClick={() => navigate(action.href)}
                         onMouseEnter={() => setSelectedIdx(itemIdx)}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all"
-                        style={{
-                          background: isSelected ? (isDark ? "rgba(232,184,75,0.08)" : "rgba(99,102,241,0.06)") : "transparent",
-                          border: `1px solid ${isSelected ? (isDark ? "rgba(232,184,75,0.2)" : "rgba(99,102,241,0.2)") : "transparent"}`,
-                        }}
+                        className={`flex items-center gap-3 px-3 py-2.5 text-left transition-all ${
+                          isSelected 
+                            ? `${isDark ? 'bg-[rgba(255,255,255,0.05)] border-2 border-[#6366F1]' : 'bg-gray-50 border-2 border-[#6366F1]'}`
+                            : `${isDark ? 'border-2 border-transparent' : 'border-2 border-transparent'}`
+                        }`}
                       >
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"}` }}>
-                          <Icon size={13} style={{ color: isSelected ? (isDark ? "#e8b84b" : "rgba(99,102,241,1)") : "var(--color-text-secondary)" }} />
+                        <div className={`w-7 h-7 flex items-center justify-center flex-shrink-0 ${
+                          isSelected 
+                            ? 'bg-[#6366F1] text-white' 
+                            : `${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)]' : 'bg-gray-100 text-gray-500'}`
+                        } ${isDark ? 'border-2 border-[rgba(255,255,255,0.1)]' : 'border-2 border-gray-200'}`}>
+                          <Icon size={13} />
                         </div>
-                        <span className="flex-1 font-body text-sm" style={{ color: isSelected ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
+                        <span className={`flex-1 font-mono font-black text-sm ${isSelected ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-[rgba(255,255,255,0.5)]' : 'text-gray-500')}`}>
                           {action.label}
                         </span>
-                        <kbd className="font-mono text-[0.5rem] px-1.5 py-0.5 rounded flex-shrink-0"
-                          style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`, color: "var(--color-text-faint)" }}>
+                        <kbd className={`font-mono font-black text-[10px] px-2 py-0.5 flex-shrink-0 ${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] border-2 border-[rgba(255,255,255,0.1)]' : 'bg-gray-100 text-gray-400 border-2 border-gray-200'}`}>
                           {action.shortcut}
                         </kbd>
                       </button>
@@ -290,21 +283,20 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
               </div>
             </div>
 
-            {/* Footer hint */}
-            <div className="flex items-center gap-4 px-5 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${isDark ? "rgba(232,184,75,0.08)" : "rgba(99,102,241,0.1)"}` }}>
+            {/* Footer */}
+            <div className="flex items-center gap-4 px-4 py-2 flex-shrink-0" style={{ borderTop: `3px solid ${borderColor}` }}>
               {[
-                { keys: ["↑", "↓"], label: "Navigate" },
-                { keys: ["↵"], label: "Select" },
-                { keys: ["Esc"], label: "Close" },
+                { keys: ["↑", "↓"], label: "NAV" },
+                { keys: ["↵"], label: "SELECT" },
+                { keys: ["ESC"], label: "CLOSE" },
               ].map(({ keys, label }) => (
                 <div key={label} className="flex items-center gap-1.5">
                   {keys.map(k => (
-                    <kbd key={k} className="font-mono text-[0.5rem] px-1.5 py-0.5 rounded"
-                      style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`, color: "var(--color-text-secondary)" }}>
+                    <kbd key={k} className={`font-mono font-black text-[10px] px-1.5 py-0.5 ${isDark ? 'bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.15)]' : 'bg-gray-100 text-gray-500 border border-gray-300'}`}>
                       {k}
                     </kbd>
                   ))}
-                  <span className="font-mono text-[0.5rem]" style={{ color: "var(--color-text-faint)" }}>{label}</span>
+                  <span className={`font-mono font-black text-[10px] ${isDark ? 'text-[rgba(255,255,255,0.3)]' : 'text-gray-400'}`}>{label}</span>
                 </div>
               ))}
             </div>
