@@ -121,7 +121,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40`}
+        className={`hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40`}
         style={{
           width: sidebarWidth,
           backgroundColor: isDark ? '#050510' : '#FFFFFF',
@@ -129,18 +129,8 @@ export default function Sidebar() {
           transition: 'width 250ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
-        {/* ── Logo + Toggle ── */}
-        <div className={`flex items-center ${expanded ? 'justify-between' : 'justify-center'} px-2 border-b-3 shrink-0`} style={{ height: 64, borderColor }}>
-          {expanded && (
-            <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <div className={`w-8 h-8 flex items-center justify-center overflow-hidden shrink-0 ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
-                <img src="/logo.jpg" alt="MoonFluxx" className="w-full h-full object-cover" />
-              </div>
-              <span className="font-mono font-black text-sm tracking-[0.15em] uppercase group-hover:text-[#6366F1] transition-colors">
-                MoonFluxx
-              </span>
-            </Link>
-          )}
+        {/* ── Toggle Button ── */}
+        <div className={`flex items-center ${expanded ? 'justify-end' : 'justify-center'} px-2 pt-2 pb-1 shrink-0`}>
           <button
             onClick={toggle}
             className={`
@@ -156,7 +146,7 @@ export default function Sidebar() {
         </div>
 
         {/* ── Main nav ── */}
-        <nav className="flex flex-col gap-0.5 px-2 pt-3 overflow-x-hidden">
+        <nav className="flex flex-col gap-0.5 px-2 pt-1 overflow-x-hidden">
           {MAIN_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -213,7 +203,7 @@ export default function Sidebar() {
         />
 
         {/* ── Bottom section (Profile & Settings) ── */}
-        <div className="flex flex-col gap-0.5 px-2 pb-3">
+        <div className="flex flex-col gap-0.5 px-2 pb-2">
           {BOTTOM_ITEMS.map((item) => (
             <NavLink
               key={item.href}
