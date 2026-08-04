@@ -19,144 +19,75 @@ export default function TopBar() {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const isDark = theme === 'dark';
+  const borderColor = isDark ? 'rgba(255,255,255,0.2)' : '#000';
 
   return (
     <header
+      className="fixed top-0 left-0 right-0 z-50 flex items-center px-3 sm:px-5 gap-3 font-mono uppercase tracking-wider"
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
         height: 64,
-        zIndex: 50,
-        background: isDark ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderBottom: isDark
-          ? '1px solid rgba(99,102,241,0.06)'
-          : '1px solid rgba(99,102,241,0.10)',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 20px',
-        gap: 12,
-        transition: 'background 0.3s ease, border-color 0.3s ease',
+        backgroundColor: isDark ? '#050510' : '#FFFFFF',
+        borderBottom: `3px solid ${borderColor}`,
       }}
     >
       {/* ── Logo ── */}
-      <Link href="/" className="flex items-center gap-3 shrink-0 group mr-2 sm:mr-6">
-        <span className="bmark">
-          <span className="b-ring"></span>
-          <span className="b-ring2"></span>
-          <span className="b-flow"></span>
-          <span className="b-fh"></span>
-          <span className="b-fhl"></span>
-          <span className="b-fv"></span>
-          <span className="b-core"></span>
-        </span>
-        
+      <Link href="/" className="flex items-center gap-2 shrink-0 group mr-2 sm:mr-4">
+        <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
+          M
+        </div>
         <span
-          className="inline group-hover:opacity-80 transition-opacity"
-          style={{
-            fontFamily: "'Clash Display', sans-serif",
-            fontWeight: 500,
-            fontSize: '1rem',
-            letterSpacing: '.22em',
-            textTransform: 'uppercase' as const,
-            color: 'var(--color-text-primary)',
-            whiteSpace: 'nowrap',
-          }}
+          className="hidden sm:inline font-black text-sm tracking-[0.2em] group-hover:text-[#6366F1] transition-colors"
         >
-          MoonFluxx<sup style={{ fontSize: '.5em', fontWeight: 300, letterSpacing: 0 }}>®</sup>
+          MOONFLUXX
         </span>
       </Link>
 
       {/* ── Search ── */}
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-        {/* Desktop search input */}
-        <div
-          className="hidden md:flex"
-          style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: 480,
-            alignItems: 'center',
-          }}
-        >
+      <div className="flex-1 flex justify-center">
+        {/* Desktop search */}
+        <div className="hidden md:flex relative w-full" style={{ maxWidth: 480 }}>
           <Search
             size={15}
-            style={{
-              position: 'absolute',
-              left: 12,
-              color: 'var(--color-text-faint)',
-              pointerEvents: 'none',
-              flexShrink: 0,
-            }}
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: isDark ? 'rgba(255,255,255,0.3)' : '#999' }}
           />
           <input
             type="text"
-            placeholder="Search tokens..."
+            placeholder="> SEARCH_TOKENS.EXE --QUERY='...'"
             readOnly
             onClick={() => setSearchModalOpen(true)}
-            style={{
-              width: '100%',
-              height: 40,
-              background: isDark ? 'var(--color-surface-2)' : 'var(--color-surface-2)',
-              border: '1px solid var(--color-border-subtle)',
-              borderRadius: 10,
-              paddingLeft: 36,
-              paddingRight: 12,
-              fontSize: 13,
-              fontFamily: "'Outfit', sans-serif",
-              color: 'var(--color-text-primary)',
-              outline: 'none',
-              cursor: 'pointer',
-              transition: 'border-color 0.2s ease, background 0.3s ease',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.40)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
-            }}
+            className={`
+              w-full h-10 pl-9 pr-16 font-mono font-bold text-xs uppercase tracking-wider cursor-pointer
+              ${isDark 
+                ? 'bg-black text-white border-2 border-[rgba(255,255,255,0.2)] placeholder-[rgba(255,255,255,0.25)] focus:border-[#6366F1]' 
+                : 'bg-gray-50 text-black border-2 border-black placeholder-gray-400 focus:border-[#6366F1]'}
+              outline-none transition-colors
+            `}
           />
           <kbd
-            className="hidden lg:flex"
-            style={{
-              position: 'absolute',
-              right: 10,
-              fontSize: 10,
-              fontFamily: "'JetBrains Mono', monospace",
-              color: 'var(--color-text-faint)',
-              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
-              borderRadius: 4,
-              padding: '2px 6px',
-              alignItems: 'center',
-              gap: 2,
-              pointerEvents: 'none',
-            }}
+            className={`
+              hidden lg:flex absolute right-2 top-1/2 -translate-y-1/2
+              text-[10px] font-mono font-black px-2 py-1 pointer-events-none
+              ${isDark 
+                ? 'bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.15)]' 
+                : 'bg-gray-200 text-gray-500 border border-gray-300'}
+            `}
           >
             ⌘K
           </kbd>
         </div>
 
         {/* Mobile search icon */}
-        <div className="flex md:hidden" style={{ alignItems: 'center' }}>
+        <div className="flex md:hidden items-center">
           <button
             onClick={() => setSearchModalOpen(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 38,
-              height: 38,
-              background: isDark ? 'rgba(99,102,241,0.05)' : 'rgba(99,102,241,0.08)',
-              border: '1px solid var(--color-border-subtle)',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              color: '#818CF8',
-              transition: 'all 0.2s ease',
-            }}
+            className={`
+              flex items-center justify-center w-9 h-9
+              ${isDark 
+                ? 'bg-black text-[#6366F1] border-2 border-[rgba(255,255,255,0.2)] hover:border-[#6366F1]' 
+                : 'bg-white text-[#6366F1] border-2 border-black hover:bg-[#6366F1] hover:text-white'}
+              transition-all
+            `}
             aria-label="Search"
           >
             <Search size={16} />
@@ -168,106 +99,50 @@ export default function TopBar() {
       <button
         onClick={toggleTheme}
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 38,
-          height: 38,
-          borderRadius: '50%',
-          background: isDark ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.08)',
-          border: '1px solid var(--color-border-subtle)',
-          cursor: 'pointer',
-          color: isDark ? '#F59E0B' : '#6366F1',
-          flexShrink: 0,
-          transition: 'all 0.3s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDark ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.15)';
-          e.currentTarget.style.transform = 'scale(1.08)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isDark ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.08)';
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
+        className={`
+          flex items-center justify-center w-9 h-9 shrink-0 font-black transition-all
+          ${isDark 
+            ? 'bg-black text-[#F59E0B] border-2 border-[rgba(255,255,255,0.2)] hover:border-[#F59E0B] hover:shadow-[2px_2px_0px_0px_#F59E0B]' 
+            : 'bg-white text-[#6366F1] border-2 border-black hover:bg-[#6366F1] hover:text-white hover:shadow-[2px_2px_0px_0px_#000]'}
+          active:translate-y-0.5 active:shadow-none
+        `}
       >
         {isDark ? <Sun size={16} /> : <Moon size={16} />}
       </button>
 
       {/* ── Wallet ── */}
-      <div style={{ flexShrink: 0 }}>
+      <div className="shrink-0">
         {connected && address ? (
           <button
-            className="shadow-[0_0_0_2px_rgba(99,102,241,0.3)]"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-              height: 36,
-              padding: '0 14px',
-              background: isDark ? 'rgba(99,102,241,0.05)' : 'rgba(99,102,241,0.08)',
-              border: '1px solid rgba(99,102,241,0.20)',
-              borderRadius: 8,
-              cursor: 'pointer',
-              color: 'var(--color-text-primary)',
-              fontSize: 12,
-              fontFamily: "'JetBrains Mono', monospace",
-              letterSpacing: '0.03em',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease',
-            }}
+            className={`
+              flex items-center gap-2 h-9 px-3 font-mono font-black text-xs tracking-wider
+              ${isDark 
+                ? 'bg-black text-[#10B981] border-2 border-[#10B981] shadow-[2px_2px_0px_0px_#10B981]' 
+                : 'bg-white text-black border-2 border-black shadow-[2px_2px_0px_0px_#10B981]'}
+              hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all
+            `}
           >
-            <span
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                background: '#10B981',
-                flexShrink: 0,
-                boxShadow: '0 0 6px rgba(16,185,129,0.7)',
-              }}
-            />
+            <span className="w-2 h-2 bg-[#10B981] shrink-0 shadow-[0_0_6px_#10B981]" />
             {shortenAddr(address)}
           </button>
         ) : (
           <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 36,
-              padding: '0 16px',
-              background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
-              boxShadow: '0 4px 15px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 8,
-              cursor: 'pointer',
-              color: '#fff',
-              fontSize: 13,
-              fontFamily: "'Outfit', sans-serif",
-              fontWeight: 600,
-              letterSpacing: '0.01em',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.2)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.background = 'linear-gradient(135deg, #4338CA, #4F46E5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.1)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'linear-gradient(135deg, #4F46E5, #6366F1)';
-            }}
             onClick={() => setModalOpen(true)}
+            className={`
+              flex items-center justify-center h-9 px-4 font-mono font-black text-xs tracking-wider
+              bg-[#6366F1] text-white
+              ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'}
+              shadow-[3px_3px_0px_0px_#10B981]
+              hover:shadow-[5px_5px_0px_0px_#10B981] hover:-translate-y-0.5
+              active:translate-y-0.5 active:shadow-none
+              transition-all
+            `}
           >
-            Connect Wallet
+            [ CONNECT WALLET ]
           </button>
         )}
       </div>
 
-      <div className="fluxx-beam" />
       <SearchModal open={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
     </header>
   );
