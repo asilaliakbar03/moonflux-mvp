@@ -61,7 +61,7 @@ function NavLink({
     <Link href={item.href} className="block relative group/link">
       <div
         className={`
-          flex items-center gap-3 px-3 py-3 cursor-pointer transition-all duration-150 font-mono font-black uppercase tracking-wider text-sm
+          flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-all duration-150 font-mono font-black uppercase tracking-wider text-sm
           ${isActive 
             ? `${isDark ? 'bg-[#6366F1] text-white border-2 border-[rgba(255,255,255,0.2)]' : 'bg-[#6366F1] text-white border-3 border-black'}` 
             : `${isDark ? 'text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]' : 'text-gray-500 hover:text-black hover:bg-gray-100'} border-2 border-transparent`
@@ -121,7 +121,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 overflow-hidden`}
+        className={`hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40`}
         style={{
           width: sidebarWidth,
           backgroundColor: isDark ? '#050510' : '#FFFFFF',
@@ -129,24 +129,34 @@ export default function Sidebar() {
           transition: 'width 250ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
-        {/* ── Toggle Button ── */}
-        <div className="flex items-center justify-end px-2 pt-4 pb-2">
+        {/* ── Logo + Toggle ── */}
+        <div className={`flex items-center justify-between px-3 border-b-3`} style={{ height: 64, borderColor }}>
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
+              M
+            </div>
+            {expanded && (
+              <span className="font-mono font-black text-sm tracking-[0.15em] uppercase group-hover:text-[#6366F1] transition-colors">
+                MoonFluxx
+              </span>
+            )}
+          </Link>
           <button
             onClick={toggle}
             className={`
-              p-2 font-mono font-black transition-all
+              p-1.5 font-mono font-black transition-all
               ${isDark 
                 ? 'text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] border-2 border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.3)]' 
                 : 'text-gray-400 hover:text-black hover:bg-gray-100 border-2 border-gray-200 hover:border-black'}
             `}
             title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
-            {expanded ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+            {expanded ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
           </button>
         </div>
 
         {/* ── Main nav ── */}
-        <nav className="flex-1 flex flex-col gap-1 px-2 pt-2 overflow-y-auto overflow-x-hidden">
+        <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-3 overflow-x-hidden">
           {MAIN_ITEMS.map((item) => (
             <NavLink
               key={item.href}
@@ -157,11 +167,11 @@ export default function Sidebar() {
           ))}
 
           {/* ── LAUNCH BUTTON (right below Community) ── */}
-          <div className="mt-2">
+          <div className="mt-1">
             <Link href="/launch" className="block relative group/link">
               <div
                 className={`
-                  flex items-center gap-3 px-3 py-3 cursor-pointer font-mono font-black uppercase tracking-wider text-sm
+                  flex items-center gap-3 px-3 py-2.5 cursor-pointer font-mono font-black uppercase tracking-wider text-sm
                   bg-[#10B981] text-black transition-all
                   ${isDark ? 'border-2 border-[rgba(255,255,255,0.2)]' : 'border-3 border-black'}
                   ${isDark ? 'shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]' : 'shadow-[3px_3px_0px_0px_#000]'}
@@ -198,12 +208,12 @@ export default function Sidebar() {
 
         {/* ── Divider ── */}
         <div
-          className="mx-2 my-2"
+          className="mx-2 my-1"
           style={{ borderTop: `2px solid ${borderColor}` }}
         />
 
         {/* ── Bottom section (Profile & Settings) ── */}
-        <div className="flex flex-col gap-1 px-2 pb-4">
+        <div className="flex flex-col gap-0.5 px-2 pb-3">
           {BOTTOM_ITEMS.map((item) => (
             <NavLink
               key={item.href}

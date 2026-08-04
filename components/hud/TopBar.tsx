@@ -30,14 +30,12 @@ export default function TopBar() {
         borderBottom: `3px solid ${borderColor}`,
       }}
     >
-      {/* ── Logo ── */}
-      <Link href="/" className="flex items-center gap-2 shrink-0 group mr-2 sm:mr-4">
+      {/* ── Logo (mobile only, desktop has it in sidebar) ── */}
+      <Link href="/" className="flex md:hidden items-center gap-2 shrink-0 group mr-2">
         <div className={`w-8 h-8 flex items-center justify-center font-black text-lg bg-[#6366F1] text-white ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
           M
         </div>
-        <span
-          className="hidden sm:inline font-black text-sm tracking-[0.2em] group-hover:text-[#6366F1] transition-colors"
-        >
+        <span className="font-black text-sm tracking-[0.2em] group-hover:text-[#6366F1] transition-colors">
           MOONFLUXX
         </span>
       </Link>
