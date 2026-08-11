@@ -12,14 +12,21 @@ export interface TokenDeployFormData {
   telegram: string;
 }
 
-export function useTokenDeploy() {
+type ToastFn = (message: string, type?: 'success' | 'error' | 'info') => void;
+
+export function useTokenDeploy(showToast?: ToastFn) {
   const router = useRouter();
   const { anchorWallet, connection } = useMoonWallet();
   const [isDeploying, setIsDeploying] = useState(false);
 
+  const notify = (msg: string, type: 'success' | 'error' | 'info' = 'info') => {
+    if (showToast) showToast(msg, type);
+    else if (type === 'error') alert(msg);
+  };
+
   const deployToken = async (formData: TokenDeployFormData, imageFile: File | null) => {
     if (!anchorWallet) {
-      alert("Please connect your wallet first");
+      notify('Connect your wallet first', 'error');
       return;
     }
 
@@ -143,7 +150,14 @@ export function useTokenDeploy() {
       router.push(`/token/${mint.publicKey.toBase58()}`);
     } catch (err: any) {
       console.error("Deploy failed:", err);
-      alert(`Deployment failed: ${err.message || String(err)}\nSee console for details.`);
+      const msg = err.message || String(err);
+      if (msg.includes('rejected') || msg.includes('User rejected')) {
+        notify('Transaction rejected in wallet', 'error');
+      } else if (msg.includes('insufficient') || msg.includes('Insufficient')) {
+        notify('Insufficient SOL balance', 'error');
+      } else {
+        notify(`Deploy failed: ${msg.slice(0, 120)}`, 'error');
+      }
     } finally {
       setIsDeploying(false);
     }

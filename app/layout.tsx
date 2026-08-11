@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Preloader from "@/components/Preloader";
 import { SidebarProvider } from "@/components/SidebarContext";
 import { MainContent } from "@/components/MainContent";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "MoonFluxx — Launch, Trade & Discover Tokens",
@@ -60,9 +61,11 @@ export default function RootLayout({
                 <Sidebar />
 
                 {/* Main content — dynamic padding based on sidebar state */}
-                <MainContent>
-                  {children}
-                </MainContent>
+                <ErrorBoundary>
+                  <MainContent>
+                    {children}
+                  </MainContent>
+                </ErrorBoundary>
               </ToastProvider>
             </SolanaProvider>
           </SidebarProvider>

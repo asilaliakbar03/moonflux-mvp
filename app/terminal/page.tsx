@@ -7,6 +7,7 @@ import MagneticButton from '@/components/MagneticButton';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import { useMoonWallet } from '@/components/WalletProvider';
 import { useTheme } from '@/components/ThemeProvider';
+import { useToast } from '@/components/ToastProvider';
 
 const TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h", "1D"];
 
@@ -126,6 +127,7 @@ export default function TerminalPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { connected } = useMoonWallet();
+  const { showToast } = useToast();
   const [activeToken] = useState("LDOGE");
   const [tf, setTf] = useState("15m");
   const [side, setSide] = useState<"BUY" | "SELL">("BUY");
@@ -455,7 +457,7 @@ export default function TerminalPage() {
               <button 
                 onClick={() => {
                   if (!connected) {
-                    alert('ERR: CONNECT WALLET');
+                    showToast('Connect your wallet first', 'error');
                   }
                 }}
                 className={`w-full py-4 text-lg transition-none focus-visible:outline-none ${borderClass} ${side === "BUY" ? 'bg-[#10B981] text-black hover:bg-[#059669]' : 'bg-[#F43F5E] text-black hover:bg-[#E11D48]'} shadow-[4px_4px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none`}

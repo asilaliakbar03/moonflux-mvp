@@ -6,6 +6,7 @@ import { Sparkles, Settings, Loader2, Rocket, Shield, Zap, TrendingUp, Terminal,
 import { useTheme } from '@/components/ThemeProvider';
 import { useMoonWallet } from "@/components/WalletProvider";
 import { useTokenDeploy, TokenDeployFormData } from "@/hooks/useTokenDeploy";
+import { useToast } from "@/components/ToastProvider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -49,7 +50,8 @@ export default function LaunchPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { anchorWallet } = useMoonWallet();
-  const { deployToken, isDeploying } = useTokenDeploy();
+  const { showToast } = useToast();
+  const { deployToken, isDeploying } = useTokenDeploy(showToast);
 
   const [mode, setMode] = useState<LaunchMode>('none');
   const [currentStep, setCurrentStep] = useState<Step>(1);

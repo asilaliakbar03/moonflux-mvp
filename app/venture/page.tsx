@@ -6,6 +6,7 @@ import { useState, useMemo } from "react";
 import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/components/ThemeProvider';
+import { useToast } from '@/components/ToastProvider';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -31,6 +32,7 @@ const getAsciiBar = (pct: number, length: number = 12) => {
 export default function VenturePage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'governance' | 'incubator'>('governance');
   const [votedProps, setVotedProps] = useState<Record<number, 'for' | 'against'>>({});
   const [votedProjects, setVotedProjects] = useState<Record<number, boolean>>({});
@@ -246,7 +248,7 @@ export default function VenturePage() {
                 VOTE FOR THE NEXT BIG PROTOCOL ACROSS CHAINS. PROJECTS THAT REACH 100% FUNDING GOAL RECEIVE A MOONFLUXX ECOSYSTEM GRANT AND AUTOMATIC LISTING.
               </p>
               <button 
-                onClick={() => alert('Applications opening soon')} 
+                onClick={() => showToast('Applications opening soon — stay tuned!', 'info')} 
                 className={`bg-[#F59E0B] text-black font-black text-lg px-8 py-4 ${borderClass} hover:bg-white transition-colors active:translate-y-1 active:shadow-none shadow-[4px_4px_0px_0px_#000]`}
               >
                 [ APPLY FOR INCUBATION ]
