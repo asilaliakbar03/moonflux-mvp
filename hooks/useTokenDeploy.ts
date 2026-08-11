@@ -141,9 +141,9 @@ export function useTokenDeploy() {
       }
 
       router.push(`/token/${mint.publicKey.toBase58()}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Deploy failed:", err);
-      alert("Deployment failed. See console.");
+      alert(`Deployment failed: ${err.message || String(err)}\nSee console for details.`);
     } finally {
       setIsDeploying(false);
     }

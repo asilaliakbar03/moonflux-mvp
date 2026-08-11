@@ -177,9 +177,10 @@ export async function POST(req: Request) {
       },
     };
 
-    // Encode the metadata JSON as a data URI so the caller has a usable URI
-    const metadataJson = JSON.stringify(mockMetadata);
-    const metadataUri  = `data:application/json;base64,${Buffer.from(metadataJson).toString('base64')}`;
+    // Encode the metadata JSON as a data URI so the caller has a usable URI (but keep it short to avoid exceeding 200 chars on-chain if possible, or just return a dummy URL)
+    // The smart contract has a 200 character limit for metadataUri.
+    // Base64 encoding the entire JSON is too long. Let's return a dummy URL for the dev fallback.
+    const metadataUri = 'https://moonflux.vercel.app/mock-metadata.json';
 
     // Stash optional social links in the response for convenience
     void twitter;
