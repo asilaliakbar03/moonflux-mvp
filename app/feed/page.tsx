@@ -178,6 +178,13 @@ export default function FeedPage() {
           { id: 'tok_luna_doge', name: 'Luna Doge', ticker: '$LDOGE', matchScore: 94, urgencySignal: 'High Conviction', matchReasons: ['High Momentum', 'AI Narrative'], explanation: 'Whale wallets accumulated $420k in the last 2 hours following AI agent volume spike.', progress: 78, marketCap: '4.2M', risk: 'Medium' },
           { id: 'tok_cyber_pepe', name: 'Cyber Pepe', ticker: '$CPEPE', matchScore: 88, urgencySignal: 'Medium Signal', matchReasons: ['Breakout Pattern'], explanation: 'Consolidating above 200 EMA with expanding volume on DEX.', progress: 62, marketCap: '1.8M', risk: 'Low' },
           { id: 'tok_ai_swarm', name: 'AI Swarm', ticker: '$SWRM', matchScore: 96, urgencySignal: 'High Conviction', matchReasons: ['Whale Buys', 'Trending AI'], explanation: 'Multi-sig wallet created 15 minutes ago. Trading volume surge +210%.', progress: 95, marketCap: '8.9M', risk: 'Medium' },
+          { id: 'tok_neon_cat', name: 'Neon Cat', ticker: '$NCAT', matchScore: 81, urgencySignal: 'Medium Signal', matchReasons: ['Community Growth', 'Meme Velocity'], explanation: 'Discord grew by 3,200 members in 48 hours. Twitter mentions up 540%.', progress: 45, marketCap: '920K', risk: 'Low' },
+          { id: 'tok_quantum_ape', name: 'Quantum Ape', ticker: '$QAPE', matchScore: 92, urgencySignal: 'High Conviction', matchReasons: ['Smart Money Inflow', 'Low Float'], explanation: 'Top 10 whale wallet just bought $180k. Only 12% of supply circulating.', progress: 88, marketCap: '6.1M', risk: 'High' },
+          { id: 'tok_sol_punk', name: 'Sol Punk', ticker: '$SPUNK', matchScore: 77, urgencySignal: 'Low Signal', matchReasons: ['Steady Growth'], explanation: 'Consistent 5% daily growth for 2 weeks. Strong diamond hand holder base.', progress: 34, marketCap: '510K', risk: 'Low' },
+          { id: 'tok_degen_flux', name: 'Degen Flux', ticker: '$DFLUX', matchScore: 90, urgencySignal: 'High Conviction', matchReasons: ['Bonding Curve Rush', 'KOL Mentions'], explanation: 'Bonding curve at 72 SOL. 3 major KOLs tweeted in last hour.', progress: 85, marketCap: '3.7M', risk: 'Medium' },
+          { id: 'tok_moon_wif', name: 'Moon Wif Hat', ticker: '$MWIF', matchScore: 85, urgencySignal: 'Medium Signal', matchReasons: ['Viral Meme', 'Exchange Listing'], explanation: 'Trending on CT. Rumored listing on tier-2 CEX within 48 hours.', progress: 71, marketCap: '2.4M', risk: 'Medium' },
+          { id: 'tok_based_ai', name: 'Based AI', ticker: '$BSAI', matchScore: 93, urgencySignal: 'High Conviction', matchReasons: ['AI Agent Integration', 'Revenue'], explanation: 'First memecoin with working AI agent generating $2.1k daily revenue.', progress: 91, marketCap: '11.2M', risk: 'Low' },
+          { id: 'tok_giga_chad', name: 'Giga Chad', ticker: '$GIGA', matchScore: 79, urgencySignal: 'Medium Signal', matchReasons: ['Cultural Moment', 'Volume Spike'], explanation: 'Viral tweet with 45k likes. DEX volume up 380% in the last 4 hours.', progress: 56, marketCap: '1.5M', risk: 'Medium' },
         ]);
       } finally {
         setLoading(false);
@@ -193,6 +200,16 @@ export default function FeedPage() {
     const index = Math.round(scrollPos / height);
     if (index !== activeIndex && index >= 0 && index < tokens.length) {
       setActiveIndex(index);
+    }
+    // Loop back to the start when reaching the last token
+    const maxScroll = e.currentTarget.scrollHeight - height;
+    if (scrollPos >= maxScroll - 5 && tokens.length > 1) {
+      setTimeout(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+          setActiveIndex(0);
+        }
+      }, 800);
     }
   };
 
@@ -219,10 +236,22 @@ export default function FeedPage() {
       const height = containerRef.current.clientHeight;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        containerRef.current.scrollBy({ top: height, behavior: 'smooth' });
+        if (activeIndex >= tokens.length - 1) {
+          // Loop to start
+          containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+          setActiveIndex(0);
+        } else {
+          containerRef.current.scrollBy({ top: height, behavior: 'smooth' });
+        }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        containerRef.current.scrollBy({ top: -height, behavior: 'smooth' });
+        if (activeIndex <= 0) {
+          // Loop to end
+          containerRef.current.scrollTo({ top: height * (tokens.length - 1), behavior: 'smooth' });
+          setActiveIndex(tokens.length - 1);
+        } else {
+          containerRef.current.scrollBy({ top: -height, behavior: 'smooth' });
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
