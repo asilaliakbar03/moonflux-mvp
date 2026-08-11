@@ -16,6 +16,9 @@ import {
   X,
   PanelLeftClose,
   PanelLeft,
+  Store,
+  CalendarDays,
+  Network,
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -35,6 +38,9 @@ const MAIN_ITEMS: NavItem[] = [
   { icon: LineChart,       label: 'Terminal',    href: '/terminal'    },
   { icon: Trophy,          label: 'Leaderboard', href: '/leaderboard' },
   { icon: Swords,          label: 'Arena',       href: '/arena'       },
+  { icon: Store,           label: 'Marketplace', href: '/marketplace' },
+  { icon: CalendarDays,    label: 'Calendar',    href: '/calendar'    },
+  { icon: Network,         label: 'Reputation',  href: '/reputation'  },
   { icon: Users,           label: 'Community',   href: '/venture'     },
 ];
 
