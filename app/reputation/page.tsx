@@ -80,8 +80,9 @@ export default function ReputationGraphPage() {
     
     filteredNodes.forEach((node, i) => {
       const angle = (i / filteredNodes.length) * 2 * Math.PI;
-      // Add a bit of randomness to make it look organic
-      const r = radius * (0.8 + Math.random() * 0.4);
+      // Use deterministic offset based on node id instead of Math.random
+      const seed = node.id.charCodeAt(node.id.length - 1) / 255;
+      const r = radius * (0.8 + seed * 0.4);
       positions[node.id] = {
         x: centerX + r * Math.cos(angle),
         y: centerY + r * Math.sin(angle)
@@ -177,7 +178,7 @@ export default function ReputationGraphPage() {
                     <text
                       y={25}
                       textAnchor="middle"
-                      fill={textClass}
+                      fill={isDark ? '#FFFFFF' : '#000000'}
                       fontSize={10}
                       fontWeight={isSelected ? 'bold' : 'normal'}
                       className={`font-mono ${isDark ? 'fill-white' : 'fill-black'}`}
@@ -220,7 +221,7 @@ export default function ReputationGraphPage() {
               <div className="space-y-4">
                 <div className={`p-3 ${borderClass} bg-black/5 dark:bg-white/5`}>
                   <div className="text-xs text-gray-500 mb-1 uppercase">Projects Launched</div>
-                  <div className={`text-lg font-bold ${textClass}`}>{selectedNode.metadata.projectsLaunched}</div>
+                  <div className={`text-lg font-bold ${textClass}`}>{selectedNode.metadata?.projectsLaunched ?? 0}</div>
                 </div>
                 
                 <div className={`p-3 ${borderClass} bg-black/5 dark:bg-white/5`}>
@@ -230,7 +231,7 @@ export default function ReputationGraphPage() {
                 
                 <div className={`p-3 ${borderClass} bg-black/5 dark:bg-white/5`}>
                   <div className="text-xs text-gray-500 mb-1 uppercase">Followers</div>
-                  <div className={`text-lg font-bold ${textClass}`}>{selectedNode.metadata.followers.toLocaleString()}</div>
+                  <div className={`text-lg font-bold ${textClass}`}>{(selectedNode.metadata?.followers ?? 0).toLocaleString()}</div>
                 </div>
               </div>
 

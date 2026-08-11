@@ -41,7 +41,7 @@ export function getEvolutionStage(data: {
       emoji: '🏛️',
       description: 'Revenue generating',
       nextMilestone: 'Enable governance',
-      progress: 0
+      progress: 50
     };
   }
   
@@ -52,12 +52,12 @@ export function getEvolutionStage(data: {
       emoji: '🌳',
       description: 'Bonding curve graduated',
       nextMilestone: 'Generate revenue',
-      progress: 0
+      progress: 50
     };
   }
   
   if (data.holders >= 1000 && data.poolSol >= 50) {
-    const progress = Math.min(100, (data.poolSol / 85) * 100);
+    const progress = Math.min(100, ((data.poolSol - 50) / (85 - 50)) * 100);
     return {
       stage: 3,
       name: 'GROWTH',

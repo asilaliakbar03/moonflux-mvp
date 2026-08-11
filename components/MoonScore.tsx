@@ -47,7 +47,7 @@ export function MoonScore({
 
   // Prevent hydration mismatch
   if (!mounted) {
-    return <div className={`animate-pulse rounded-full bg-gray-200`} />;
+    return <div className={`animate-pulse rounded-full bg-gray-200 ${size === 'sm' ? 'h-8 w-8' : size === 'md' ? 'h-24 w-24' : 'h-32 w-32'}`} />;
   }
 
   if (size === "sm") {
@@ -64,7 +64,7 @@ export function MoonScore({
   // Configuration for md and lg gauges
   const radius = size === "lg" ? 60 : 40;
   const stroke = size === "lg" ? 12 : 8;
-  const normalizedRadius = radius - stroke * 2;
+  const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
@@ -93,7 +93,7 @@ export function MoonScore({
             fill="transparent"
             strokeWidth={stroke}
             strokeDasharray={circumference + " " + circumference}
-            style={{ strokeDashoffset: circumference }}
+            initial={{ strokeDashoffset: circumference }}
             animate={{ strokeDashoffset }}
             transition={{ duration: 1.5, ease: "easeOut" }}
             r={normalizedRadius}

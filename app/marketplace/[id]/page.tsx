@@ -72,7 +72,7 @@ export default function ListingDetailPage() {
   const [bidAmount, setBidAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const id = params.id as string;
+  const id = (params?.id as string) || '1';
   // Fallback to first item if ID not in mock DB
   const listing = MOCK_DB[id] || MOCK_DB["1"];
 
