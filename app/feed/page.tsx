@@ -193,6 +193,17 @@ export default function FeedPage() {
     loadFeed();
   }, []);
 
+  // Track the original base tokens for reshuffling
+  const baseTokensRef = useRef<FeedToken[]>([]);
+  
+  useEffect(() => {
+    if (tokens.length > 0 && baseTokensRef.current.length === 0) {
+      baseTokensRef.current = [...tokens];
+    }
+  }, [tokens]);
+
+  const appendCooldownRef = useRef(false);
+
   const handleScroll = (e: any) => {
     if (!containerRef.current) return;
     const scrollPos = e.currentTarget.scrollTop;
@@ -201,15 +212,20 @@ export default function FeedPage() {
     if (index !== activeIndex && index >= 0 && index < tokens.length) {
       setActiveIndex(index);
     }
-    // Loop back to the start when reaching the last token
+    // Infinite scroll: when near the bottom, append more shuffled tokens
     const maxScroll = e.currentTarget.scrollHeight - height;
-    if (scrollPos >= maxScroll - 5 && tokens.length > 1) {
-      setTimeout(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-          setActiveIndex(0);
-        }
-      }, 800);
+    if (scrollPos >= maxScroll - height * 2 && tokens.length > 1 && !appendCooldownRef.current) {
+      const base = baseTokensRef.current;
+      if (base.length === 0) return;
+      appendCooldownRef.current = true;
+      // Shuffle and append with unique keys
+      const batch = Math.floor(tokens.length / base.length);
+      const shuffled = [...base]
+        .sort(() => Math.random() - 0.5)
+        .map(t => ({ ...t, id: `${t.id}_${batch}_${Math.random().toString(36).slice(2, 6)}` }));
+      setTokens(prev => [...prev, ...shuffled]);
+      // Cooldown: wait 2s before allowing another append
+      setTimeout(() => { appendCooldownRef.current = false; }, 2000);
     }
   };
 
@@ -236,22 +252,10 @@ export default function FeedPage() {
       const height = containerRef.current.clientHeight;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (activeIndex >= tokens.length - 1) {
-          // Loop to start
-          containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-          setActiveIndex(0);
-        } else {
-          containerRef.current.scrollBy({ top: height, behavior: 'smooth' });
-        }
+        containerRef.current.scrollBy({ top: height, behavior: 'smooth' });
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (activeIndex <= 0) {
-          // Loop to end
-          containerRef.current.scrollTo({ top: height * (tokens.length - 1), behavior: 'smooth' });
-          setActiveIndex(tokens.length - 1);
-        } else {
-          containerRef.current.scrollBy({ top: -height, behavior: 'smooth' });
-        }
+        containerRef.current.scrollBy({ top: -height, behavior: 'smooth' });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
