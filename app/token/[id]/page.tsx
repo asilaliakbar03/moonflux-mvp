@@ -300,13 +300,13 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           
           {/* Interactive Recharts Price Chart */}
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }} transition={{ delay: 0.1 }} className={`${bBg} ${bBorder} ${bShadow} p-3 sm:p-6 h-[280px] sm:h-[400px] flex flex-col`}>
-            <div className={`flex justify-between items-center mb-6 border-b-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'} pb-4`}>
+            <div className={`flex flex-wrap justify-between items-center mb-4 sm:mb-6 gap-2 border-b-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'} pb-4`}>
               <div className="flex items-center gap-2 font-bold tracking-wider text-sm text-[#6366F1]">
                 <BarChart3 className="w-4 h-4" /> [ PRICE CHART ]
               </div>
               <div className="flex gap-2">
                 {['15M', '1H', '4H', '1D'].map(tf => (
-                  <button key={tf} className={`px-3 py-1 ${bBg} text-xs font-bold transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${bBorder} ${bShadow}`}>
+                  <button key={tf} className={`px-3 py-2 ${bBg} text-xs font-bold transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${bBorder} ${bShadow}`}>
                     {tf}
                   </button>
                 ))}
@@ -345,7 +345,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
               <Activity className="w-4 h-4 text-[#6366F1]" />
               <h3 className="font-bold text-sm tracking-wider text-[#6366F1]">[ RECENT TRADES ]</h3>
             </div>
-            <div className="max-h-[300px] overflow-y-auto">
+            <div className="max-h-[300px] overflow-y-auto overflow-x-auto">
               <table className="w-full text-left">
                 <thead className={`sticky top-0 ${bBg} border-b-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'} z-10`}>
                   <tr className={`${textMuted} text-xs`}>

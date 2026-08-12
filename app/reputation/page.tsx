@@ -100,9 +100,9 @@ export default function ReputationGraphPage() {
   };
 
   return (
-    <div className={`min-h-screen p-8 font-mono ${bgClass} flex flex-col`}>
+    <div className={`min-h-screen p-4 sm:p-8 font-mono ${bgClass} flex flex-col`}>
       <header className="mb-6">
-        <h1 className={`text-4xl md:text-5xl font-black mb-2 uppercase tracking-wider ${textClass}`}>[ REPUTATION GRAPH ]</h1>
+        <h1 className={`text-xl sm:text-4xl md:text-5xl font-black mb-2 uppercase tracking-wider ${textClass}`}>[ REPUTATION GRAPH ]</h1>
         <p className="text-[#6366F1] font-bold text-lg uppercase tracking-wide">See the Ecosystem. Trust the Network.</p>
       </header>
 
@@ -111,7 +111,7 @@ export default function ReputationGraphPage() {
           <button
             key={f}
             onClick={() => { setFilter(f as any); setSelectedNode(null); }}
-            className={`px-4 py-2 text-sm font-bold uppercase whitespace-nowrap ${borderClass} ${filter === f ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
+            className={`px-4 py-2.5 text-sm min-h-[44px] font-bold uppercase whitespace-nowrap ${borderClass} ${filter === f ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
           >
             {f}
           </button>

@@ -128,7 +128,7 @@ export default function MarketplacePage() {
   });
 
   return (
-    <div className={`min-h-screen ${bgClass} ${textClass} font-mono p-6 md:p-12`}>
+    <div className={`min-h-screen ${bgClass} ${textClass} font-mono p-4 sm:p-6 md:p-12`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -137,7 +137,7 @@ export default function MarketplacePage() {
       >
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-wider">
+          <h1 className="text-xl sm:text-4xl md:text-6xl font-bold uppercase tracking-wider">
             [ ACQUISITION MARKETPLACE ]
           </h1>
           <p className="text-xl md:text-2xl text-gray-500 uppercase tracking-widest">
@@ -152,7 +152,7 @@ export default function MarketplacePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 uppercase font-bold text-sm transition-all ${
+                className={`px-4 py-2.5 uppercase font-bold text-sm min-h-[44px] transition-all ${
                   activeTab === tab
                     ? "bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_#000]"
                     : `hover:bg-gray-200 dark:hover:bg-gray-800 ${textClass}`

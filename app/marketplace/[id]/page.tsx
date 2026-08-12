@@ -145,10 +145,10 @@ export default function ListingDetailPage() {
         </Link>
 
         {/* Header Section */}
-        <div className={`p-8 ${panelBgClass} ${borderClass} shadow-[8px_8px_0px_0px_#000] flex flex-col md:flex-row justify-between items-start md:items-center gap-6`}>
+        <div className={`p-4 sm:p-8 ${panelBgClass} ${borderClass} shadow-[8px_8px_0px_0px_#000] flex flex-col md:flex-row justify-between items-start md:items-center gap-6`}>
           <div>
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
+              <h1 className="text-xl sm:text-4xl md:text-6xl font-black uppercase tracking-tight">
                 {listing.name}
               </h1>
               <span className={`px-4 py-1 text-sm font-bold uppercase ${borderClass} ${
@@ -162,7 +162,7 @@ export default function ListingDetailPage() {
             <p className="text-2xl text-[#6366F1] font-bold">{listing.ticker}</p>
           </div>
           
-          <div className={`p-4 ${borderClass} bg-black text-white text-center min-w-[200px]`}>
+          <div className={`p-4 ${borderClass} bg-black text-white text-center w-full sm:w-auto sm:min-w-[200px]`}>
             <p className="text-sm text-gray-400 mb-1 uppercase">Asking Price</p>
             <p className="text-3xl font-black text-[#F59E0B]">{listing.askingPrice} SOL</p>
           </div>

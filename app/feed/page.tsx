@@ -58,7 +58,7 @@ function FeedItem({ token, idx, activeIndex, savedTokens, handleSave }: any) {
             />
 
             {/* Badges overlay */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 sm:gap-2 z-10">
               <div className={`px-2.5 py-1 text-xs font-black uppercase border ${isDark ? "bg-black text-[#10B981] border-[#10B981]" : "bg-white text-black border-black shadow-[2px_2px_0px_0px_#000]"}`}>
                 AI MATCH: {token.matchScore}%
               </div>
@@ -67,7 +67,7 @@ function FeedItem({ token, idx, activeIndex, savedTokens, handleSave }: any) {
               </div>
             </div>
 
-            <div className="absolute top-3 right-3 z-10">
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
               <span className={`px-2 py-1 text-xs font-black uppercase border ${isDark ? "bg-black text-white border-white" : "bg-black text-white border-black shadow-[2px_2px_0px_0px_#000]"}`}>
                 ${token.marketCap || '4.2M'} MC
               </span>
@@ -283,7 +283,7 @@ export default function FeedPage() {
       className={`fixed top-[64px] left-0 md:left-[72px] right-0 bottom-16 md:bottom-0 overflow-y-scroll overflow-x-hidden snap-y snap-mandatory ${isDark ? 'bg-[#000000]' : 'bg-gray-100'} z-40 scrollbar-hide font-mono`}
     >
       {/* Top Right Saved Tokens Button */}
-      <div className="absolute top-6 right-6 z-50">
+      <div className="absolute top-3 right-3 sm:top-6 sm:right-6 z-50">
         <button 
           onClick={() => setShowSavedModal(true)}
           className={`flex items-center gap-2 border-2 px-4 py-2 font-black uppercase text-xs transition-all ${

@@ -125,14 +125,14 @@ export default function LaunchCalendarPage() {
 
     return (
       <div className={`${borderClass} ${shadowClass} bg-transparent mt-6`}>
-        <div className={`grid grid-cols-7 border-b-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'}`}>
+        <div className={`grid grid-cols-7 overflow-x-auto border-b-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'}`}>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
             <div key={day} className={`p-2 text-center font-bold text-sm ${textClass} ${i > 0 ? `border-l-2 ${isDark ? 'border-[rgba(255,255,255,0.15)]' : 'border-black'}` : ''}`}>
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 border-l-2 border-t-2 border-transparent">
+        <div className="grid grid-cols-7 overflow-x-auto border-l-2 border-t-2 border-transparent">
           {days}
         </div>
       </div>
@@ -196,10 +196,10 @@ export default function LaunchCalendarPage() {
   };
 
   return (
-    <div className={`min-h-screen p-8 font-mono ${isDark ? 'bg-[#050510]' : 'bg-white'}`}>
+    <div className={`min-h-screen p-4 sm:p-8 font-mono ${isDark ? 'bg-[#050510]' : 'bg-white'}`}>
       <div className="max-w-6xl mx-auto">
         <header className="mb-8">
-          <h1 className={`text-4xl md:text-5xl font-black mb-2 uppercase tracking-wider ${textClass}`}>[ LAUNCH CALENDAR ]</h1>
+          <h1 className={`text-xl sm:text-4xl md:text-5xl font-black mb-2 uppercase tracking-wider ${textClass}`}>[ LAUNCH CALENDAR ]</h1>
           <p className="text-[#0EA5E9] font-bold text-lg uppercase tracking-wide">Know Before Everyone Else.</p>
         </header>
 
@@ -207,19 +207,19 @@ export default function LaunchCalendarPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-3 py-1 text-sm font-bold uppercase ${borderClass} ${filter === 'all' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
+              className={`px-3 py-2.5 text-sm min-h-[44px] font-bold uppercase ${borderClass} ${filter === 'all' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
             >
               All
             </button>
             <button
               onClick={() => setFilter('week')}
-              className={`px-3 py-1 text-sm font-bold uppercase ${borderClass} ${filter === 'week' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
+              className={`px-3 py-2.5 text-sm min-h-[44px] font-bold uppercase ${borderClass} ${filter === 'week' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
             >
               This Week
             </button>
             <button
               onClick={() => setFilter('month')}
-              className={`px-3 py-1 text-sm font-bold uppercase ${borderClass} ${filter === 'month' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
+              className={`px-3 py-2.5 text-sm min-h-[44px] font-bold uppercase ${borderClass} ${filter === 'month' ? (isDark ? 'bg-white text-black' : 'bg-black text-white') : `${bgClass} ${textClass}`}`}
             >
               This Month
             </button>
