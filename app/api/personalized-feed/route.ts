@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
+
 
 export const maxDuration = 30;
 
@@ -81,6 +83,9 @@ function getMockFeed(preferences: Record<string, unknown> = {}): PersonalizedFee
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const rateLimited = checkRateLimit(req, { maxRequests: 15, windowSec: 60 });
+  if (rateLimited) return rateLimited;
+
   let body: { walletAddress?: string; recentViews?: string[]; recentBuys?: string[]; preferences?: Record<string, unknown> } = {};
   try {
     body = await req.json();
@@ -129,6 +134,9 @@ Rank tokens by fit for this user. Consider: their viewing/buying history, stated
 }
 
 export async function GET(req: NextRequest) {
+  const rateLimited = checkRateLimit(req, { maxRequests: 15, windowSec: 60 });
+  if (rateLimited) return rateLimited;
+
   if (isAIConfigured()) {
     try {
       const result = await aiGenerate<PersonalizedFeedResponse>({

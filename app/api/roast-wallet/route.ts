@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const maxDuration = 60;
 
@@ -87,6 +88,9 @@ function buildMockRoast(address: string): WalletRoast {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 5, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const { address } = await req.json();
 
     if (!address || typeof address !== 'string') {

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { aiChat, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
+
 
 export const maxDuration = 45;
 
@@ -100,6 +102,9 @@ function getMockResponse(msg: string, ctx?: TokenMarketContext): { response: str
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 15, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const body: RequestBody = await req.json();
     const { message, history = [], tokenContext } = body;
 

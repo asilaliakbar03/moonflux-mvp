@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 5, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { tokenName, holders, volume, poolSol, socialFollowers } = body;
 

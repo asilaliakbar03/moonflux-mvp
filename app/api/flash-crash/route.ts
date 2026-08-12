@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
+
 
 export const maxDuration = 30;
 
@@ -72,6 +74,9 @@ function buildMock(priceChange: number, tokenName: string): FlashCrashReport {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 10, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const { tokenId, priceChange, tokenName } = await req.json();
 
     if (!tokenId) {

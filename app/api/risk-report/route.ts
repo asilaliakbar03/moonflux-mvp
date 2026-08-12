@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const maxDuration = 45;
 
@@ -128,6 +129,9 @@ function buildMockReport(tokenId: string, tokenName?: string): RiskReportData {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 5, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const { tokenId, tokenName, ticker, mintAddress } = await req.json();
 
     if (!tokenId) {

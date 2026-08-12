@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiGenerate, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -13,6 +14,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const rateLimited = checkRateLimit(request, { maxRequests: 10, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const prompt = `
       You are an expert Solana token evaluator. The user has provided a token mint address: "${mint}".
       Please generate a deterministic but realistic MoonScore evaluation for this specific token address.

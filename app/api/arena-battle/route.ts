@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const maxDuration = 60;
 
@@ -31,6 +32,9 @@ const MOCK_ANALYSES: Record<string, string[]> = {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = checkRateLimit(req, { maxRequests: 10, windowSec: 60 });
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const tokenA = body.tokenA || 'Unknown Token A';
     const tokenB = body.tokenB || 'Unknown Token B';

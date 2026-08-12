@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { aiGenerate, isAIConfigured, MODELS } from '@/lib/ai';
+import { checkRateLimit } from '@/lib/rateLimit';
+
 
 export const maxDuration = 45;
 
@@ -86,7 +88,10 @@ function buildMock(): NarrativeRadarResponse {
 
 // ── Route handler ─────────────────────────────────────────────────────────────
 
-export async function GET() {
+export async function GET(req: Request) {
+  const rateLimited = checkRateLimit(req, { maxRequests: 10, windowSec: 60 });
+  if (rateLimited) return rateLimited;
+
   if (isAIConfigured()) {
     try {
       const result = await aiGenerate<Omit<NarrativeRadarResponse, 'lastUpdated' | 'nextRefresh'>>({
