@@ -429,6 +429,62 @@ export default function LaunchPage() {
                     />
                   </div>
 
+                  {/* Token Image Upload */}
+                  <div>
+                    <label className={`block text-[10px] font-black uppercase mb-1 ${bText}`}>TOKEN IMAGE</label>
+                    <div 
+                      className={`border-2 border-dashed p-4 text-center cursor-pointer transition-all ${
+                        isDark 
+                          ? imageFile ? 'border-[#10B981] bg-[#10B981]/5' : 'border-[rgba(255,255,255,0.2)] hover:border-[#10B981]/60'
+                          : imageFile ? 'border-black bg-yellow-50' : 'border-gray-400 hover:border-black'
+                      }`}
+                      onClick={() => document.getElementById('token-image-input')?.click()}
+                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith('image/')) setImageFile(file);
+                      }}
+                    >
+                      <input 
+                        id="token-image-input"
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setImageFile(file);
+                        }}
+                      />
+                      {imageFile ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <img 
+                            src={URL.createObjectURL(imageFile)} 
+                            alt="Token preview" 
+                            className={`w-16 h-16 object-cover border-2 ${isDark ? 'border-[#10B981]' : 'border-black'}`}
+                          />
+                          <div className="text-left">
+                            <p className={`text-[10px] font-black uppercase ${bText}`}>{imageFile.name}</p>
+                            <p className={`text-[9px] font-bold uppercase ${bMuted}`}>{(imageFile.size / 1024).toFixed(0)} KB</p>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setImageFile(null); }}
+                              className="text-[9px] font-black uppercase text-red-500 hover:text-red-400 mt-1"
+                            >
+                              [ REMOVE ]
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className={`text-2xl mb-1 ${bMuted}`}>📷</div>
+                          <p className={`text-[10px] font-black uppercase ${bMuted}`}>CLICK OR DRAG IMAGE HERE</p>
+                          <p className={`text-[8px] font-bold uppercase mt-0.5 ${bMuted}`}>PNG, JPG, GIF • MAX 5MB</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Curve Options */}
                   {mode === 'ai' && (
                     <div>
