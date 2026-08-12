@@ -139,9 +139,11 @@ export async function POST(req: Request) {
       try {
         const result = await aiGenerate<GeneratedToken>({
           system: SYSTEM_PROMPT,
-          prompt: `Generate token data for: ${prompt}`,
-          model: MODELS.SMART,
+          prompt: `Generate unique and creative token data for this concept: "${prompt}". Be original — don't repeat patterns from previous generations. Make the name memorable and the ticker punchy.`,
+          model: MODELS.FAST,
+          temperature: 0.8,
           maxTokens: 4000,
+          skipCache: true,
         });
 
         const response = NextResponse.json(result.data);

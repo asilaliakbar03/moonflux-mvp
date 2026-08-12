@@ -89,28 +89,92 @@ export default function LaunchPage() {
   const simulateAIGeneration = async () => {
     if (!aiPrompt) return;
     setGeneratingStep(1);
-    await new Promise((r) => setTimeout(r, 1000));
-    setGeneratingStep(2);
-    await new Promise((r) => setTimeout(r, 1200));
-    setGeneratingStep(3);
-    await new Promise((r) => setTimeout(r, 800));
-
+    
     try {
-      const prefixes = ["NEO", "CYBER", "QUANTUM", "SOL", "FLUX", "LUNA", "HYPER", "ASTRO"];
-      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-      const words = aiPrompt.split(' ');
-      const userWord = words.find(w => w.length > 3) || "Token";
+      // Step 1: Analyzing prompt
+      await new Promise((r) => setTimeout(r, 600));
+      setGeneratingStep(2);
       
-      const mockName = `${randomPrefix} ${userWord.charAt(0).toUpperCase() + userWord.slice(1)}`;
-      const mockTicker = `${randomPrefix.substring(0,2)}${userWord.substring(0,2)}`.toUpperCase();
+      // Step 2: Call the REAL AI API
+      const res = await fetch('/api/generate-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt }),
+      });
+
+      setGeneratingStep(3);
+      await new Promise((r) => setTimeout(r, 400));
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({
+          ...formData,
+          name: data.name || 'MoonToken',
+          ticker: data.ticker || 'MOON',
+          description: data.description || `AI-generated token inspired by: ${aiPrompt}`,
+          website: data.website || '',
+          twitter: data.twitter || '',
+          telegram: data.telegram || '',
+        });
+        setSelectedCurve(data.suggestedCurve || 'balanced');
+      } else {
+        // API returned error — use smart local fallback
+        throw new Error(`API returned ${res.status}`);
+      }
+    } catch (err) {
+      console.warn('[AI Launch] API call failed, using local generation:', err);
+      // Smart local fallback with more variety
+      const themes: Record<string, { names: string[]; tickers: string[]; descs: string[] }> = {
+        dog: {
+          names: ['Moon Bark', 'Degen Pup', 'Alpha Shiba', 'Bone Runner', 'Woof Protocol'],
+          tickers: ['BARK', 'DPUP', 'ASHIB', 'BONE', 'WOOF'],
+          descs: [
+            'The goodest boy on Solana. Diamond paws, zero paper hands. A community of loyal degens building the most based dog token.',
+            'Born in the kennel of DeFi. This pup trades harder than your favorite CT influencer. Fetch gains, not sticks.',
+          ],
+        },
+        ai: {
+          names: ['Neural Flux', 'Agent Zero', 'Synth Mind', 'Cortex AI', 'Deep Alpha'],
+          tickers: ['NFLX', 'AGNT', 'SYNTH', 'CRTX', 'DALPH'],
+          descs: [
+            'An autonomous AI agent that trades its own token. Every buy trains the model. Every sell is a lesson learned.',
+            'The first sentient DeFi protocol. Built by machines, governed by degens. Intelligence on every block.',
+          ],
+        },
+        cat: {
+          names: ['Neon Cat', 'Purr Protocol', 'Whisker DAO', 'Meow Coin', 'Cyber Kitty'],
+          tickers: ['NCAT', 'PURR', 'WHSK', 'MEOW', 'CKIT'],
+          descs: [
+            'Nine lives, infinite gains. The internet\'s favorite animal takes over Solana. Purring all the way to the moon.',
+            'Cats rule the internet. Now they rule DeFi. $PURR is the currency of the feline underground.',
+          ],
+        },
+        default: {
+          names: ['Moon Forge', 'Degen Labs', 'Neon Protocol', 'Flux Engine', 'Hyper Mint'],
+          tickers: ['FORGE', 'DLAB', 'NEON', 'FLUX', 'HYPR'],
+          descs: [
+            'A new era of decentralized innovation. Built for the culture, powered by the community.',
+            'Where degens become legends. This protocol rewards the brave and punishes the paper hands.',
+          ],
+        },
+      };
+
+      const seed = aiPrompt.toLowerCase();
+      let theme = themes.default;
+      if (seed.match(/dog|doge|shib|pup|bone|woof/)) theme = themes.dog;
+      else if (seed.match(/ai|agent|bot|robot|neural|machine/)) theme = themes.ai;
+      else if (seed.match(/cat|kitty|meow|purr|feline/)) theme = themes.cat;
+      
+      const idx = Math.floor(Math.random() * theme.names.length);
+      const descIdx = Math.floor(Math.random() * theme.descs.length);
       
       setFormData({
         ...formData,
-        name: mockName,
-        ticker: mockTicker,
-        description: `Forged in the digital ether. Inspired by: ${aiPrompt}. This token harnesses the power of the MoonFluxx protocol to deliver community growth.`,
+        name: theme.names[idx],
+        ticker: theme.tickers[idx],
+        description: theme.descs[descIdx],
       });
-      setSelectedCurve(Math.random() > 0.5 ? "fast" : "balanced");
+      setSelectedCurve((['fast', 'balanced', 'stable', 'aggressive'] as const)[Math.floor(Math.random() * 4)]);
     } finally {
       setGeneratingStep(0);
       setCurrentStep(2);
