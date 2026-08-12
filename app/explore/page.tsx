@@ -106,7 +106,7 @@ export default function ExplorePage() {
     
     if (searchQuery) {
       const lowerQ = searchQuery.toLowerCase();
-      result = result.filter(t => t.name.toLowerCase().includes(lowerQ) || t.ticker.toLowerCase().includes(lowerQ));
+      result = result.filter(t => (t.name || '').toLowerCase().includes(lowerQ) || (t.ticker || '').toLowerCase().includes(lowerQ));
     }
 
     // Sort
@@ -274,7 +274,10 @@ export default function ExplorePage() {
                     </div>
 
                     {/* Quick Buy Hover Button */}
-                    <div className={`absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-40 px-3 py-2 text-center font-black text-xs uppercase ${bBorder} ${isDark ? "bg-[#10B981] text-black" : "bg-[#10B981] text-black"}`}>
+                    <div 
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      className={`absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-40 px-3 py-2 text-center font-black text-xs uppercase cursor-pointer hover:brightness-110 ${bBorder} ${isDark ? "bg-[#10B981] text-black" : "bg-[#10B981] text-black"}`}
+                    >
                       [ QUICK BUY 0.1 SOL ]
                     </div>
                   </div>

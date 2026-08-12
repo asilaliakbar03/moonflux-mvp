@@ -150,7 +150,7 @@ export default function TerminalPage() {
       try {
         const [pumpRes, crashRes, radarRes] = await Promise.all([
           fetch("/api/pump-forecast").then(r => r.json()),
-          fetch("/api/flash-crash").then(r => r.json()),
+          fetch("/api/flash-crash", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tokenId: 'LDOGE', priceChange: 18.4, tokenName: 'Luna Doge' }) }).then(r => r.json()),
           fetch("/api/narrative-radar").then(r => r.json()),
         ]);
         setIntel({ pump: pumpRes, crash: crashRes, radar: radarRes });
@@ -374,7 +374,7 @@ export default function TerminalPage() {
                     <span className="text-xs text-[#F43F5E]">CRASH RISK</span>
                   </div>
                   <div className="text-2xl text-current">
-                    {intel?.crash ? intel.crash.riskLevel : "..."}
+                    {intel?.crash?.riskLevel ?? "LOW"}
                   </div>
                   <div className="text-xs text-[#F59E0B] mt-1">VOLATILITY ACTIVE</div>
                 </div>

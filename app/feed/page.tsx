@@ -163,7 +163,7 @@ export default function FeedPage() {
   useEffect(() => {
     async function loadFeed() {
       try {
-        const res = await fetch('/api/trade-copilot');
+        const res = await fetch('/api/trade-copilot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ wallet: 'anonymous' }) });
         if (!res.ok) throw new Error('Copilot endpoint failed');
         const data = await res.json();
         

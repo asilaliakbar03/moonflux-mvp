@@ -39,7 +39,7 @@ export default function LaunchCalendarPage() {
         const res = await fetch('/api/launch-calendar');
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
-        setLaunches(data.launches);
+        setLaunches(data?.launches || []);
       } catch (error) {
         showToast('Error loading calendar data', 'error');
         console.error(error);
