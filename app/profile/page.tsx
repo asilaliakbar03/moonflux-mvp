@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   User, Wallet, Copy, Check, Share2, ExternalLink,
   Globe, MessageCircle, Rocket, BarChart2,
@@ -17,6 +17,14 @@ import { useTheme } from "@/components/ThemeProvider";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+function timeAgo(ts: number): string {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60) return `${Math.floor(diff)}S AGO`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}M AGO`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}H AGO`;
+  return `${Math.floor(diff / 86400)}D AGO`;
+}
 
 // ── MOCK DATA ─────────────────────────────────────────────────────────────────
 const HOLDINGS = [
@@ -61,9 +69,84 @@ export default function ProfilePage() {
   const [roastData, setRoastData] = useState<any>(null);
   const [isRoasting, setIsRoasting] = useState(false);
 
-  const displayName = connected && address ? `${address.slice(0,4)}...${address.slice(-4)}` : "DEGENDAVE";
-  const handle = connected && address ? address.slice(0, 8) : "degendave";
+  // ── Real data from Supabase ──
+  const [profileData, setProfileData] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ username: "", bio: "", twitter_handle: "" });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const fetchProfile = useCallback(async () => {
+    if (!connected || !address) return;
+    try {
+      const res = await fetch(`/api/profile?wallet=${address}`);
+      const data = await res.json();
+      setProfileData(data);
+      if (data.user) {
+        setEditForm({
+          username: data.user.username || "",
+          bio: data.user.bio || "",
+          twitter_handle: data.user.twitter_handle || "",
+        });
+      }
+    } catch (err) {
+      console.warn("Could not fetch profile:", err);
+    }
+  }, [connected, address]);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  const handleSaveProfile = async () => {
+    if (!address) return;
+    setIsSaving(true);
+    try {
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: address, ...editForm }),
+      });
+      showToast("PROFILE UPDATED!", "success");
+      setIsEditing(false);
+      fetchProfile();
+    } catch {
+      showToast("UPDATE FAILED", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Use real data if available, fallback to mock
+  const dbUser = profileData?.user;
+  const dbTokens = profileData?.tokens || [];
+  const dbTrades = profileData?.trades || [];
+  const dbStats = profileData?.stats;
+
+  const displayName = dbUser?.username || (connected && address ? `${address.slice(0,4)}...${address.slice(-4)}` : "ANON");
+  const handle = dbUser?.username || (connected && address ? address.slice(0, 8) : "connect wallet");
   const shortAddr = address ? `${address.slice(0, 6)}...${address.slice(-6)}` : "NOT CONNECTED";
+  const userBio = dbUser?.bio || "ON-CHAIN DEGEN // TOKEN LAUNCHER // AI MAXI";
+
+  // Real created tokens or mock fallback
+  const createdTokens = dbTokens.length > 0 ? dbTokens.map((t: any) => ({
+    icon: "🚀", name: t.name, ticker: t.ticker, status: t.graduated ? "GRADUATED" : "LIVE",
+    mcap: "", holders: 0, progress: Math.floor((t.bonding_curve_progress || 0) * 100), color: "#6366F1",
+    mint: t.mint_address,
+  })) : CREATED_TOKENS;
+
+  // Real activity from trades or mock fallback
+  const realActivity = dbTrades.length > 0 ? dbTrades.slice(0, 10).map((t: any) => ({
+    type: t.type === "buy" ? "BUY" : "SELL",
+    icon: t.type === "buy" ? "💚" : "🔴",
+    ticker: t.tokens?.ticker || "???",
+    amount: `${t.sol_amount?.toFixed(2)} SOL`,
+    time: timeAgo(new Date(t.created_at).getTime()),
+    desc: `${t.type === "buy" ? "BOUGHT" : "SOLD"} ${t.token_amount?.toLocaleString() || "?"} ${t.tokens?.ticker || ""}`,
+  })) : ACTIVITY_FEED;
+
+  // Real stats or mock fallback
+  const volumeSol = dbStats?.totalVolumeSol ?? 42;
+  const pnlSol = dbStats?.pnlSol ?? 0;
+  const tokensLaunched = dbStats?.tokensLaunched ?? CREATED_TOKENS.length;
+  const totalTrades = dbStats?.totalTrades ?? 62;
 
   const handleCopy = () => {
     if (address) { navigator.clipboard.writeText(address); }
@@ -78,7 +161,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/roast-wallet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: address || "degendave.sol" }),
+        body: JSON.stringify({ address: address || "anon.sol" }),
       });
       const data = await res.json();
       setRoastData(data.roast);
@@ -89,7 +172,7 @@ export default function ProfilePage() {
     }
   };
 
-  const filteredActivity = ACTIVITY_FEED.filter(a => {
+  const filteredActivity = realActivity.filter((a: any) => {
     if (activityFilter === "ALL") return true;
     if (activityFilter === "TRADES") return a.type === "BUY" || a.type === "SELL";
     if (activityFilter === "LAUNCHES") return a.type === "LAUNCH";
@@ -155,13 +238,17 @@ export default function ProfilePage() {
               </h1>
               <div className="flex items-center justify-center sm:justify-start gap-3 mt-2 flex-wrap">
                 <span className={`text-sm font-bold ${isDark ? "text-[#818CF8]" : "text-[#6366F1]"}`}>@{handle}</span>
-                <span className={`px-1.5 py-0.5 text-[10px] font-black uppercase ${isDark ? "bg-[#6366F1] text-white" : "bg-black text-white"}`}>[ PRO TRADER ]</span>
-                <span className={`px-1.5 py-0.5 text-[10px] font-black uppercase border ${isDark ? "border-[#10B981] text-[#10B981]" : "border-black text-black bg-[#10B981]"}`}>[ VERIFIED ]</span>
+                {connected && (
+                  <button
+                    onClick={() => setIsEditing(!isEditing)}
+                    className={`px-1.5 py-0.5 text-[10px] font-black uppercase cursor-pointer transition-all ${isDark ? "bg-[#6366F1] text-white hover:bg-[#818CF8]" : "bg-black text-white hover:bg-[#6366F1]"}`}
+                  >
+                    [ EDIT PROFILE ]
+                  </button>
+                )}
               </div>
               <p className={`mt-3 text-sm max-w-md ${bMuted} uppercase leading-tight font-bold`}>
-                {">"} FULL-DEGEN ALPHA HUNTER ON SOLANA.<br/>
-                {">"} TOP 5% CREATOR ON MOONFLUXX.<br/>
-                {">"} GRADUATED 2 TOKENS TO RAYDIUM.
+                {">"} {userBio}
               </p>
             </div>
           </div>
@@ -196,9 +283,9 @@ export default function ProfilePage() {
             {/* Social Stat Blocks */}
             <div className={`mt-2 flex border w-full md:w-auto ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"} divide-x ${isDark ? "divide-[rgba(255,255,255,0.2)]" : "divide-black"}`}>
               {[
-                { label: "FOLLOWERS", value: "--" },
-                { label: "FOLLOWING", value: "124" },
-                { label: "VOLUME",    value: "42 SOL" },
+                { label: "TOKENS", value: String(tokensLaunched) },
+                { label: "TRADES", value: String(totalTrades) },
+                { label: "VOLUME",    value: `${volumeSol} SOL` },
               ].map((s, i) => (
                 <div key={i} className={`px-3 py-2 text-center ${isDark ? "bg-[#0A0A1A]" : "bg-gray-100"}`}>
                   <div className={`text-sm font-black ${bText}`}>{s.value}</div>
@@ -209,6 +296,63 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {/* ── EDIT PROFILE PANEL ────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isEditing && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`mb-6 ${bBorder} ${bShadow} ${bBg} p-6 overflow-hidden`}
+          >
+            <h3 className={`text-xs font-black uppercase tracking-widest mb-4 ${isDark ? "text-[#818CF8]" : "text-[#6366F1]"}`}>// EDIT PROFILE</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={`text-[10px] font-black uppercase tracking-widest ${bMuted}`}>USERNAME</label>
+                <input
+                  value={editForm.username}
+                  onChange={e => setEditForm(p => ({ ...p, username: e.target.value }))}
+                  placeholder="Enter username..."
+                  className={`w-full mt-1 px-3 py-2 text-sm font-bold uppercase ${bBorder} ${bBg} ${bText} focus:outline-none focus:ring-2 focus:ring-[#6366F1]`}
+                />
+              </div>
+              <div>
+                <label className={`text-[10px] font-black uppercase tracking-widest ${bMuted}`}>BIO</label>
+                <input
+                  value={editForm.bio}
+                  onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))}
+                  placeholder="On-chain degen..."
+                  className={`w-full mt-1 px-3 py-2 text-sm font-bold uppercase ${bBorder} ${bBg} ${bText} focus:outline-none focus:ring-2 focus:ring-[#6366F1]`}
+                />
+              </div>
+              <div>
+                <label className={`text-[10px] font-black uppercase tracking-widest ${bMuted}`}>X / TWITTER</label>
+                <input
+                  value={editForm.twitter_handle}
+                  onChange={e => setEditForm(p => ({ ...p, twitter_handle: e.target.value }))}
+                  placeholder="@yourhandle"
+                  className={`w-full mt-1 px-3 py-2 text-sm font-bold uppercase ${bBorder} ${bBg} ${bText} focus:outline-none focus:ring-2 focus:ring-[#6366F1]`}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleSaveProfile}
+                disabled={isSaving}
+                className={`px-6 py-2.5 font-black text-xs uppercase ${bBorder} bg-[#10B981] text-black hover:brightness-110 transition-all`}
+              >
+                {isSaving ? "SAVING..." : "[ SAVE PROFILE ]"}
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className={`px-6 py-2.5 font-black text-xs uppercase ${bBorder} ${bBg} ${bText} hover:opacity-80 transition-all`}
+              >
+                [ CANCEL ]
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── BENTO METRICS MATRIX ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
@@ -385,7 +529,7 @@ export default function ProfilePage() {
                 </div>
               </Link>
 
-              {CREATED_TOKENS.map((t, i) => (
+              {createdTokens.map((t: any, i: number) => (
                 <div key={i} className={`p-5 ${bBorder} ${bShadow} ${bBg} flex flex-col justify-between gap-4`}>
                   <div className="flex justify-between items-start">
                     <div className={`w-12 h-12 flex items-center justify-center text-2xl border ${isDark ? "border-[rgba(255,255,255,0.2)] bg-black" : "border-black bg-white"}`}>
@@ -450,7 +594,7 @@ export default function ProfilePage() {
                 <span className="font-black text-sm">USER_ACTIVITY_LOG.SH</span>
               </div>
               <div className="space-y-3 text-xs sm:text-sm font-bold tracking-wide">
-                {filteredActivity.map((item, i) => (
+                {filteredActivity.map((item: any, i: number) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#10B981]/10 px-2 py-1 -mx-2">
                     <span className="text-[#818CF8] shrink-0">{item.time}</span>
                     <span className="text-gray-400 hidden sm:inline">|</span>
