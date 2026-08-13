@@ -137,7 +137,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const mintAddress = unwrappedParams.id;
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const { connected } = useMoonWallet();
+  const { connected, address } = useMoonWallet();
   const { price: solUsd } = useSOLPrice();
   const { buyTokens, sellTokens, isTrading, error: tradeError, txSignature, clearError, clearTx } = useTokenTrade();
   const { showToast } = useToast();
@@ -160,6 +160,11 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const [inputVal, setInputVal] = useState('');
   const [slippage, setSlippage] = useState<number | 'custom'>(1);
 
+  // Comments State
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [isPostingComment, setIsPostingComment] = useState(false);
+
   const [dbToken, setDbToken] = useState<any>(null);
 
   // Derivations
@@ -169,6 +174,31 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const isComplete = curveData.complete;
   const progress = Math.min(100, (curveData.realSolReserves / GRAD_SOL) * 100);
   
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`/api/comments?mint=${mintAddress}`);
+      const data = await res.json();
+      setComments(data.comments || []);
+    } catch { /* silent */ }
+  };
+
+  const handlePostComment = async () => {
+    if (!commentText.trim() || !connected || isPostingComment) return;
+    setIsPostingComment(true);
+    try {
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mint: mintAddress, wallet: address, text: commentText }),
+      });
+      if (res.ok) {
+        setCommentText('');
+        fetchComments();
+      }
+    } catch { /* silent */ }
+    finally { setIsPostingComment(false); }
+  };
+
   useEffect(() => {
     async function fetchDbToken() {
       try {
@@ -185,6 +215,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
       }
     }
     fetchDbToken();
+    fetchComments();
 
     setTrades(genInitialTrades(mintAddress));
     setChartData(genChartData(mintAddress, 40, basePrice));
@@ -596,6 +627,82 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
           </motion.div>
 
         </div>
+
+        {/* ── COMMENTS / DISCUSSION ─────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          className={`mt-6 ${bBg} ${bBorder} ${bShadow} p-5`}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-sm tracking-wider">[ DISCUSSION ]</h3>
+            <span className={`text-xs font-bold ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              {comments.length} COMMENT{comments.length !== 1 ? 'S' : ''}
+            </span>
+          </div>
+
+          {/* Comment Input */}
+          {connected ? (
+            <div className="mb-4">
+              <div className="flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handlePostComment()}
+                  placeholder="SAY SOMETHING BASED..."
+                  maxLength={500}
+                  className={`flex-1 px-3 py-2.5 text-xs font-bold uppercase ${bBorder} ${bBg} focus:outline-none focus:ring-2 focus:ring-[#6366F1] placeholder:${isDark ? 'text-gray-600' : 'text-gray-400'}`}
+                />
+                <button
+                  onClick={handlePostComment}
+                  disabled={isPostingComment || !commentText.trim()}
+                  className={`px-4 py-2.5 text-xs font-black uppercase ${bBorder} bg-[#6366F1] text-white hover:brightness-110 transition-all disabled:opacity-50`}
+                >
+                  {isPostingComment ? '...' : 'POST'}
+                </button>
+              </div>
+              <div className={`text-right text-[10px] font-bold mt-1 ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                {commentText.length}/500
+              </div>
+            </div>
+          ) : (
+            <div className={`text-center text-xs font-bold py-3 mb-4 ${bBorder} ${isDark ? 'text-gray-500 bg-black' : 'text-gray-400 bg-gray-50'}`}>
+              CONNECT WALLET TO COMMENT
+            </div>
+          )}
+
+          {/* Comments List */}
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {comments.length === 0 ? (
+              <div className={`text-center py-8 text-xs font-bold ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                NO COMMENTS YET — BE THE FIRST 🚀
+              </div>
+            ) : (
+              comments.map((c: any, i: number) => (
+                <motion.div
+                  key={c.id || i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className={`p-3 ${bBorder} ${isDark ? 'bg-[#0A0A1A]' : 'bg-gray-50'}`}
+                >
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className={`text-xs font-black ${isDark ? 'text-[#818CF8]' : 'text-[#6366F1]'}`}>
+                      {c.users?.username || `${(c.users?.wallet_address || '???').slice(0, 4)}...${(c.users?.wallet_address || '???').slice(-4)}`}
+                    </span>
+                    <span className={`text-[10px] font-bold ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                      {c.created_at ? new Date(c.created_at).toLocaleString() : ''}
+                    </span>
+                  </div>
+                  <p className={`text-xs font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'} break-words`}>
+                    {c.text}
+                  </p>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
