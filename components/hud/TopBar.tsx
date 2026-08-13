@@ -32,10 +32,10 @@ export default function TopBar() {
     >
       {/* ── Logo ── */}
       <Link href="/" className="flex items-center gap-2 shrink-0 group mr-2 sm:mr-4">
-        <div className={`w-9 h-9 flex items-center justify-center overflow-hidden shrink-0 ${isDark ? 'border-2 border-[rgba(255,255,255,0.3)]' : 'border-2 border-black'} shadow-[2px_2px_0px_0px_#10B981]`}>
+        <div className="w-9 h-9 flex items-center justify-center overflow-hidden shrink-0">
           <img src="/logo.jpg" alt="MoonFluxx" className="w-full h-full object-cover" />
         </div>
-        <span className="hidden sm:inline font-black text-sm tracking-[0.2em] group-hover:text-[#6366F1] transition-colors">
+        <span className="hidden sm:inline font-black text-sm tracking-[0.2em] group-hover:text-[#10B981] transition-colors">
           MOONFLUXX
         </span>
       </Link>
