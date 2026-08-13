@@ -7,6 +7,7 @@ import { useWalletModal } from '@/components/SolanaProvider';
 import { useTheme } from '@/components/ThemeProvider';
 import Link from 'next/link';
 import { SearchModal } from '@/components/SearchModal';
+import LogoMark from '@/components/LogoMark';
 
 function shortenAddr(addr: string) {
   return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
@@ -32,11 +33,12 @@ export default function TopBar() {
     >
       {/* ── Logo ── */}
       <Link href="/" className="flex items-center gap-2.5 shrink-0 group mr-2 sm:mr-4">
-        <div className="w-10 h-10 flex items-center justify-center overflow-hidden shrink-0">
-          <img src="/logo.svg" alt="MoonFluxx" className="w-full h-full" />
-        </div>
-        <span className={`hidden sm:inline font-black text-sm tracking-[0.2em] transition-colors ${isDark ? 'group-hover:text-[#818CF8]' : 'group-hover:text-[#6366F1]'}`}>
-          MOONFLUXX
+        <LogoMark size={28} />
+        <span
+          className={`hidden sm:inline font-medium text-sm tracking-[0.22em] uppercase transition-colors ${isDark ? 'group-hover:text-[#818CF8]' : 'group-hover:text-[#6366F1]'}`}
+          style={{ fontFamily: "'Clash Display', sans-serif" }}
+        >
+          MoonFluxx<sup style={{ fontSize: '0.5em', fontWeight: 300, letterSpacing: 0 }}>®</sup>
         </span>
       </Link>
 
