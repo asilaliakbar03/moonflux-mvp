@@ -93,7 +93,19 @@ export default function ProfilePage() {
     }
   }, [connected, address]);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  // Follows data
+  const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
+
+  const fetchFollows = useCallback(async () => {
+    if (!connected || !address) return;
+    try {
+      const res = await fetch(`/api/follows?wallet=${address}`);
+      const data = await res.json();
+      setFollowStats({ followers: data.followers || 0, following: data.following || 0 });
+    } catch { /* silent */ }
+  }, [connected, address]);
+
+  useEffect(() => { fetchProfile(); fetchFollows(); }, [fetchProfile, fetchFollows]);
 
   const handleSaveProfile = async () => {
     if (!address) return;
@@ -283,8 +295,8 @@ export default function ProfilePage() {
             {/* Social Stat Blocks */}
             <div className={`mt-2 flex border w-full md:w-auto ${isDark ? "border-[rgba(255,255,255,0.2)]" : "border-black"} divide-x ${isDark ? "divide-[rgba(255,255,255,0.2)]" : "divide-black"}`}>
               {[
-                { label: "TOKENS", value: String(tokensLaunched) },
-                { label: "TRADES", value: String(totalTrades) },
+                { label: "FOLLOWERS", value: String(followStats.followers) },
+                { label: "FOLLOWING", value: String(followStats.following) },
                 { label: "VOLUME",    value: `${volumeSol} SOL` },
               ].map((s, i) => (
                 <div key={i} className={`px-3 py-2 text-center ${isDark ? "bg-[#0A0A1A]" : "bg-gray-100"}`}>

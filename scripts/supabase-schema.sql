@@ -74,6 +74,14 @@ create table if not exists public.watchlist (
   primary key (user_id, token_id)
 );
 
+-- ── FOLLOWS ──────────────────────────────────────────────────────────────────
+create table if not exists public.follows (
+  follower_id  uuid references public.users(id) on delete cascade,
+  following_id uuid references public.users(id) on delete cascade,
+  created_at   timestamptz default now(),
+  primary key (follower_id, following_id)
+);
+
 -- ── INDEXES ───────────────────────────────────────────────────────────────────
 create index if not exists idx_tokens_created_at    on public.tokens(created_at desc);
 create index if not exists idx_trades_token_id      on public.trades(token_id);
@@ -88,11 +96,13 @@ alter table public.trades        enable row level security;
 alter table public.comments      enable row level security;
 alter table public.price_alerts  enable row level security;
 alter table public.watchlist     enable row level security;
+alter table public.follows       enable row level security;
 
 -- Allow public read on tokens and trades (anyone can see the market)
 create policy "Public read tokens"  on public.tokens  for select using (true);
 create policy "Public read trades"  on public.trades  for select using (true);
 create policy "Public read comments" on public.comments for select using (true);
+create policy "Public read follows" on public.follows for select using (true);
 
 -- Allow service role full access (our API routes use service_role key)
 create policy "Service role full access users"   on public.users         for all using (true);
@@ -101,3 +111,4 @@ create policy "Service role full access trades"  on public.trades        for all
 create policy "Service role full access comments" on public.comments     for all using (true);
 create policy "Service role full access alerts"  on public.price_alerts  for all using (true);
 create policy "Service role full access watch"   on public.watchlist     for all using (true);
+create policy "Service role full access follows" on public.follows      for all using (true);
