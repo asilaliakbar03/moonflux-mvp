@@ -12,6 +12,8 @@ import {
 import { useMoonWallet } from '@/components/WalletProvider';
 import { useSOLPrice } from '@/lib/useSOLPrice';
 import { useTheme } from '@/components/ThemeProvider';
+import { useTokenTrade } from '@/hooks/useTokenTrade';
+import { useToast } from '@/components/ToastProvider';
 import { 
   LineChart, Line, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -137,6 +139,8 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const isDark = theme === 'dark';
   const { connected } = useMoonWallet();
   const { price: solUsd } = useSOLPrice();
+  const { buyTokens, sellTokens, isTrading, error: tradeError, txSignature, clearError, clearTx } = useTokenTrade();
+  const { showToast } = useToast();
 
   const [curveData, setCurveData] = useState(() => buildMockCurveState(mintAddress));
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -155,7 +159,6 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
   const [tab, setTab] = useState<'buy' | 'sell'>('buy');
   const [inputVal, setInputVal] = useState('');
   const [slippage, setSlippage] = useState<number | 'custom'>(1);
-  const [isExecuting, setIsExecuting] = useState(false);
 
   const [dbToken, setDbToken] = useState<any>(null);
 
@@ -213,15 +216,39 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
     const amt = parseFloat(inputVal);
     if (!amt || isNaN(amt) || !connected) return;
     
-    setIsExecuting(true);
-    try {
-      await new Promise(r => setTimeout(r, 1400));
+    const slippageBps = typeof slippage === 'number' ? slippage * 100 : 100; // Convert % to bps
+    
+    let signature: string | null = null;
+    
+    if (tab === 'buy') {
+      signature = await buyTokens(mintAddress, amt, slippageBps, {
+        virtualSolReserves: curveData.virtualSolReserves,
+        virtualTokenReserves: curveData.virtualTokenReserves,
+      });
+    } else {
+      signature = await sellTokens(mintAddress, amt, slippageBps, {
+        virtualSolReserves: curveData.virtualSolReserves,
+        virtualTokenReserves: curveData.virtualTokenReserves,
+      });
+    }
+    
+    if (signature) {
       setInputVal('');
-      // Show success (omitted for brevity)
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsExecuting(false);
+      showToast(
+        `${tab === 'buy' ? 'Bought' : 'Sold'} successfully! Tx: ${signature.slice(0, 8)}...`,
+        'success'
+      );
+      // Add the trade to the local feed
+      setTrades(prev => [{
+        id: `real-${Date.now()}`,
+        type: tab,
+        wallet: 'You',
+        tokens: tab === 'buy' ? Math.floor(outputPreview) : Math.floor(amt),
+        sol: tab === 'buy' ? amt : outputPreview,
+        ts: Date.now(),
+      }, ...prev].slice(0, 20));
+    } else if (tradeError) {
+      showToast(tradeError, 'error');
     }
   };
 
@@ -503,7 +530,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
 
             <button 
               onClick={handleExecute}
-              disabled={!connected || isExecuting || amountNum <= 0}
+              disabled={!connected || isTrading || amountNum <= 0}
               className={`w-full py-4 font-bold text-lg transition-all ${bBorder} ${bShadow} active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
                 !connected || amountNum <= 0 
                   ? 'bg-gray-500 text-white cursor-not-allowed opacity-50' 
@@ -512,7 +539,7 @@ export default function TokenPage({ params }: { params: Promise<{ id: string }> 
                     : 'bg-[#F43F5E] hover:bg-[#E11D48] text-white'
               }`}
             >
-              {!connected ? 'CONNECT WALLET' : isExecuting ? 'CONFIRMING...' : `QUICK ${tab === 'buy' ? 'BUY' : 'SELL'}`}
+              {!connected ? 'CONNECT WALLET' : isTrading ? 'CONFIRMING TX...' : `QUICK ${tab === 'buy' ? 'BUY' : 'SELL'}`}
             </button>
           </motion.div>
 
