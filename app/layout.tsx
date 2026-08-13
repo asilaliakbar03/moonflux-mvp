@@ -14,6 +14,19 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 export const metadata: Metadata = {
   title: "MoonFluxx — Launch, Trade & Discover Tokens",
   description: "The easiest way to launch, discover, and trade tokens across multiple chains. AI-powered. Community-first.",
+  keywords: ["solana", "token launch", "memecoin", "DeFi", "crypto", "AI trading", "bonding curve", "MoonFluxx"],
+  openGraph: {
+    title: "MoonFluxx — Launch. Trade. Discover.",
+    description: "AI-powered token launch platform. Create, discover, and trade tokens across Solana.",
+    type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "MoonFluxx" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MoonFluxx — Launch. Trade. Discover.",
+    description: "AI-powered token launch platform on Solana.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
