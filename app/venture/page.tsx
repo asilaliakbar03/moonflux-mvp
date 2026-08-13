@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, X, Clock, Users, Flame, Star, Rocket, Circle } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Check, X, Clock, Users, Flame, Star, Rocket, Circle, Activity } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/components/ThemeProvider';
@@ -33,7 +33,7 @@ export default function VenturePage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'governance' | 'incubator'>('governance');
+  const [activeTab, setActiveTab] = useState<'governance' | 'incubator' | 'feed'>('governance');
   const [votedProps, setVotedProps] = useState<Record<number, 'for' | 'against'>>({});
   const [votedProjects, setVotedProjects] = useState<Record<number, boolean>>({});
 
@@ -110,6 +110,16 @@ export default function VenturePage() {
               }`}
             >
               [ --INCUBATOR ]
+            </button>
+            <button
+              onClick={() => setActiveTab('feed')}
+              className={`px-6 py-4 font-black text-lg ${borderHeavyClass} transition-all ${
+                activeTab === 'feed'
+                  ? 'bg-[#10B981] text-black shadow-[4px_4px_0px_0px_#000]'
+                  : `${isDark ? 'bg-black text-[rgba(255,255,255,0.4)]' : 'bg-gray-100 text-gray-400'} hover:bg-[#10B981] hover:text-black`
+              }`}
+            >
+              [ --LIVE FEED ]
             </button>
           </div>
         </motion.div>
@@ -325,7 +335,92 @@ export default function VenturePage() {
           </motion.div>
         )}
 
+        {/* ── LIVE FEED ── */}
+        {activeTab === 'feed' && (
+          <FeedTab isDark={isDark} borderClass={borderClass} shadowPrimary={shadowPrimary} textMuted={textMuted} borderHeavyClass={borderHeavyClass} />
+        )}
+
       </div>
     </div>
+  );
+}
+
+function FeedTab({ isDark, borderClass, shadowPrimary, textMuted, borderHeavyClass }: { isDark: boolean; borderClass: string; shadowPrimary: string; textMuted: string; borderHeavyClass: string }) {
+  const [feedItems, setFeedItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFeed() {
+      try {
+        // Fetch recent tokens
+        const tokensRes = await fetch('/api/explore-tokens?limit=10');
+        const tokensData = tokensRes.ok ? await tokensRes.json() : { tokens: [] };
+        
+        // Build feed items from tokens (launches)
+        const launches = (tokensData.tokens || []).map((t: any) => ({
+          type: 'launch',
+          icon: '🚀',
+          title: `${t.name} ($${t.ticker}) LAUNCHED`,
+          detail: t.description?.slice(0, 60) || 'New token on MoonFluxx',
+          time: t.created_at ? new Date(t.created_at).toLocaleString() : '',
+          color: '#10B981',
+          mint: t.mint_address,
+        }));
+
+        setFeedItems(launches.length > 0 ? launches : [
+          { type: 'launch', icon: '🚀', title: 'MOONFLUX PLATFORM LIVE', detail: 'The future of fair-launch tokens', time: 'NOW', color: '#10B981' },
+          { type: 'system', icon: '⚡', title: 'BONDING CURVES ACTIVE', detail: 'Real on-chain trading is live', time: 'NOW', color: '#6366F1' },
+          { type: 'system', icon: '💬', title: 'DISCUSSIONS ENABLED', detail: 'Comment on any token page', time: 'NOW', color: '#F59E0B' },
+        ]);
+      } catch {
+        setFeedItems([
+          { type: 'system', icon: '⚡', title: 'PLATFORM ONLINE', detail: 'Connect wallet to participate', time: 'NOW', color: '#6366F1' },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFeed();
+  }, []);
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
+      <div className={`${borderHeavyClass} p-6 ${isDark ? 'bg-black' : 'bg-gray-50'} ${shadowPrimary}`}>
+        <div className="flex items-center gap-3 mb-1">
+          <Activity className="w-5 h-5 text-[#10B981]" />
+          <span className="text-xs font-black tracking-widest" style={{ color: '#10B981' }}>// PLATFORM ACTIVITY</span>
+        </div>
+        <div className={`text-xs ${textMuted} font-bold`}>REAL-TIME FEED OF LAUNCHES, TRADES, AND COMMUNITY ACTIVITY</div>
+      </div>
+
+      {loading ? (
+        <div className={`${borderHeavyClass} p-12 text-center ${isDark ? 'bg-black' : 'bg-gray-50'}`}>
+          <div className={`text-sm font-black ${textMuted} animate-pulse`}>LOADING FEED...</div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {feedItems.map((item: any, i: number) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`${borderClass} p-5 ${isDark ? 'bg-[#0A0A1A]' : 'bg-white'} ${shadowPrimary} hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all`}
+            >
+              <div className="flex items-start gap-4">
+                <span className="text-2xl">{item.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="font-black text-sm" style={{ color: item.color }}>{item.title}</span>
+                    <span className={`text-[10px] font-bold shrink-0 ${textMuted}`}>{item.time}</span>
+                  </div>
+                  <p className={`text-xs font-bold mt-1 ${textMuted}`}>{item.detail}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.div>
   );
 }
