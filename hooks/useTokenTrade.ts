@@ -128,6 +128,20 @@ export function useTokenTrade() {
           "confirmed"
         );
 
+        // Record trade to DB (fire-and-forget)
+        fetch('/api/record-trade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mint: mintAddress,
+            wallet: anchorWallet.publicKey.toBase58(),
+            type: 'buy',
+            solAmount: solAmount,
+            tokenAmount: tokensOut.toNumber() / 1e6,
+            txSignature: signature,
+          }),
+        }).catch(() => {});
+
         setTxSignature(signature);
         return signature;
       } catch (err: any) {
@@ -233,6 +247,20 @@ export function useTokenTrade() {
           { signature, blockhash, lastValidBlockHeight },
           "confirmed"
         );
+
+        // Record trade to DB (fire-and-forget)
+        fetch('/api/record-trade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mint: mintAddress,
+            wallet: anchorWallet.publicKey.toBase58(),
+            type: 'sell',
+            solAmount: solOut.toNumber() / 1e9,
+            tokenAmount: tokenAmount,
+            txSignature: signature,
+          }),
+        }).catch(() => {});
 
         setTxSignature(signature);
         return signature;
