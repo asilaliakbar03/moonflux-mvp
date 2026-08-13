@@ -31,11 +31,11 @@ export default function TopBar() {
       }}
     >
       {/* ── Logo ── */}
-      <Link href="/" className="flex items-center gap-2 shrink-0 group mr-2 sm:mr-4">
-        <div className="w-9 h-9 flex items-center justify-center overflow-hidden shrink-0">
-          <img src="/logo.jpg" alt="MoonFluxx" className="w-full h-full object-cover" />
+      <Link href="/" className="flex items-center gap-2.5 shrink-0 group mr-2 sm:mr-4">
+        <div className="w-10 h-10 flex items-center justify-center overflow-hidden shrink-0">
+          <img src="/logo.svg" alt="MoonFluxx" className="w-full h-full" />
         </div>
-        <span className="hidden sm:inline font-black text-sm tracking-[0.2em] group-hover:text-[#10B981] transition-colors">
+        <span className={`hidden sm:inline font-black text-sm tracking-[0.2em] transition-colors ${isDark ? 'group-hover:text-[#818CF8]' : 'group-hover:text-[#6366F1]'}`}>
           MOONFLUXX
         </span>
       </Link>
